@@ -1,0 +1,2 @@
+curl -v http://localhost:8080/realms/rt/protocol/openid-connect/certs
+

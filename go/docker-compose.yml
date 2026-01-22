@@ -1,0 +1,49 @@
+services:
+  # ---------------------------
+  # Dev 
+  # --------------------------
+  dev:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    image: konsin1988/rt-go-dev:1.0.0
+    container_name: rt-go-dev 
+    env_file: .env
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./app:/app
+      - /app/tmp
+    environment:
+      - GO_ENABLED=0
+      - GO111MODULE=on
+        #  - DB_USER=${DB_USER}
+        #  - DB_PASSWORD=${DB_PASSWORD}
+        #  - DB_HOST=${DB_HOST}
+        #  - DB_PORT=${DB_PORT}
+        #  - DB_NAME=${DB_NAME}
+    restart: unless-stopped
+    command: air /app
+    networks:
+      - rt-app-net 
+
+  # -------------------------
+  # Prod
+  # --------------------------
+  prod:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: konsin1988/rt-go:1.0.0
+    container_name: rt-go
+    env_file: .env
+    ports:
+      - "8000:8000"
+    restart: unless-stopped
+    networks:
+      - rt-app-net
+
+networks:
+  rt-app-net:
+    name: rt-app-net 
+    external: True

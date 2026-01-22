@@ -1,0 +1,15 @@
+type User {
+  login: String!
+  about: String
+  avatarImageUrl: String
+  displayName: String
+  email: String!
+}
+type UserContact {
+  label: String
+  type: String!
+  value: String!
+}
+type Query {
+  me: User
+}

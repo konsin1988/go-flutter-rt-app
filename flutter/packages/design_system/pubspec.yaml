@@ -1,0 +1,48 @@
+name: design_system
+description: "Design system package."
+publish_to: "none"
+version: 0.0.1
+
+environment:
+  sdk: ^3.6.0
+  flutter: ">=3.27.1"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  flutter_svg: ^2.0.15
+  flutter_svg_provider: ^1.0.7
+  custom_sliding_segmented_control: ^1.8.4
+  vector_math: ^2.1.4
+  syncfusion_flutter_datepicker: ^28.1.35
+  intl: ^0.20.2
+  
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+
+# For information on the generic Dart part of this file, see the
+# following page: https://dart.dev/tools/pub/pubspec
+
+# The following section is specific to Flutter packages.
+flutter:
+  fonts:
+    - family: MuseoSans
+      fonts:
+        - asset: fonts/MuseoSansRegular.ttf
+          weight: 400
+        - asset: fonts/MuseoSansBold.ttf          
+          weight: 700
+    - family: SFProDisplay
+      fonts:
+        - asset: fonts/SF-Compact-Display-Medium.otf
+          weight: 500
+    - family: IBMPlexSans
+      fonts:
+        - asset: fonts/IBMPlexSans-SemiBold.ttf
+          weight: 600
+
+
+    
