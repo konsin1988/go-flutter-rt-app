@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+
+import '../screens/login/login_page.dart';
+import '../auth/auth_state.dart';
+
 import '../screens/home/home_page.dart';
 import '../screens/ai/ai_page.dart';
 import '../screens/services/services_page.dart';
@@ -10,7 +14,20 @@ import '../widgets/bottom_nav_scaffold.dart';
 
 final GoRouter appRouter = GoRouter(
   initialLocation: AppRoutes.init,
+
+  redirect: (context, state) {
+    final isLoggedIn = AuthState.isAuthenticated;
+    final goingToLogin = state.uri.path == AppRoutes.login;
+
+    if (!isLoggedIn && !goingToLogin) return AppRoutes.login;
+    if (isLoggedIn && goingToLogin) return AppRoutes.home;
+    return AppRoutes.home;
+  },
   routes: [
+    GoRoute(
+      path: AppRoutes.login,
+      builder: (context, state) => const LoginPage(),
+    ),
     StatefulShellRoute.indexedStack(
       builder: (context, state, navigationShell) {
         return BottomNavScaffold(navigationShell: navigationShell);

@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:rt_app/utils/constants.dart';
 import 'package:flutter_web_plugins/url_strategy.dart';
-//import 'app/main_screen.dart';
 import 'app/app_router.dart';
+import '../../style/colors.dart';
+import '../../style/fonts.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -20,7 +21,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp.router(
       debugShowCheckedModeBanner: false,
       routerConfig: appRouter,
-      title: 'Flutter GoRouter Example',
+      title: 'РТ-ТЕХПРИЕМКА',
     );
   }
 }

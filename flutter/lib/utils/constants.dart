@@ -9,11 +9,28 @@ class AppIcons {
 }
 
 class AppRoutes {
+  static const String login = '/login';
   static const String init = '/init';
   static const String home = '/';
   static const String ai = '/ai';
   static const String services = '/services';
   static const String profile = '/profile';
+}
+
+class AppBarTitles {
+  AppBarTitles._();
+
+  static const String home = 'Главная';
+  static const String ai = 'Искусственный интеллект';
+  static const String services = 'Сервисы';
+  static const String profile = 'Профиль';
+
+  static const List<String> tabTitles = [
+    home,
+    ai,
+    services,
+    profile,
+  ];
 }
 
 
