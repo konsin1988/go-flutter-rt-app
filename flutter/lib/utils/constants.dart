@@ -33,50 +33,11 @@ class AppBarTitles {
   ];
 }
 
-
-const String baseRESTLink = "http://10.0.2.2:3000";
-const String baseUrl = "http://10.0.2.2:3000";
-
-late final String serverLink;
-late final String baseQraphqlLink;
-late final String baseWSQraphqlLink;
-
-Future<bool> isAndroidEmulator() async {
-  final info = await DeviceInfoPlugin().androidInfo;
-  return !info.isPhysicalDevice;
+class AppLinks {
+  static const String baseURL = 
+    String.fromEnvironment('BASE_URL', defaultValue: "http://10.100.221.18:8000");
+  //static const String serverLink = "10.0.2.2:3000";
+  //static const String baseQraphqlLink = "http://10.0.2.2:3000/graphql";
+  //static const String baseWSQraphqlLink = "ws://10.0.2.2:3000/graphql";  
 }
 
-Future<void> initConstants() async {
-  final isEmulator = await isAndroidEmulator();
-  if (isEmulator) {
-    serverLink = "10.0.2.2:3000";
-    baseQraphqlLink = "http://10.0.2.2:3000/graphql";
-    baseWSQraphqlLink = "ws://10.0.2.2:3000/graphql";  
-  } else {
-    serverLink = "api.stage.hub-rt.codd.io";
-    baseQraphqlLink = "https://api.stage.hub-rt.codd.io/graphql";
-    baseWSQraphqlLink = "wss://api.stage.hub-rt.codd.io/graphql";
-  }
-}
-
-const Duration serverLinkCheckDuration = Duration(seconds: 5);
-
-//Имя устройства, которое следует показывать пользователям.
-//Не длиннее 100 символов. Для мобильных устройств рекомендуется передавать имя устройства, заданное пользователем.
-//Если такого имени нет, его можно собрать из модели устройства, названия и версии ОС и т. д.
-Future<String> get k_deviceName async {
-  DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
-
-  if (Platform.isAndroid) {
-    AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;        
-
-    return "${androidInfo.model} ${androidInfo.host}";
-  } else if (Platform.isIOS) {
-    IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
-    return "${iosInfo.utsname.machine} ${iosInfo.name}";
-  } else {
-    return "Unknow_device_name";
-  }
-}
-
-const int k_aiSessionFavoriteQueriesNumber = 6;

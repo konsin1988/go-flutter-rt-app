@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../screens/login/login_page.dart';
-import '../auth/auth_state.dart';
+import '../auth/auth_provider.dart';
 
 import '../screens/home/home_page.dart';
 import '../screens/ai/ai_page.dart';
@@ -14,16 +14,30 @@ import '../widgets/bottom_nav_scaffold.dart';
 
 final GoRouter appRouter = GoRouter(
   initialLocation: AppRoutes.init,
-
+  refreshListenable: authProvider,
+  
   redirect: (context, state) {
-    final isLoggedIn = AuthState.isAuthenticated;
-    final goingToLogin = state.uri.path == AppRoutes.login;
+    final loggedIn = authProvider.isAuthenticated;
+    final currentPath = state.uri.path; 
 
-    if (!isLoggedIn && !goingToLogin) return AppRoutes.login;
-    if (isLoggedIn && goingToLogin) return AppRoutes.home;
-    return AppRoutes.home;
+    if (currentPath == '/') {
+      return loggedIn ? AppRoutes.home : AppRoutes.login;
+    }
+
+    //if (!loggedIn && currentPath != AppRoutes.login) {
+    //  return AppRoutes.login;
+    //}
+    if (loggedIn && currentPath == AppRoutes.login) {
+      return AppRoutes.home;
+    }
+    return null;
   },
+
   routes: [
+    GoRoute(
+      path: AppRoutes.init,
+      builder: (context, state) => const InitPage(),
+    ),
     GoRoute(
       path: AppRoutes.login,
       builder: (context, state) => const LoginPage(),
