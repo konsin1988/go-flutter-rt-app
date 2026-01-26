@@ -3,7 +3,12 @@ import '../../../style/colors.dart';
 import '../../../style/fonts.dart';
 
 class LoginField extends StatefulWidget {
-  const LoginField({Key? key}) : super(key: key);
+  final TextEditingController controller;
+
+  const LoginField({
+    super.key,
+    required this.controller,
+  });
 
   @override
   _LoginFieldState createState() => _LoginFieldState();
@@ -14,6 +19,7 @@ class _LoginFieldState extends State<LoginField> {
   @override
   Widget build(BuildContext context) {
     return TextField(
+      controller: widget.controller,
       cursorColor: RTColorStyle.light600.value,
       style: RTFontStyle.loginTextField.value,
       decoration: InputDecoration(

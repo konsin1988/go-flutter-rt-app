@@ -7,6 +7,7 @@ import 'package:go_router/go_router.dart';
 import '../../utils/constants.dart';
 import '../../style/colors.dart';
 import '../../style/fonts.dart';
+import '../home/home_page.dart';
 
 class InitPage extends StatefulWidget {
   const InitPage({super.key});
@@ -36,7 +37,7 @@ class _InitPageState extends State<InitPage> with SingleTickerProviderStateMixin
     _controller.addStatusListener((status) {
       if (status == AnimationStatus.completed && mounted) {
 	Future.delayed(const Duration(milliseconds: 200), () {
-        context.go(AppRoutes.home);
+	  context.go(AppRoutes.home);
 	});
       }
     });
@@ -45,6 +46,25 @@ class _InitPageState extends State<InitPage> with SingleTickerProviderStateMixin
       _controller.forward();
     });
   }
+
+  void _goToHomePage() {
+    Navigator.of(context).pushReplacement(
+      PageRouteBuilder(
+        pageBuilder: (context, animation, secondaryAnimation) => HomePage(),
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          final fade = Tween(begin: 0.0, end: 1.0).animate(animation);
+          final slide = Tween(begin: const Offset(0, 0.1), end: Offset.zero)
+              .animate(animation);
+          return FadeTransition(
+            opacity: fade,
+            child: SlideTransition(position: slide, child: child),
+          );
+        },
+        transitionDuration: const Duration(milliseconds: 500),
+      ),
+    );
+  }
+
 
   @override
   void dispose() {

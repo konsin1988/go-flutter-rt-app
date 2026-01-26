@@ -13,3 +13,17 @@ type UserContact {
 type Query {
   me: User
 }
+
+# ghost 
+type Post {
+  id: ID!
+  title: String!
+  html: String!
+  slug: String!
+  feature_image: String!
+}
+
+extend type Query {
+  posts: [Post!]!
+}
+

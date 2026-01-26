@@ -3,7 +3,12 @@ import '../../../style/colors.dart';
 import '../../../style/fonts.dart';
 
 class PasswordField extends StatefulWidget {
-  const PasswordField({Key? key}) : super(key: key);
+  final TextEditingController controller;  
+
+  const PasswordField({
+    super.key,
+    required this.controller,
+  });
 
   @override
   _PasswordFieldState createState() => _PasswordFieldState();
@@ -15,6 +20,7 @@ class _PasswordFieldState extends State<PasswordField> {
   @override
   Widget build(BuildContext context) {
     return TextField(
+      controller: widget.controller,
       obscureText: _obscureText,
       cursorColor: RTColorStyle.light600.value,
       style: RTFontStyle.loginTextField.value,

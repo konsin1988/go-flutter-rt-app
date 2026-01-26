@@ -36,6 +36,7 @@ class AppBarTitles {
 class AppLinks {
   static const String baseURL = 
     String.fromEnvironment('BASE_URL', defaultValue: "http://10.100.221.18:8000");
+  static const String graphqlURL = '$baseURL/graphql';
   //static const String serverLink = "10.0.2.2:3000";
   //static const String baseQraphqlLink = "http://10.0.2.2:3000/graphql";
   //static const String baseWSQraphqlLink = "ws://10.0.2.2:3000/graphql";  

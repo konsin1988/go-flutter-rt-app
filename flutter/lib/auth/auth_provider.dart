@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
 import 'auth_service.dart';
 import 'token_storage.dart';
-import 'package:provider/provider.dart';
+import '../../graphql/graphql_service.dart';
 
 final AuthProvider authProvider = AuthProvider();
 
@@ -33,6 +35,31 @@ class AuthProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<String?> refreshAccessToken() async {
+    final refreshToken = await _tokenStorage.getRefreshToken();
+    if (refreshToken == null) {
+      await logout();
+      return null;
+    }
+  
+    try {
+      final newAccessToken = await _authService.refreshToken(refreshToken);
+  
+      await _tokenStorage.saveTokens(
+        accessToken: newAccessToken,
+        refreshToken: refreshToken,
+      );
+  
+      _isAuthenticated = true;
+      notifyListeners();
+  
+      return newAccessToken;
+    } catch (_) {
+      await logout();
+      return null;
+    }
+  }
+
   Future<void> logout() async {
     final refreshToken = await _tokenStorage.getRefreshToken();
     if (refreshToken != null) {
@@ -40,6 +67,7 @@ class AuthProvider extends ChangeNotifier {
     }
 
     await _tokenStorage.clear();
+    GraphQLService().clearCache();
     _isAuthenticated = false;
     notifyListeners();
   }

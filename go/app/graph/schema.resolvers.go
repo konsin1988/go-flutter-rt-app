@@ -9,6 +9,7 @@ import (
 	"context"
 	"errors"
 	"konsin1988/rt-app/auth/jwt"
+	ghost "konsin1988/rt-app/domain/post"
 	"konsin1988/rt-app/graph/model"
 )
 
@@ -25,9 +26,29 @@ func (r *queryResolver) Me(ctx context.Context) (*model.User, error) {
 	}
 
 	return &model.User{
-		Login:    authUser.Email,
-		Email:	  authUser.Email,
+		Login: authUser.Email,
+		Email: authUser.Email,
 	}, nil
+}
+
+// Posts is the resolver for the posts field.
+func (r *queryResolver) Posts(ctx context.Context) ([]*model.Post, error) {
+	ghostPosts, err := ghost.FetchGhostPosts()
+	if err != nil {
+		return nil, err
+	}
+
+	var posts []*model.Post
+	for _, gp := range ghostPosts {
+		posts = append(posts, &model.Post{
+			ID:	      gp.ID,
+			Title:	      gp.Title,
+			HTML:	      gp.HTML,
+			Slug:	      gp.Slug,
+			FeatureImage: gp.FeatureImage,
+		})
+	}
+	return posts, nil
 }
 
 // Query returns QueryResolver implementation.
