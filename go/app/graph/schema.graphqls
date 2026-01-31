@@ -27,3 +27,31 @@ extend type Query {
   posts: [Post!]!
 }
 
+# texx
+type TexxPost {
+  DocumentId:	ID!	  
+  Title:	String!
+  Link:		String!
+  PublishedAt:	String!
+  PreviewImage: String!
+  PostText:	String!
+}
+
+extend type Query {
+  texxPosts: [TexxPost!]!
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

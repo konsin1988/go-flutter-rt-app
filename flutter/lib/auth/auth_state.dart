@@ -1,4 +1,6 @@
-class AuthState {
-  static bool isAuthenticated = false;
+enum AuthStatus {
+  unknown,
+  unauthenticated,
+  authenticated,
 }
 

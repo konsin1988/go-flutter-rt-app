@@ -1,0 +1,45 @@
+services:
+  postgres:
+    image: pgvector/pgvector:pg16
+    container_name: postgres
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: >
+        pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB} &&
+        psql -U $${POSTGRES_USER} -d $${POSTGRES_DB} -c "SELECT 1;" -q
+      interval: 20s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    environment:
+      POSTGRES_DB: ${POSTGRES_DATABASE}
+      POSTGRES_USER: ${POSTGRES_USERNAME}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - ./volumes/postgres_data:/var/lib/postgresql/data
+    networks:
+      - rt-app-net
+
+  redis:
+    image: redis:latest
+    container_name: redis
+    ports:
+      - '6379:6379'
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./volumes/redis_data:/data
+    networks:
+      - rt-app-net
+
+
+volumes:
+  postgres_data:
+  redis_data:
+
+networks:
+  rt-app-net:
+    name: rt-app-net
+    external: false

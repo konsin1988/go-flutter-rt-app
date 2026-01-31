@@ -26,12 +26,9 @@ class HomePage extends StatelessWidget {
     return ListView.builder(
       itemCount: posts.length,
       itemBuilder: (context, index) {
-        return PostCard(post: posts[posts.length - index - 1]);
+        return PostCard(post: posts[index]);
       },
     );
-    //return Center(
-    //    child: Text('Главная страница', style: TextStyle(fontSize: 24)),
-    //);
   }
 }
 

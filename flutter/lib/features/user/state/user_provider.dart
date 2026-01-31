@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
+
 import '../data/user_repository.dart';
 import '../data/user_models.dart';
 
@@ -8,7 +10,8 @@ class UserProvider extends ChangeNotifier {
   bool loading = false;
 
   UserProvider(this._repo){
-    print("UserProvider created;");
+    loadMe();
+    debugPrint("UserProvider created;");
   }
 
   Future<void> loadMe() async {

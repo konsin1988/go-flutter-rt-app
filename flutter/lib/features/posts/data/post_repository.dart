@@ -13,7 +13,7 @@ class PostRepository {
     final result = await _client.query(
       QueryOptions(
         document: gql(PostQueries.getPostsQuery),
-        fetchPolicy: FetchPolicy.networkOnly, // optional, but recommended
+        fetchPolicy: FetchPolicy.networkOnly, 
       ),
     );
 
@@ -22,11 +22,11 @@ class PostRepository {
     }
 
     final data = result.data;
-    if (data == null || data['posts'] == null) {
+    if (data == null || data['texxPosts'] == null) {
       return [];
     }
 
-    final List postsJson = data['posts'] as List;
+    final List postsJson = data['texxPosts'] as List;
 
     return postsJson
         .map(

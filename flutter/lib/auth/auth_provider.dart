@@ -2,24 +2,25 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'auth_service.dart';
+import 'auth_state.dart';
 import 'token_storage.dart';
 import '../../graphql/graphql_service.dart';
-
-final AuthProvider authProvider = AuthProvider();
 
 class AuthProvider extends ChangeNotifier {
   final _authService = AuthService();
   final _tokenStorage = TokenStorage();
+  AuthStatus status = AuthStatus.unknown;
 
-  bool _isAuthenticated = false;
-  bool get isAuthenticated => _isAuthenticated;
+  Future<void> init() async {
+    await _tokenStorage.init();
 
-  Future<void> checkAuth() async {
-    final token = await _tokenStorage.getAccessToken();
-    _isAuthenticated = token != null;
-    notifyListeners();
+    status = _tokenStorage.accessToken == null
+      ? AuthStatus.unauthenticated
+      : AuthStatus.authenticated;
+
+    notifyListeners(); 
   }
-
+  
   Future<void> login(String email, String password) async {
     final result = await _authService.login(
       email: email,
@@ -31,44 +32,19 @@ class AuthProvider extends ChangeNotifier {
       refreshToken: result['refresh_token'],
     );
 
-    _isAuthenticated = true;
+    status = AuthStatus.authenticated;
     notifyListeners();
   }
 
-  Future<String?> refreshAccessToken() async {
-    final refreshToken = await _tokenStorage.getRefreshToken();
-    if (refreshToken == null) {
-      await logout();
-      return null;
-    }
-  
-    try {
-      final newAccessToken = await _authService.refreshToken(refreshToken);
-  
-      await _tokenStorage.saveTokens(
-        accessToken: newAccessToken,
-        refreshToken: refreshToken,
-      );
-  
-      _isAuthenticated = true;
-      notifyListeners();
-  
-      return newAccessToken;
-    } catch (_) {
-      await logout();
-      return null;
-    }
-  }
-
   Future<void> logout() async {
-    final refreshToken = await _tokenStorage.getRefreshToken();
+    final refreshToken = _tokenStorage.refreshToken;
     if (refreshToken != null) {
       await _authService.logout(refreshToken);
     }
 
     await _tokenStorage.clear();
     GraphQLService().clearCache();
-    _isAuthenticated = false;
+    status = AuthStatus.unauthenticated;
     notifyListeners();
   }
 }

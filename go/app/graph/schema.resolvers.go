@@ -8,9 +8,14 @@ package graph
 import (
 	"context"
 	"errors"
+	"fmt"
+	"strings"
+
 	"konsin1988/rt-app/auth/jwt"
 	ghost "konsin1988/rt-app/domain/post"
+	"konsin1988/rt-app/domain/texx"
 	"konsin1988/rt-app/graph/model"
+	"konsin1988/rt-app/helpers"
 )
 
 // Me is the resolver for the me field.
@@ -41,11 +46,50 @@ func (r *queryResolver) Posts(ctx context.Context) ([]*model.Post, error) {
 	var posts []*model.Post
 	for _, gp := range ghostPosts {
 		posts = append(posts, &model.Post{
-			ID:	      gp.ID,
-			Title:	      gp.Title,
-			HTML:	      gp.HTML,
-			Slug:	      gp.Slug,
+			ID:           gp.ID,
+			Title:        gp.Title,
+			HTML:         gp.HTML,
+			Slug:         gp.Slug,
 			FeatureImage: gp.FeatureImage,
+		})
+	}
+	return posts, nil
+}
+
+// TexxPosts is the resolver for the texxPosts field.
+func (r *queryResolver) TexxPosts(ctx context.Context) ([]*model.TexxPost, error) {
+	texxPosts, err := texx.FetchTexxPosts()
+	if err != nil {
+		return nil, err
+	}
+
+	var posts []*model.TexxPost
+	for _, tex := range texxPosts {
+		var bPostText strings.Builder 
+		for _, ContentPart := range tex.Content {
+		    if (ContentPart.ContentType == "paragraph"){
+		      var bContentPartText strings.Builder 
+		      for _, ChildrenPart := range ContentPart.ContentChildren{
+		        if (ChildrenPart.ChildrenType == "text"){
+			  bContentPartText.WriteString(ChildrenPart.ChildrenText) 
+			} else if (ChildrenPart.ChildrenType == "link") {
+			  bContentPartText.WriteString(ChildrenPart.LinkChildren[0].LinkText)
+			}
+		      }
+		      ContentPartText := bContentPartText.String()
+		      bPostText.WriteString(ContentPartText)
+		      bPostText.WriteString("\n")
+		    }
+		}
+		PostText := bPostText.String()
+		PostText = strings.Join(strings.Split(PostText, "\n")[:3], "\n\n")
+		posts = append(posts, &model.TexxPost{
+			DocumentID:   tex.DocumentId,
+			Title:        tex.Title,
+			Link:         fmt.Sprintf("https://texx.digital/news-and-articles/article/%s", tex.Slug),
+			PublishedAt:  helpers.GetRussianDate(tex.PublishedAt), 
+			PreviewImage: fmt.Sprintf("https://texx.digital%s", tex.PreviewImage.Formats.Small.Url),
+			PostText:     PostText,
 		})
 	}
 	return posts, nil

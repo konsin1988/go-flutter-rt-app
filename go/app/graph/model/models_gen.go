@@ -13,6 +13,15 @@ type Post struct {
 type Query struct {
 }
 
+type TexxPost struct {
+	DocumentID   string `json:"DocumentId"`
+	Title        string `json:"Title"`
+	Link         string `json:"Link"`
+	PublishedAt  string `json:"PublishedAt"`
+	PreviewImage string `json:"PreviewImage"`
+	PostText     string `json:"PostText"`
+}
+
 type User struct {
 	Login          string  `json:"login"`
 	About          *string `json:"about,omitempty"`

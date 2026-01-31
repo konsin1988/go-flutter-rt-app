@@ -1,25 +1,28 @@
 class Post {
-  final String id;
-  final String title;
-  final String html;
-  final String slug;
-  final String featureImage;
+  final String DocumentId;
+  final String Title;
+  final String Link;
+  final String PublishedAt;
+  final String PreviewImage;
+  final String PostText;
 
   Post ({
-    required this.id,
-    required this.title,
-    required this.html,
-    required this.slug,
-    required this.featureImage,
+    required this.DocumentId,
+    required this.Title,
+    required this.Link,	
+    required this.PublishedAt,
+    required this.PreviewImage,
+    required this.PostText,
   });
 
   factory Post.fromJson(Map<String, dynamic> json) {
     return Post(
-      id: json['id'] as String,
-      title: json['title'] as String,
-      html: json['html'] as String,
-      slug: json['slug'] as String,
-      featureImage: json['feature_image'] as String,
+      DocumentId: json['DocumentId'] as String,
+      Title: json['Title'] as String,
+      Link: json['Link'] as String,
+      PublishedAt: json['PublishedAt'] as String,
+      PreviewImage: json['PreviewImage'] as String,
+      PostText: json['PostText'] as String,
     );
   }
 }

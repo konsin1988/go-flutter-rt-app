@@ -16,8 +16,8 @@ class GraphQLService {
 
     final AuthLink authLink = AuthLink(
       getToken: () async {
-	final token = await TokenStorage().getAccessToken();
-	if (token == null) return "";
+	final token = TokenStorage().accessToken;
+	if (token == null) return null; 
 	return 'Bearer $token';
       },
     );

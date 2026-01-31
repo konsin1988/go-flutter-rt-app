@@ -26,7 +26,7 @@ class AuthService {
     }
   }
   
-  Future<String> refreshToken(String refreshToken) async {
+  Future<String> getRefreshToken(String refreshToken) async {
     final response = await http.post(
       Uri.parse('$baseURL/auth/refresh'),
       headers: {'Content-Type': 'application/json'},

@@ -1,8 +1,6 @@
 import './colors.dart';
 import 'package:flutter/material.dart';
 
-// Text style
-// Important specify package name for use font inside package
 
 enum RTFontStyle {
   h1,
@@ -10,8 +8,8 @@ enum RTFontStyle {
   loginLabels,
   loginTextField,
   appTitle,
+  PublishedAt,
 
-  h4,
   h5,
   bodyXL,
   bodyL,
@@ -24,6 +22,7 @@ enum RTFontStyle {
 extension RTFontStyleExtension on RTFontStyle {
   TextStyle get value {
     switch (this) {
+
       case RTFontStyle.h1:
         return const TextStyle(
             fontFamily: "MuseoSans",
@@ -31,6 +30,7 @@ extension RTFontStyleExtension on RTFontStyle {
             height: 36 / 32,
             fontWeight: FontWeight.w700,
             package: "design_system");
+
       case RTFontStyle.h2:
         return TextStyle(
             fontFamily: "MuseoSans",
@@ -39,6 +39,7 @@ extension RTFontStyleExtension on RTFontStyle {
 	    color: RTColorStyle.light1000.value,
             fontWeight: FontWeight.w700,
             package: "design_system");
+
       case RTFontStyle.loginLabels:
         return TextStyle(
             fontFamily: "MuseoSans",
@@ -47,6 +48,7 @@ extension RTFontStyleExtension on RTFontStyle {
             fontWeight: FontWeight.w300,
 	    color: RTColorStyle.light800.value,
             package: "design_system");
+
       case RTFontStyle.appTitle:
         return TextStyle(
             fontFamily: "MuseoSans",
@@ -65,13 +67,17 @@ extension RTFontStyleExtension on RTFontStyle {
             package: "design_system",
 	    color: RTColorStyle.light800.value);
 
-      case RTFontStyle.h4:
-        return const TextStyle(
+      case RTFontStyle.PublishedAt:
+        return TextStyle(
             fontFamily: "MuseoSans",
-            fontSize: 17,
+            fontSize: 13,
             height: 20 / 17,
             fontWeight: FontWeight.w700,
-            package: "design_system");
+            package: "design_system",
+	    color: RTColorStyle.dark600.value);
+
+
+
       case RTFontStyle.h5:
         return const TextStyle(
             fontFamily: "MuseoSans",

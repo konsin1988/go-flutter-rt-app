@@ -1,4 +1,4 @@
 up:
-	docker compose -f ~/RT-App/hub-api/docker/docker-compose.yml up -d && cd ~/keycloak && docker compose up -d
+	docker compose up -d && docker compose -f ~/keycloak/docker-compose.yaml up -d  && docker compose -f go/docker-compose.yml up -d dev
 down: 
-	docker compose -f ~/keycloak/docker-compose.yaml down && docker compose -f ~/RT-App/hub-api/docker/docker-compose.yml down
+	docker compose -f ./go/docker-compose.yml down && docker compose -f ~/keycloak/docker-compose.yaml down && docker compose down

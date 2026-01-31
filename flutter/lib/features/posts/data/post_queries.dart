@@ -1,12 +1,13 @@
 class PostQueries {
   static const String getPostsQuery = r'''
     query GetPosts {
-      posts {
-	id 
-	title 
-	html
-	slug
-	feature_image
+      texxPosts {
+	DocumentId
+   	Title
+   	Link
+   	PublishedAt
+   	PreviewImage
+   	PostText
       }
     }
   ''';

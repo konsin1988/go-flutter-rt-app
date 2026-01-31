@@ -55,8 +55,18 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
-		Me    func(childComplexity int) int
-		Posts func(childComplexity int) int
+		Me        func(childComplexity int) int
+		Posts     func(childComplexity int) int
+		TexxPosts func(childComplexity int) int
+	}
+
+	TexxPost struct {
+		DocumentID   func(childComplexity int) int
+		Link         func(childComplexity int) int
+		PostText     func(childComplexity int) int
+		PreviewImage func(childComplexity int) int
+		PublishedAt  func(childComplexity int) int
+		Title        func(childComplexity int) int
 	}
 
 	User struct {
@@ -77,6 +87,7 @@ type ComplexityRoot struct {
 type QueryResolver interface {
 	Me(ctx context.Context) (*model.User, error)
 	Posts(ctx context.Context) ([]*model.Post, error)
+	TexxPosts(ctx context.Context) ([]*model.TexxPost, error)
 }
 
 type executableSchema struct {
@@ -141,6 +152,49 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.Query.Posts(childComplexity), true
+	case "Query.texxPosts":
+		if e.complexity.Query.TexxPosts == nil {
+			break
+		}
+
+		return e.complexity.Query.TexxPosts(childComplexity), true
+
+	case "TexxPost.DocumentId":
+		if e.complexity.TexxPost.DocumentID == nil {
+			break
+		}
+
+		return e.complexity.TexxPost.DocumentID(childComplexity), true
+	case "TexxPost.Link":
+		if e.complexity.TexxPost.Link == nil {
+			break
+		}
+
+		return e.complexity.TexxPost.Link(childComplexity), true
+	case "TexxPost.PostText":
+		if e.complexity.TexxPost.PostText == nil {
+			break
+		}
+
+		return e.complexity.TexxPost.PostText(childComplexity), true
+	case "TexxPost.PreviewImage":
+		if e.complexity.TexxPost.PreviewImage == nil {
+			break
+		}
+
+		return e.complexity.TexxPost.PreviewImage(childComplexity), true
+	case "TexxPost.PublishedAt":
+		if e.complexity.TexxPost.PublishedAt == nil {
+			break
+		}
+
+		return e.complexity.TexxPost.PublishedAt(childComplexity), true
+	case "TexxPost.Title":
+		if e.complexity.TexxPost.Title == nil {
+			break
+		}
+
+		return e.complexity.TexxPost.Title(childComplexity), true
 
 	case "User.about":
 		if e.complexity.User.About == nil {
@@ -590,6 +644,49 @@ func (ec *executionContext) fieldContext_Query_posts(_ context.Context, field gr
 	return fc, nil
 }
 
+func (ec *executionContext) _Query_texxPosts(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Query_texxPosts,
+		func(ctx context.Context) (any, error) {
+			return ec.resolvers.Query().TexxPosts(ctx)
+		},
+		nil,
+		ec.marshalNTexxPost2ᚕᚖkonsin1988ᚋrtᚑappᚋgraphᚋmodelᚐTexxPostᚄ,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Query_texxPosts(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "DocumentId":
+				return ec.fieldContext_TexxPost_DocumentId(ctx, field)
+			case "Title":
+				return ec.fieldContext_TexxPost_Title(ctx, field)
+			case "Link":
+				return ec.fieldContext_TexxPost_Link(ctx, field)
+			case "PublishedAt":
+				return ec.fieldContext_TexxPost_PublishedAt(ctx, field)
+			case "PreviewImage":
+				return ec.fieldContext_TexxPost_PreviewImage(ctx, field)
+			case "PostText":
+				return ec.fieldContext_TexxPost_PostText(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type TexxPost", field.Name)
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Query___type(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
 		ctx,
@@ -693,6 +790,180 @@ func (ec *executionContext) fieldContext_Query___schema(_ context.Context, field
 				return ec.fieldContext___Schema_directives(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type __Schema", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TexxPost_DocumentId(ctx context.Context, field graphql.CollectedField, obj *model.TexxPost) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_TexxPost_DocumentId,
+		func(ctx context.Context) (any, error) {
+			return obj.DocumentID, nil
+		},
+		nil,
+		ec.marshalNID2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_TexxPost_DocumentId(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TexxPost",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TexxPost_Title(ctx context.Context, field graphql.CollectedField, obj *model.TexxPost) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_TexxPost_Title,
+		func(ctx context.Context) (any, error) {
+			return obj.Title, nil
+		},
+		nil,
+		ec.marshalNString2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_TexxPost_Title(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TexxPost",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TexxPost_Link(ctx context.Context, field graphql.CollectedField, obj *model.TexxPost) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_TexxPost_Link,
+		func(ctx context.Context) (any, error) {
+			return obj.Link, nil
+		},
+		nil,
+		ec.marshalNString2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_TexxPost_Link(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TexxPost",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TexxPost_PublishedAt(ctx context.Context, field graphql.CollectedField, obj *model.TexxPost) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_TexxPost_PublishedAt,
+		func(ctx context.Context) (any, error) {
+			return obj.PublishedAt, nil
+		},
+		nil,
+		ec.marshalNString2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_TexxPost_PublishedAt(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TexxPost",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TexxPost_PreviewImage(ctx context.Context, field graphql.CollectedField, obj *model.TexxPost) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_TexxPost_PreviewImage,
+		func(ctx context.Context) (any, error) {
+			return obj.PreviewImage, nil
+		},
+		nil,
+		ec.marshalNString2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_TexxPost_PreviewImage(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TexxPost",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TexxPost_PostText(ctx context.Context, field graphql.CollectedField, obj *model.TexxPost) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_TexxPost_PostText,
+		func(ctx context.Context) (any, error) {
+			return obj.PostText, nil
+		},
+		nil,
+		ec.marshalNString2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_TexxPost_PostText(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TexxPost",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
 		},
 	}
 	return fc, nil
@@ -2503,6 +2774,28 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "texxPosts":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_texxPosts(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "__type":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Query___type(ctx, field)
@@ -2511,6 +2804,70 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Query___schema(ctx, field)
 			})
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var texxPostImplementors = []string{"TexxPost"}
+
+func (ec *executionContext) _TexxPost(ctx context.Context, sel ast.SelectionSet, obj *model.TexxPost) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, texxPostImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("TexxPost")
+		case "DocumentId":
+			out.Values[i] = ec._TexxPost_DocumentId(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "Title":
+			out.Values[i] = ec._TexxPost_Title(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "Link":
+			out.Values[i] = ec._TexxPost_Link(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "PublishedAt":
+			out.Values[i] = ec._TexxPost_PublishedAt(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "PreviewImage":
+			out.Values[i] = ec._TexxPost_PreviewImage(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "PostText":
+			out.Values[i] = ec._TexxPost_PostText(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -3065,6 +3422,60 @@ func (ec *executionContext) marshalNString2string(ctx context.Context, sel ast.S
 		}
 	}
 	return res
+}
+
+func (ec *executionContext) marshalNTexxPost2ᚕᚖkonsin1988ᚋrtᚑappᚋgraphᚋmodelᚐTexxPostᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.TexxPost) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNTexxPost2ᚖkonsin1988ᚋrtᚑappᚋgraphᚋmodelᚐTexxPost(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) marshalNTexxPost2ᚖkonsin1988ᚋrtᚑappᚋgraphᚋmodelᚐTexxPost(ctx context.Context, sel ast.SelectionSet, v *model.TexxPost) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			graphql.AddErrorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._TexxPost(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalN__Directive2githubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐDirective(ctx context.Context, sel ast.SelectionSet, v introspection.Directive) graphql.Marshaler {
