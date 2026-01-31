@@ -1,17 +1,37 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../auth/auth_provider.dart';
+import '../../utils/constants.dart';
 import '../../features/user/state/user_provider.dart';
 import '../../widgets/app_top_bar.dart';
 import '../../style/colors.dart';
 import '../../style/fonts.dart';
+import 'widgets/TextFields.dart';
+import 'helpers/helpers.dart';
 
 
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
 
+  double screenWidth(BuildContext context) =>
+    MediaQuery.of(context).size.width;
+
   @override
   Widget build(BuildContext context) {
+    Future<void> _onLogoutPressed() async {
+      try {
+        final auth = Provider.of<AuthProvider>(context, listen: false);
+        await auth.logout();
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Logout failed')),
+        );
+      } 
+    }
+
+    final SW = MediaQuery.of(context).size.width;
+    final SH = MediaQuery.of(context).size.height;
     final userProvider = context.watch<UserProvider>();
 
     if (userProvider.loading) {
@@ -21,16 +41,114 @@ class ProfilePage extends StatelessWidget {
     final user = userProvider.user;
 
     if (user == null) {
-      return const Center(child: Text('No user data'));
+      return const CircularProgressIndicator();
     }
+
+    final userName = extractNameFromEmail(user.email);
+
     return Center(
 	child: Column(
 	  children: [
-	    const Spacer(flex: 2),
-	    Text('Профиль', style: TextStyle(fontSize: 24)),
-	    Text('Login: ${user.login}'),
-	    Text('Email: ${user.email}'),
-	    const Spacer(flex: 2),
+	    const Spacer(flex:1),
+	    Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+		const Spacer(flex:1),
+		Container(
+		  width: SW * 0.4,
+		  height: SW * 0.4,
+		  padding: const EdgeInsets.all(4),
+		  decoration: BoxDecoration(
+  		    shape: BoxShape.circle, 
+  		    border: Border.all(
+  		      color: RTColorStyle.beige900.value,
+  		      width: 2,
+  		    ),
+  		  ),
+		  child: CircleAvatar(
+                    backgroundImage: NetworkImage(
+                      '${AppLinks.baseURL}/images/users/${userName}', // mock image
+                    ),
+		  ),
+		),
+		const Spacer(flex:1),
+
+		Column(
+		  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+		    SizedBox(height: SH * 0.02),
+		    Text('Коньшин'),
+		    Row(
+		      children: [
+			SizedBox(width:15),
+		        Text('Дмитрий'),
+		           ],
+		    ),
+		    Row(
+		      children: [
+			SizedBox(width:5),
+			Text('Сергеевич'),
+		      ],
+		    ),
+		    SizedBox(height:20),
+		    Row(
+		      children: [
+		        Icon(Icons.cake, size: 25, color: RTColorStyle.beige600.value),
+		        SizedBox(width:10),
+                    	Text(
+			  '13.02.1988',
+			  style: RTFontStyle.appTitle.value.copyWith(fontSize: SW * 0.05),
+			),
+		      ],
+		    ),
+		  ],
+		),
+		const Spacer(flex:2),
+              ],
+            ),
+
+	    const Spacer(flex: 1),
+            const Divider(),
+	    const Spacer(flex: 1),
+	    
+	    Padding(
+	      padding: EdgeInsets.only(left: 16, bottom: SH * 0.01),
+	      child: Text(
+		"Основная информация",
+		style: RTFontStyle.appTitle.value 
+	      ),
+	    ),
+
+	    /// -------- Section 2 --------
+	    Container(
+	      width: double.infinity,
+	      child: Column(
+	        crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+	          TextFields(field: 'Департамент:', value: 'IT'),
+	          TextFields(field: 'Рабочий телефон:', value: '326'),
+	          TextFields(field: 'Мобильный телефон:', value: '+7(925)418-56-16'),
+	          TextFields(field: 'Электронная почта:', value: '${user.email}'),
+	          TextFields(field: 'Руководитель:', value: 'Кондратенко Денис Анатольевич'),
+                ],
+              ),
+	    ),
+	    const Spacer(flex:4),
+	    SizedBox(
+	      width: double.infinity,
+	      child: ElevatedButton(
+	        onPressed: _onLogoutPressed,
+	        style: ElevatedButton.styleFrom(
+	          backgroundColor: RTColorStyle.dark800.value,
+	          foregroundColor: RTColorStyle.light700.value,
+	          padding: EdgeInsets.symmetric(horizontal: 24, vertical: 10),
+	          shape: RoundedRectangleBorder(
+	            borderRadius: BorderRadius.circular(8),
+	          ),
+	        ),
+	        child: Text('Выйти', style: TextStyle(fontSize: 18)),
+	      ),
+	    ),
 	  ],
 	),
     );

@@ -56,7 +56,10 @@ func main() {
   healthService := health.NewService(healthRepo) 
   healthHandler := transport.NewHealthHandler(healthService)
 
+  //fileServer := http.FileServer(http.Dir("./uploads"))
+
   mux := http.NewServeMux()
+  mux.Handle("/images/", http.StripPrefix("/images/", http.HandlerFunc(transport.ImageHandler)))
   mux.Handle("/health", healthHandler)
   mux.Handle("/playground", playground.Handler("GraphQL", "/graphql"))
   mux.HandleFunc("/auth/login", authHandler.Login)

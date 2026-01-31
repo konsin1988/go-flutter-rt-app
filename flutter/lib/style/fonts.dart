@@ -9,9 +9,9 @@ enum RTFontStyle {
   loginTextField,
   appTitle,
   PublishedAt,
+  ProfileField,
+  ProfileValue,
 
-  h5,
-  bodyXL,
   bodyL,
   bodyM,
   bodyS,
@@ -76,22 +76,25 @@ extension RTFontStyleExtension on RTFontStyle {
             package: "design_system",
 	    color: RTColorStyle.dark600.value);
 
-
-
-      case RTFontStyle.h5:
-        return const TextStyle(
+      case RTFontStyle.ProfileField:
+        return TextStyle(
             fontFamily: "MuseoSans",
-            fontSize: 15,
+            fontSize: 18,
             height: 20 / 15,
             fontWeight: FontWeight.w700,
-            package: "design_system");
-      case RTFontStyle.bodyXL:
+            package: "design_system",
+	    color: RTColorStyle.beige700.value);
+
+      case RTFontStyle.ProfileValue:
         return const TextStyle(
             fontFamily: "MuseoSans",
-            fontSize: 16,
+            fontSize: 18,
             height: 24 / 16,
             fontWeight: FontWeight.w400,
             package: "design_system");
+
+
+
       case RTFontStyle.bodyL:
         return const TextStyle(
             fontFamily: "MuseoSans",
