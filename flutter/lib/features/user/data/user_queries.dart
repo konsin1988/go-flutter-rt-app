@@ -2,11 +2,15 @@ class UserQueries {
   static const String me = r'''
     query Me {
       me {
-        login
         email
-        about
-        avatarImageUrl
-        displayName
+	lastName
+	firstName
+	secondName
+	wphone
+	phone
+	birthday	
+	dept	
+	head	
       }
     }
   ''';

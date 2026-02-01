@@ -67,7 +67,7 @@ class ProfilePage extends StatelessWidget {
   		  ),
 		  child: CircleAvatar(
                     backgroundImage: NetworkImage(
-                      '${AppLinks.baseURL}/images/users/${userName}', // mock image
+                      '${AppLinks.baseURL}/images/users/${userName}', 
                     ),
 		  ),
 		),
@@ -77,17 +77,17 @@ class ProfilePage extends StatelessWidget {
 		  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
 		    SizedBox(height: SH * 0.02),
-		    Text('Коньшин'),
+		    Text('${user.lastName}'),
 		    Row(
 		      children: [
 			SizedBox(width:15),
-		        Text('Дмитрий'),
+		        Text('${user.firstName}'),
 		           ],
 		    ),
 		    Row(
 		      children: [
 			SizedBox(width:5),
-			Text('Сергеевич'),
+			Text('${user.secondName}'),
 		      ],
 		    ),
 		    SizedBox(height:20),
@@ -96,7 +96,7 @@ class ProfilePage extends StatelessWidget {
 		        Icon(Icons.cake, size: 25, color: RTColorStyle.beige600.value),
 		        SizedBox(width:10),
                     	Text(
-			  '13.02.1988',
+			  '${user.birthday}',
 			  style: RTFontStyle.appTitle.value.copyWith(fontSize: SW * 0.05),
 			),
 		      ],
@@ -125,11 +125,11 @@ class ProfilePage extends StatelessWidget {
 	      child: Column(
 	        crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-	          TextFields(field: 'Департамент:', value: 'IT'),
-	          TextFields(field: 'Рабочий телефон:', value: '326'),
-	          TextFields(field: 'Мобильный телефон:', value: '+7(925)418-56-16'),
+	          TextFields(field: 'Департамент:', value: '${user.dept}'),
+	          TextFields(field: 'Рабочий телефон:', value: '${user.wphone}'),
+	          TextFields(field: 'Мобильный телефон:', value: '${user.phone}'),
 	          TextFields(field: 'Электронная почта:', value: '${user.email}'),
-	          TextFields(field: 'Руководитель:', value: 'Кондратенко Денис Анатольевич'),
+	          TextFields(field: 'Руководитель:', value: '${user.head}'),
                 ],
               ),
 	    ),

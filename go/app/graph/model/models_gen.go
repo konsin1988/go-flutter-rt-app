@@ -23,11 +23,15 @@ type TexxPost struct {
 }
 
 type User struct {
-	Login          string  `json:"login"`
-	About          *string `json:"about,omitempty"`
-	AvatarImageURL *string `json:"avatarImageUrl,omitempty"`
-	DisplayName    *string `json:"displayName,omitempty"`
-	Email          string  `json:"email"`
+	Email      string  `json:"email"`
+	FirstName  string  `json:"firstName"`
+	LastName   string  `json:"lastName"`
+	SecondName string  `json:"secondName"`
+	Birthday   *string `json:"birthday,omitempty"`
+	Wphone     *string `json:"wphone,omitempty"`
+	Phone      *string `json:"phone,omitempty"`
+	Dept       *string `json:"dept,omitempty"`
+	Head       *string `json:"head,omitempty"`
 }
 
 type UserContact struct {

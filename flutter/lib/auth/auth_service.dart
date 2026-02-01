@@ -14,7 +14,7 @@ class AuthService {
       Uri.parse('$baseURL/auth/login'),
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode({
-	'email': email,
+	'email': email + '@rt-techpriemka.ru',
 	'password': password,
       }),
     );

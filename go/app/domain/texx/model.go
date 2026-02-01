@@ -5,18 +5,6 @@ import (
   "konsin1988/rt-app/types"
 )
 
-type GhostPost struct {
-    ID		  string  `json:"id"`
-    Title	  string  `json:"title"`
-    HTML	  string  `json:"html"`
-    Slug	  string  `json:"slug"`
-    FeatureImage  string  `json:"feature_image"`
-}
-
-type GhostPostResponse struct {
-    Posts []GhostPost `json:"posts"`
-}
-
 type TexxPost struct {
     DocumentId	  string	    `json:"documentId"`
     Title	  string	    `json:"Title"`

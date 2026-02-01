@@ -4,12 +4,17 @@ import (
   "konsin1988/rt-app/auth/jwt"
   "context"
   "errors"
+  user "konsin1988/rt-app/domain/user"
 )
 
-type Resolver struct{}
+type Resolver struct{
+  UserRepo user.Repository
+}
 
-func NewResolver() *Resolver{
-  return &Resolver{}
+func NewResolver(userRepo user.Repository) *Resolver{
+  return &Resolver{
+    UserRepo: userRepo,
+  }
 }
 
 func userFromContext(ctx context.Context) (*jwt.User, error){

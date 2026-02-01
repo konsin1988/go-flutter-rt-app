@@ -33,7 +33,6 @@ func (r *queryResolver) Me(ctx context.Context) (*model.User, error) {
 	if err != nil {
 		return nil, err
 	}
-	birthday := dbUser.Birthday.Format("02.01.2006")
 	fioList := strings.Fields(dbUser.FIO)
 
 	return &model.User{
@@ -41,11 +40,8 @@ func (r *queryResolver) Me(ctx context.Context) (*model.User, error) {
 		FirstName:  fioList[1],
 		LastName:   fioList[0],
 		SecondName: fioList[2],
-		Wphone:     &dbUser.Wphone,
-		Phone:      &dbUser.Phone,
-		Birthday:   &birthday,
-		Dept:	    &dbUser.Dept,
-		Head:	    &dbUser.Head,
+		Wphone:	    &dbUser.Wphone,
+		Phone:	    &dbUser.Phone,
 	}, nil
 }
 

@@ -1,9 +1,15 @@
+scalar Date
+
 type User {
-  login: String!
-  about: String
-  avatarImageUrl: String
-  displayName: String
   email: String!
+  firstName: String!
+  lastName: String!
+  secondName: String!
+  birthday: String 
+  wphone: String
+  phone: String
+  dept: String 
+  head: String 
 }
 type UserContact {
   label: String

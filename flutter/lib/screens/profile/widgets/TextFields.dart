@@ -32,7 +32,7 @@ class TextFields extends StatelessWidget {
 	),
 	Padding(
 	  padding: EdgeInsets.only(left: SW * 0.3, 
-				  right: SW * 0.01, 
+				  right: SW * 0.05, 
 				  top: SW * 0.005, 
 				  bottom: SW * 0.025),
 	  child: Text(

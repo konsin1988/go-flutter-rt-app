@@ -12,6 +12,7 @@ import (
     keycloak_repo "konsin1988/rt-app/infrastructure/keycloak"
     jwt "konsin1988/rt-app/auth/jwt"
     graph "konsin1988/rt-app/graph"
+    repos "konsin1988/rt-app/infrastructure/db"
     
     "github.com/99designs/gqlgen/graphql/handler"
     "github.com/99designs/gqlgen/graphql/playground"
@@ -25,6 +26,9 @@ func main() {
   }
   defer db.Close()
 
+  userRepo := repos.NewPostgresRepo(db)
+
+
   kc := config.LoadKeycloakConfig()
   jwks, err := jwt.LoadJWKS(kc.JWKSURL)
   if err != nil {
@@ -35,7 +39,7 @@ func main() {
   jwtService := jwt.NewService(validator)
   jwtMiddleware := jwt.Middleware(jwtService)
 
-  resolver := graph.NewResolver()
+  resolver := graph.NewResolver(userRepo)
   schema := graph.NewExecutableSchema(graph.Config{Resolvers: resolver})
   graphqlHandler := handler.NewDefaultServer(schema)
 

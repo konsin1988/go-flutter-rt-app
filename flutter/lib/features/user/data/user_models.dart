@@ -1,25 +1,37 @@
 class User {
-  final String login;
   final String email;
-  final String? about;
-  final String? avatarImageUrl;
-  final String? displayName;
+  final String lastName;
+  final String firstName;
+  final String secondName;
+  final String? wphone;
+  final String? phone;
+  final String? birthday;
+  final String? dept;
+  final String? head;
 
   User({
-    required this.login,
     required this.email,
-    this.about,
-    this.avatarImageUrl,
-    this.displayName,
+    required this.lastName,
+    required this.firstName,
+    required this.secondName,
+    this.wphone,
+    this.phone,
+    this.birthday,
+    this.dept,
+    this.head,
   });
 
   factory User.fromJson(Map<String, dynamic> json) {
     return User(
-      login: json['login'] as String,
       email: json['email'] as String,
-      about: json['about'] as String?,
-      avatarImageUrl: json['avatarImageUrl'] as String?,
-      displayName: json['displayName'] as String?,
+      lastName: json['lastName'] as String,
+      firstName: json['firstName'] as String,
+      secondName: json['secondName'] as String,
+      wphone: json['wphone'] as String?,
+      phone: json['phone'] as String?,
+      birthday: json['birthday'] as String?,
+      dept: json['dept'] as String?,
+      head: json['head'] as String?,
     );
   }
 }
