@@ -11,6 +11,7 @@ class UserQueries {
 	birthday	
 	dept	
 	head	
+	imageURL
       }
     }
   ''';

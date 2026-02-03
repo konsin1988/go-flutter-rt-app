@@ -3,6 +3,7 @@ package main
 import (
     "net/http"
     "log"
+    "os"
 
     "konsin1988/rt-app/config"
     infraDB "konsin1988/rt-app/infrastructure/db"
@@ -13,6 +14,8 @@ import (
     jwt "konsin1988/rt-app/auth/jwt"
     graph "konsin1988/rt-app/graph"
     repos "konsin1988/rt-app/infrastructure/db"
+    bitrix "konsin1988/rt-app/bitrix"
+    user "konsin1988/rt-app/domain/user"
     
     "github.com/99designs/gqlgen/graphql/handler"
     "github.com/99designs/gqlgen/graphql/playground"
@@ -26,8 +29,12 @@ func main() {
   }
   defer db.Close()
 
-  userRepo := repos.NewPostgresRepo(db)
+  bitrixURL := os.Getenv("BITRIX24_URL")
 
+  userRepo := repos.NewPostgresRepo(db)
+  bitrixClient := bitrix.New(bitrixURL)
+  userService := user.NewService(userRepo, bitrixClient) 
+  
 
   kc := config.LoadKeycloakConfig()
   jwks, err := jwt.LoadJWKS(kc.JWKSURL)
@@ -39,7 +46,7 @@ func main() {
   jwtService := jwt.NewService(validator)
   jwtMiddleware := jwt.Middleware(jwtService)
 
-  resolver := graph.NewResolver(userRepo)
+  resolver := graph.NewResolver(userService)
   schema := graph.NewExecutableSchema(graph.Config{Resolvers: resolver})
   graphqlHandler := handler.NewDefaultServer(schema)
 
@@ -60,10 +67,7 @@ func main() {
   healthService := health.NewService(healthRepo) 
   healthHandler := transport.NewHealthHandler(healthService)
 
-  //fileServer := http.FileServer(http.Dir("./uploads"))
-
   mux := http.NewServeMux()
-  mux.Handle("/images/", http.StripPrefix("/images/", http.HandlerFunc(transport.ImageHandler)))
   mux.Handle("/health", healthHandler)
   mux.Handle("/playground", playground.Handler("GraphQL", "/graphql"))
   mux.HandleFunc("/auth/login", authHandler.Login)

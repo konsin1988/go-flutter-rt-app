@@ -14,9 +14,6 @@ import 'helpers/helpers.dart';
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
 
-  double screenWidth(BuildContext context) =>
-    MediaQuery.of(context).size.width;
-
   @override
   Widget build(BuildContext context) {
     Future<void> _onLogoutPressed() async {
@@ -67,7 +64,7 @@ class ProfilePage extends StatelessWidget {
   		  ),
 		  child: CircleAvatar(
                     backgroundImage: NetworkImage(
-                      '${AppLinks.baseURL}/images/users/${userName}', 
+		      '${user.imageURL}',
                     ),
 		  ),
 		),

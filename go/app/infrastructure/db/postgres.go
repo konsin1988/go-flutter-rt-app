@@ -26,10 +26,10 @@ func (r *PostgresRepo) FindByEmail(ctx context.Context, email string) (*user.Use
     left join user_data ud2 on ud.head_id = ud2.id
     where ud.email = $1`
   u := &user.User{}
-  err := r.db.QueryRowContext(context.Background(), query, email).
+  err := r.db.QueryRowContext(ctx, query, email).
 	      Scan(&u.ID, &u.Email, &u.FIO, &u.Birthday, 
 		&u.Wphone, &u.Phone, &u.Dept, &u.Head)
-  if err == sql.ErrNoRows {
+  if errors.Is(err, sql.ErrNoRows) {
     return nil, errors.New("user not found")
   }
   if err != nil {

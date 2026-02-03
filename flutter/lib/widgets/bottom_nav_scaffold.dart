@@ -21,15 +21,28 @@ class BottomNavScaffold extends StatelessWidget {
     );
   }
 
+  String appBarTitle(BuildContext context) {
+    final location = GoRouterState.of(context).uri.toString();
+
+    final routeTitle = AppBarTitles.routeTitles[location];
+    if (routeTitle != null) {
+      return routeTitle;
+    }
+    
+    return AppBarTitles.tabTitles[navigationShell.currentIndex];
+  }
+
   @override
   Widget build(BuildContext context) {
+    
     return Scaffold(
       body: DefaultTextStyle(
-        style: RTFontStyle.h2.value, // all child Text widgets inherit this
+        style: RTFontStyle.h2.value, 
         child: navigationShell,
       ),
       appBar: AppTopBar(
-        title: AppBarTitles.tabTitles[navigationShell.currentIndex],
+	title: appBarTitle(context),
+        //title: AppBarTitles.tabTitles[navigationShell.currentIndex],
       ),
       backgroundColor: RTColorStyle.dark900.value,
       bottomNavigationBar: BottomNavigationBar(

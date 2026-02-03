@@ -2,14 +2,6 @@
 
 package model
 
-type Post struct {
-	ID           string `json:"id"`
-	Title        string `json:"title"`
-	HTML         string `json:"html"`
-	Slug         string `json:"slug"`
-	FeatureImage string `json:"feature_image"`
-}
-
 type Query struct {
 }
 
@@ -32,6 +24,7 @@ type User struct {
 	Phone      *string `json:"phone,omitempty"`
 	Dept       *string `json:"dept,omitempty"`
 	Head       *string `json:"head,omitempty"`
+	ImageURL   *string `json:"imageURL,omitempty"`
 }
 
 type UserContact struct {

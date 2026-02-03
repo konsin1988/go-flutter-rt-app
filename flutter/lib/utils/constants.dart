@@ -2,35 +2,60 @@ import 'dart:io';
 import 'package:device_info_plus/device_info_plus.dart';
 
 class AppIcons {
+  AppIcons._();
   static const String home = 'assets/images/bottom_navbar/home.svg';
   static const String ai = 'assets/images/bottom_navbar/ai.svg';
   static const String services = 'assets/images/bottom_navbar/services.svg';
   static const String profile = 'assets/images/bottom_navbar/profile.svg';
+  static const List<String> appIcons = [
+    home, ai, services, profile,
+  ];
+}
+
+class AppImageIcons {
+  AppImageIcons._();
+  static const String assistant = 'assets/images/app/assistant.jpg';
+  static const List<String> appImageTitles = [
+    assistant,
+  ];
 }
 
 class AppRoutes {
+  AppRoutes._();
   static const String login = '/login';
   static const String init = '/init';
   static const String home = '/';
   static const String ai = '/ai';
   static const String services = '/services';
   static const String profile = '/profile';
+  static const String assistant = '/assistant';
+  static const List<String> appRoutes = [
+    login,
+    init,
+    home,
+    ai,
+    services,
+    profile,
+    assistant,
+  ];
 }
 
 class AppBarTitles {
   AppBarTitles._();
-
   static const String home = 'Главная';
   static const String ai = 'Искусственный интеллект';
   static const String services = 'Сервисы';
   static const String profile = 'Профиль';
-
   static const List<String> tabTitles = [
     home,
     ai,
     services,
     profile,
   ];
+
+  static const routeTitles = {
+    '/assistant': 'Ваш ассистент',
+  };
 }
 
 class AppLinks {

@@ -12,6 +12,7 @@ import '../screens/ai/ai_page.dart';
 import '../screens/services/services_page.dart';
 import '../screens/profile/profile_page.dart';
 import '../screens/init/init_page.dart';
+import '../screens/assistant/assistant_page.dart';
 import '../utils/constants.dart';
 import '../widgets/bottom_nav_scaffold.dart';
 
@@ -29,10 +30,6 @@ GoRouter createAppRouter(BuildContext context) {
       if (status == AuthStatus.unauthenticated){
 	return AppRoutes.login;
       }
-  
-      //if (currentPath == '/') {
-      //  return loggedIn ? AppRoutes.home : AppRoutes.login;
-      //}
   
       if (status == AuthStatus.unknown) {
         return null;
@@ -107,6 +104,21 @@ GoRouter createAppRouter(BuildContext context) {
   		  child: const ProfilePage(),
   		);
   	      }
+  	    ),
+  	  ],
+  	),
+  	StatefulShellBranch(
+  	  routes: [
+  	    GoRoute(
+  	      path: AppRoutes.assistant,
+	      pageBuilder: (context, state) {
+	        return NoTransitionPage(
+      	          child: MultiProvider(
+      	            providers: protectedProviders(context),
+      	            child: const AssistantPage(),
+      	          ),
+      	        );
+      	      },
   	    ),
   	  ],
   	),

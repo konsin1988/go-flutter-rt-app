@@ -10,7 +10,6 @@ import (
 	"errors"
 	"fmt"
 	"konsin1988/rt-app/auth/jwt"
-	ghost "konsin1988/rt-app/domain/post"
 	"konsin1988/rt-app/domain/texx"
 	"konsin1988/rt-app/graph/model"
 	"konsin1988/rt-app/helpers"
@@ -29,7 +28,8 @@ func (r *queryResolver) Me(ctx context.Context) (*model.User, error) {
 		return nil, errors.New("Invalid user in context")
 	}
 
-	dbUser, err := r.UserRepo.FindByEmail(ctx, authUser.Email)
+	//dbUser, err := r.UserRepo.FindByEmail(ctx, authUser.Email)
+	dbUser, photoURL, err := r.UserService.GetUserWithPhoto(ctx, authUser.Email)
 	if err != nil {
 		return nil, err
 	}
@@ -44,29 +44,10 @@ func (r *queryResolver) Me(ctx context.Context) (*model.User, error) {
 		Wphone:     &dbUser.Wphone,
 		Phone:      &dbUser.Phone,
 		Birthday:   &birthday,
-		Dept:	    &dbUser.Dept,
-		Head:	    &dbUser.Head,
+		Dept:       &dbUser.Dept,
+		Head:       &dbUser.Head,
+		ImageURL:   &photoURL,
 	}, nil
-}
-
-// Posts is the resolver for the posts field.
-func (r *queryResolver) Posts(ctx context.Context) ([]*model.Post, error) {
-	ghostPosts, err := ghost.FetchGhostPosts()
-	if err != nil {
-		return nil, err
-	}
-
-	var posts []*model.Post
-	for _, gp := range ghostPosts {
-		posts = append(posts, &model.Post{
-			ID:           gp.ID,
-			Title:        gp.Title,
-			HTML:         gp.HTML,
-			Slug:         gp.Slug,
-			FeatureImage: gp.FeatureImage,
-		})
-	}
-	return posts, nil
 }
 
 // TexxPosts is the resolver for the texxPosts field.
@@ -112,3 +93,4 @@ func (r *queryResolver) TexxPosts(ctx context.Context) ([]*model.TexxPost, error
 func (r *Resolver) Query() QueryResolver { return &queryResolver{r} }
 
 type queryResolver struct{ *Resolver }
+

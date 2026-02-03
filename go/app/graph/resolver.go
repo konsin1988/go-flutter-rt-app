@@ -8,12 +8,12 @@ import (
 )
 
 type Resolver struct{
-  UserRepo user.Repository
+  UserService *user.Service
 }
 
-func NewResolver(userRepo user.Repository) *Resolver{
+func NewResolver(userService *user.Service) *Resolver{
   return &Resolver{
-    UserRepo: userRepo,
+    UserService: userService,
   }
 }
 

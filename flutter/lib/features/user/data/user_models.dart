@@ -8,6 +8,7 @@ class User {
   final String? birthday;
   final String? dept;
   final String? head;
+  final String? imageURL;
 
   User({
     required this.email,
@@ -19,6 +20,7 @@ class User {
     this.birthday,
     this.dept,
     this.head,
+    this.imageURL,
   });
 
   factory User.fromJson(Map<String, dynamic> json) {
@@ -32,6 +34,7 @@ class User {
       birthday: json['birthday'] as String?,
       dept: json['dept'] as String?,
       head: json['head'] as String?,
+      imageURL: json['imageURL'] as String?,
     );
   }
 }
