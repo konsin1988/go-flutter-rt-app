@@ -2,6 +2,33 @@
 
 package model
 
+import (
+	"bytes"
+	"fmt"
+	"io"
+	"strconv"
+)
+
+type Conversation struct {
+	ID        string     `json:"id"`
+	Title     *string    `json:"title,omitempty"`
+	Messages  []*Message `json:"messages"`
+	CreatedAt string     `json:"createdAt"`
+	UpdatedAt string     `json:"updatedAt"`
+}
+
+type ConversationListItem struct {
+	ID    string  `json:"id"`
+	Title *string `json:"title,omitempty"`
+}
+
+type Message struct {
+	ID        string      `json:"id"`
+	Role      MessageRole `json:"role"`
+	Content   string      `json:"content"`
+	CreatedAt string      `json:"createdAt"`
+}
+
 type Query struct {
 }
 
@@ -31,4 +58,61 @@ type UserContact struct {
 	Label *string `json:"label,omitempty"`
 	Type  string  `json:"type"`
 	Value string  `json:"value"`
+}
+
+type MessageRole string
+
+const (
+	MessageRoleUser      MessageRole = "USER"
+	MessageRoleAssistant MessageRole = "ASSISTANT"
+	MessageRoleSystem    MessageRole = "SYSTEM"
+)
+
+var AllMessageRole = []MessageRole{
+	MessageRoleUser,
+	MessageRoleAssistant,
+	MessageRoleSystem,
+}
+
+func (e MessageRole) IsValid() bool {
+	switch e {
+	case MessageRoleUser, MessageRoleAssistant, MessageRoleSystem:
+		return true
+	}
+	return false
+}
+
+func (e MessageRole) String() string {
+	return string(e)
+}
+
+func (e *MessageRole) UnmarshalGQL(v any) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = MessageRole(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid MessageRole", str)
+	}
+	return nil
+}
+
+func (e MessageRole) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+func (e *MessageRole) UnmarshalJSON(b []byte) error {
+	s, err := strconv.Unquote(string(b))
+	if err != nil {
+		return err
+	}
+	return e.UnmarshalGQL(s)
+}
+
+func (e MessageRole) MarshalJSON() ([]byte, error) {
+	var buf bytes.Buffer
+	e.MarshalGQL(&buf)
+	return buf.Bytes(), nil
 }

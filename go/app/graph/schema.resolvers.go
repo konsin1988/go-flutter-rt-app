@@ -18,7 +18,7 @@ import (
 
 // Me is the resolver for the me field.
 func (r *queryResolver) Me(ctx context.Context) (*model.User, error) {
-	user := ctx.Value(jwt.UserContextKey)
+	user := ctx.Value(jwt.AuthUserContextKey)
 	if user == nil {
 		return nil, errors.New("Unauthorized from resolver")
 	}
@@ -28,7 +28,6 @@ func (r *queryResolver) Me(ctx context.Context) (*model.User, error) {
 		return nil, errors.New("Invalid user in context")
 	}
 
-	//dbUser, err := r.UserRepo.FindByEmail(ctx, authUser.Email)
 	dbUser, photoURL, err := r.UserService.GetUserWithPhoto(ctx, authUser.Email)
 	if err != nil {
 		return nil, err
@@ -89,8 +88,37 @@ func (r *queryResolver) TexxPosts(ctx context.Context) ([]*model.TexxPost, error
 	return posts, nil
 }
 
+// ConversationList is the resolver for the ConversationList field.
+func (r *queryResolver) ConversationList(ctx context.Context) ([]*model.ConversationListItem, error) {
+	panic(fmt.Errorf("not implemented: ConversationByID - ConversationById"))
+}
+
+// ConversationByID is the resolver for the ConversationById field.
+func (r *queryResolver) ConversationByID(ctx context.Context) (*model.Conversation, error) {
+	panic(fmt.Errorf("not implemented: ConversationByID - ConversationById"))
+}
+
 // Query returns QueryResolver implementation.
 func (r *Resolver) Query() QueryResolver { return &queryResolver{r} }
 
 type queryResolver struct{ *Resolver }
 
+// !!! WARNING !!!
+// The code below was going to be deleted when updating resolvers. It has been copied here so you have
+// one last chance to move it out of harms way if you want. There are two reasons this happens:
+//  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
+//    it when you're done.
+//  - You have helper methods in this file. Move them out to keep these resolver files clean.
+/*
+	func (r *queryResolver) MyConversations(ctx context.Context) ([]*modestringl.Conversation, error) {
+  c, err := r.ChatService.GetConversationsByUser(ctx, id)
+  if err != nil {
+    return nil, err
+  }
+  return &
+
+}
+
+// Query returns QueryResolver implementation.
+func (r *Resolver) Query() QueryResolver { return &queryResolver{r} }
+*/

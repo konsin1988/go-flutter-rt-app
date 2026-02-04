@@ -35,6 +35,62 @@ extend type Query {
   texxPosts: [TexxPost!]!
 }
 
+# ai
+type Conversation {
+  id: ID!
+  title: String
+  messages(limit: Int, offset: Int): [Message!]!
+  createdAt: Date!
+  updatedAt: Date!
+} 
+
+type ConversationListItem {
+  id: ID!
+  title: String
+}
+
+type Message {
+  id: ID!
+  role: MessageRole!
+  content: String!
+  createdAt: Date!
+}
+
+enum MessageRole {
+  USER
+  ASSISTANT
+  SYSTEM
+}
+
+extend type Query {
+  ConversationList: [ConversationListItem!]!
+}
+
+extend type Query {
+  ConversationById: Conversation!
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

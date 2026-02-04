@@ -1,10 +1,12 @@
+import 'package:go_router/go_router.dart';
 import 'package:flutter/material.dart';
 import '../../style/colors.dart';
 import '../../style/fonts.dart';
+import '../utils/constants.dart';
 
 class AppTopBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
-  final ImageProvider? leadingImage;
+  final String? leadingImage;
 
   const AppTopBar({
     super.key,
@@ -14,6 +16,9 @@ class AppTopBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
+    final SW = MediaQuery.of(context).size.width;
+    final SH = MediaQuery.of(context).size.height;
+
     return AppBar(
       centerTitle: true,
       backgroundColor: RTColorStyle.dark1000.value,
@@ -22,13 +27,30 @@ class AppTopBar extends StatelessWidget implements PreferredSizeWidget {
 	style: RTFontStyle.appTitle.value 
       ),
       leading: leadingImage != null
-	? Padding(
-	    padding: const EdgeInsets.only(left: 12),
-	    child: CircleAvatar(
-	      backgroundImage: leadingImage,
-	      radius: 18,
+	? InkWell(
+	    onTap: () {
+	      context.go(AppRoutes.profile);
+	    },
+	    child: Center( 
+	      child: Container(
+	          width: SW * 0.08,
+	          height: SW * 0.08,
+	          padding: const EdgeInsets.all(1),
+	          decoration: BoxDecoration(
+  	            shape: BoxShape.circle, 
+  	            border: Border.all(
+  	              color: RTColorStyle.beige900.value,
+  	              width: 0.5,
+  	            ),
+  	          ),
+	          child: CircleAvatar(
+	    	backgroundImage: NetworkImage(
+	    	  leadingImage!,
+		  ),
+	        ),
+	      ),
 	    ),
-	)
+	  )
 	: null,
     );
   }

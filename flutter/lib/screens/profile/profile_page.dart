@@ -34,7 +34,6 @@ class ProfilePage extends StatelessWidget {
     if (userProvider.loading) {
       return const Center(child: CircularProgressIndicator());
     }
-
     final user = userProvider.user;
 
     if (user == null) {

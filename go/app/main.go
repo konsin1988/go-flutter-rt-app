@@ -16,6 +16,7 @@ import (
     repos "konsin1988/rt-app/infrastructure/db"
     bitrix "konsin1988/rt-app/bitrix"
     user "konsin1988/rt-app/domain/user"
+    ai_chat "konsin1988/rt-app/domain/ai_chat"
     
     "github.com/99designs/gqlgen/graphql/handler"
     "github.com/99designs/gqlgen/graphql/playground"
@@ -34,6 +35,7 @@ func main() {
   userRepo := repos.NewPostgresRepo(db)
   bitrixClient := bitrix.New(bitrixURL)
   userService := user.NewService(userRepo, bitrixClient) 
+  chatService := ai_chat.NewService(userRepo)
   
 
   kc := config.LoadKeycloakConfig()
@@ -44,9 +46,9 @@ func main() {
 
   validator := jwt.NewValidator(jwks, kc.Issuer, kc.ClientID)
   jwtService := jwt.NewService(validator)
-  jwtMiddleware := jwt.Middleware(jwtService)
+  jwtMiddleware := jwt.Middleware(jwtService, userService)
 
-  resolver := graph.NewResolver(userService)
+  resolver := graph.NewResolver(userService, chatService)
   schema := graph.NewExecutableSchema(graph.Config{Resolvers: resolver})
   graphqlHandler := handler.NewDefaultServer(schema)
 

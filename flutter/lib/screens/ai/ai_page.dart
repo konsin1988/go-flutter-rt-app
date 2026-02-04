@@ -14,16 +14,6 @@ class AIPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Future<void> _onAssistantPressed() async {
-      try {
-        final auth = Provider.of<AuthProvider>(context, listen: false);
-        await auth.logout();
-      } catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Logout failed')),
-        );
-      } 
-    }
 
     final SW = MediaQuery.of(context).size.width;
     final SH = MediaQuery.of(context).size.height;
@@ -34,7 +24,7 @@ class AIPage extends StatelessWidget {
       child: Column(
       	  children: [ 
 	    ElevatedButton(
-	      onPressed: () {context.push(AppRoutes.assistant);},
+	      onPressed: () {context.go(AppRoutes.assistant);},
 	      style: ElevatedButton.styleFrom(
 	        backgroundColor: RTColorStyle.dark800.value,
 	        foregroundColor: RTColorStyle.light700.value,

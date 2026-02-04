@@ -6,6 +6,7 @@ import (
   "errors"
 
   user "konsin1988/rt-app/domain/user"
+  ai_chat "konsin1988/rt-app/domain/ai_chat"
 )
 
 type PostgresRepo struct {
@@ -37,3 +38,70 @@ func (r *PostgresRepo) FindByEmail(ctx context.Context, email string) (*user.Use
   }
   return u, nil
 }
+
+
+func (r *PostgresRepo) GetConversationsList (ctx context.Context, id int) ([]ai_chat.ConversationListItem, error) {
+  const query = `
+    select * 
+    from conversation
+    where user_id = $1
+    order by updated_at desc
+  ` 
+
+  rows, err := r.db.QueryContext(ctx, query, id)
+  if err != nil {
+    return nil, err
+  }
+  defer rows.Close()
+
+  conversations := make([]ai_chat.ConversationListItem, 0)
+
+  for rows.Next() {
+    var c ai_chat.ConversationListItem
+
+    if err := rows.Scan(
+      &c.ID,
+      &c.UserID,
+      &c.Title,
+      &c.CreatedAt,
+      &c.UpdatedAt,
+    ); err != nil {
+      return nil, err
+    }
+
+    conversations = append(conversations, c)
+  }
+  if err := rows.Err(); err != nil {
+    return nil, err
+  }
+  return conversations, nil
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
