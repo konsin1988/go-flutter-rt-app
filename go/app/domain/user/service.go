@@ -5,31 +5,24 @@ import (
 )
 
 type Bitrix interface {
-  UserPhotoURL(ctx context.Context, email string) (string, error)
+  GetBitrixUser(ctx context.Context, email string) (*MainUser, error)
 }
 
 type Service struct {
-  repo	    Repository
   bitrix    Bitrix
 }
 
-func NewService (repo Repository, bitrix Bitrix) *Service {
+func NewService (bitrix Bitrix) *Service {
   return &Service{
-    repo: repo,
     bitrix: bitrix,
   }
 }
 
-func (s *Service) GetUserWithPhoto (ctx context.Context , email string) (*User, string, error) {
-    u, err := s.repo.FindByEmail(ctx, email)
-    if err != nil{
-      return nil, "", err
-    }
-
-    photoURL, err := s.bitrix.UserPhotoURL(ctx, email)
+func (s *Service) GetUser(ctx context.Context , email string) (*MainUser, error) {
+    mainUser, err := s.bitrix.GetBitrixUser(ctx, email)
     if err != nil {
-      return nil, "", err
+      return nil, err
     }
 
-    return u, photoURL, nil
+    return mainUser, nil
 }

@@ -34,7 +34,7 @@ func main() {
 
   userRepo := repos.NewPostgresRepo(db)
   bitrixClient := bitrix.New(bitrixURL)
-  userService := user.NewService(userRepo, bitrixClient) 
+  userService := user.NewService(bitrixClient) 
   chatService := ai_chat.NewService(userRepo)
   
 

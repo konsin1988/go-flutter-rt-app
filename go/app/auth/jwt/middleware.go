@@ -16,7 +16,7 @@ type ContextKey string
 
 const (
   AuthUserContextKey ContextKey = "auth_user"
-  DomainUserContextKey ContextKey = "domain_user"
+  BitrixUserContextKey ContextKey = "domain_user"
 )
 
 func Middleware(authService *Service, userService *user.Service) func(http.Handler) http.Handler {
@@ -48,7 +48,7 @@ func Middleware(authService *Service, userService *user.Service) func(http.Handl
 	return 
       }
 
-      domainUser, _, err :=  userService.GetUserWithPhoto(r.Context(), user.Email)
+      bitrixUser, err :=  userService.GetUser(r.Context(), user.Email)
       if err != nil {
 	unauthorized(w)
 	return
@@ -56,7 +56,7 @@ func Middleware(authService *Service, userService *user.Service) func(http.Handl
 
       ctx := r.Context()
       ctx = context.WithValue(ctx, AuthUserContextKey, user)
-      ctx = context.WithValue(ctx, DomainUserContextKey, domainUser)
+      ctx = context.WithValue(ctx, BitrixUserContextKey, bitrixUser)
       next.ServeHTTP(w, r.WithContext(ctx))
     })
   }

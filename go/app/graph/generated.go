@@ -91,6 +91,7 @@ type ComplexityRoot struct {
 		ImageURL   func(childComplexity int) int
 		LastName   func(childComplexity int) int
 		Phone      func(childComplexity int) int
+		Position   func(childComplexity int) int
 		SecondName func(childComplexity int) int
 		Wphone     func(childComplexity int) int
 	}
@@ -312,6 +313,12 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.User.Phone(childComplexity), true
+	case "User.position":
+		if e.complexity.User.Position == nil {
+			break
+		}
+
+		return e.complexity.User.Position(childComplexity), true
 	case "User.secondName":
 		if e.complexity.User.SecondName == nil {
 			break
@@ -909,6 +916,8 @@ func (ec *executionContext) fieldContext_Query_me(_ context.Context, field graph
 				return ec.fieldContext_User_wphone(ctx, field)
 			case "phone":
 				return ec.fieldContext_User_phone(ctx, field)
+			case "position":
+				return ec.fieldContext_User_position(ctx, field)
 			case "dept":
 				return ec.fieldContext_User_dept(ctx, field)
 			case "head":
@@ -1514,6 +1523,35 @@ func (ec *executionContext) _User_phone(ctx context.Context, field graphql.Colle
 }
 
 func (ec *executionContext) fieldContext_User_phone(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "User",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _User_position(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_User_position,
+		func(ctx context.Context) (any, error) {
+			return obj.Position, nil
+		},
+		nil,
+		ec.marshalOString2ᚖstring,
+		true,
+		false,
+	)
+}
+
+func (ec *executionContext) fieldContext_User_position(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "User",
 		Field:      field,
@@ -3541,6 +3579,8 @@ func (ec *executionContext) _User(ctx context.Context, sel ast.SelectionSet, obj
 			out.Values[i] = ec._User_wphone(ctx, field, obj)
 		case "phone":
 			out.Values[i] = ec._User_phone(ctx, field, obj)
+		case "position":
+			out.Values[i] = ec._User_position(ctx, field, obj)
 		case "dept":
 			out.Values[i] = ec._User_dept(ctx, field, obj)
 		case "head":

@@ -6,7 +6,7 @@ import (
   "konsin1988/rt-app/types"
 )
 
-func GetRussianDate(date types.DateOnly) string {
+func GetMonth (num time.Month) string {
   months := map[time.Month]string{
     time.January:   "января",
     time.February:  "февраля",
@@ -21,5 +21,13 @@ func GetRussianDate(date types.DateOnly) string {
     time.November:  "ноября",
     time.December:  "декабря",
   }
-  return fmt.Sprintf("%d %s %d", date.Day(), months[date.Month()], date.Year())
+  return months[num]
+}
+
+func GetRussianDate(date types.DateOnly) string {
+  return fmt.Sprintf("%d %s %d", date.Day(), GetMonth(date.Month()), date.Year())
+}
+
+func GetRussianBD(date time.Time) string {
+  return fmt.Sprintf("%d %s", date.Day(), GetMonth(date.Month()))    
 }

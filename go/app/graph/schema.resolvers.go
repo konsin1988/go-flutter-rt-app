@@ -28,24 +28,23 @@ func (r *queryResolver) Me(ctx context.Context) (*model.User, error) {
 		return nil, errors.New("Invalid user in context")
 	}
 
-	dbUser, photoURL, err := r.UserService.GetUserWithPhoto(ctx, authUser.Email)
+	bitrixUser, err := r.UserService.GetUser(ctx, authUser.Email)
 	if err != nil {
 		return nil, err
 	}
-	birthday := dbUser.Birthday.Format("02.01.2006")
-	fioList := strings.Fields(dbUser.FIO)
 
 	return &model.User{
-		Email:      dbUser.Email,
-		FirstName:  fioList[1],
-		LastName:   fioList[0],
-		SecondName: fioList[2],
-		Wphone:     &dbUser.Wphone,
-		Phone:      &dbUser.Phone,
-		Birthday:   &birthday,
-		Dept:       &dbUser.Dept,
-		Head:       &dbUser.Head,
-		ImageURL:   &photoURL,
+		Email:      bitrixUser.Email,
+		FirstName:  bitrixUser.FirstName,
+		LastName:   bitrixUser.LastName,
+		SecondName: bitrixUser.SecondName,
+		Wphone:     &bitrixUser.Wphone,
+		Phone:      &bitrixUser.Phone,
+		Position:   &bitrixUser.Position,
+		Birthday:   &bitrixUser.Birthday,
+		Dept:       &bitrixUser.Dept,
+		Head:       &bitrixUser.Head,
+		ImageURL:   &bitrixUser.PhotoURL,
 	}, nil
 }
 
@@ -102,23 +101,3 @@ func (r *queryResolver) ConversationByID(ctx context.Context) (*model.Conversati
 func (r *Resolver) Query() QueryResolver { return &queryResolver{r} }
 
 type queryResolver struct{ *Resolver }
-
-// !!! WARNING !!!
-// The code below was going to be deleted when updating resolvers. It has been copied here so you have
-// one last chance to move it out of harms way if you want. There are two reasons this happens:
-//  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
-//    it when you're done.
-//  - You have helper methods in this file. Move them out to keep these resolver files clean.
-/*
-	func (r *queryResolver) MyConversations(ctx context.Context) ([]*modestringl.Conversation, error) {
-  c, err := r.ChatService.GetConversationsByUser(ctx, id)
-  if err != nil {
-    return nil, err
-  }
-  return &
-
-}
-
-// Query returns QueryResolver implementation.
-func (r *Resolver) Query() QueryResolver { return &queryResolver{r} }
-*/

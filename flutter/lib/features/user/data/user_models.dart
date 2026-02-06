@@ -5,6 +5,7 @@ class User {
   final String secondName;
   final String? wphone;
   final String? phone;
+  final String? position;
   final String? birthday;
   final String? dept;
   final String? head;
@@ -15,6 +16,7 @@ class User {
     required this.lastName,
     required this.firstName,
     required this.secondName,
+    this.position,
     this.wphone,
     this.phone,
     this.birthday,
@@ -34,6 +36,7 @@ class User {
       birthday: json['birthday'] as String?,
       dept: json['dept'] as String?,
       head: json['head'] as String?,
+      position: json['position'] as String?,
       imageURL: json['imageURL'] as String?,
     );
   }

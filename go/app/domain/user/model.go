@@ -15,3 +15,18 @@ type User struct {
   Dept	      string 
   Head	      string
 }
+
+type MainUser struct {
+  ID	      int
+  Email	      string
+  FirstName   string
+  LastName    string
+  SecondName  string
+  PhotoURL    string
+  Birthday    string 
+  Wphone      string
+  Phone	      string
+  Dept	      string
+  Position    string
+  Head	      string
+}

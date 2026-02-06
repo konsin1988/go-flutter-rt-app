@@ -49,6 +49,7 @@ type User struct {
 	Birthday   *string `json:"birthday,omitempty"`
 	Wphone     *string `json:"wphone,omitempty"`
 	Phone      *string `json:"phone,omitempty"`
+	Position   *string `json:"position,omitempty"`
 	Dept       *string `json:"dept,omitempty"`
 	Head       *string `json:"head,omitempty"`
 	ImageURL   *string `json:"imageURL,omitempty"`

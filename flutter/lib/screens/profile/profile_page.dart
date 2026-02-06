@@ -122,6 +122,7 @@ class ProfilePage extends StatelessWidget {
 	        crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
 	          TextFields(field: 'Департамент:', value: '${user.dept}'),
+		  TextFields(field: 'Должность:', value: '${user.position}'),
 	          TextFields(field: 'Рабочий телефон:', value: '${user.wphone}'),
 	          TextFields(field: 'Мобильный телефон:', value: '${user.phone}'),
 	          TextFields(field: 'Электронная почта:', value: '${user.email}'),

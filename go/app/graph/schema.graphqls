@@ -8,6 +8,7 @@ type User {
   birthday: String 
   wphone: String
   phone: String
+  position: String
   dept: String 
   head: String 
   imageURL: String
