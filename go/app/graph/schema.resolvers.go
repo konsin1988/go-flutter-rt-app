@@ -11,9 +11,11 @@ import (
 	"fmt"
 	"konsin1988/rt-app/auth/jwt"
 	"konsin1988/rt-app/domain/texx"
+	"konsin1988/rt-app/domain/user"
 	"konsin1988/rt-app/graph/model"
 	"konsin1988/rt-app/helpers"
 	"strings"
+	"time"
 )
 
 // Me is the resolver for the me field.
@@ -89,12 +91,52 @@ func (r *queryResolver) TexxPosts(ctx context.Context) ([]*model.TexxPost, error
 
 // ConversationList is the resolver for the ConversationList field.
 func (r *queryResolver) ConversationList(ctx context.Context) ([]*model.ConversationListItem, error) {
-	panic(fmt.Errorf("not implemented: ConversationByID - ConversationById"))
+	user, ok := ctx.Value(jwt.BitrixUserContextKey).(*user.MainUser)
+	if !ok {
+		return nil, errors.New("Cannot load user from context")
+	}
+
+	c, err := r.ChatService.GetConversationsList(ctx, user.ID)
+	if err != nil {
+		return nil, errors.New("Cannot load conversation list")
+	}
+	conversResult := make([]*model.ConversationListItem, 0)
+	for _, v := range c {
+		listItem := model.ConversationListItem{
+			int32(v.ID),
+			v.Title,
+			v.CreatedAt.Format(time.RFC3339),
+			v.UpdatedAt.Format(time.RFC3339),
+		}
+		conversResult = append(conversResult, &listItem)
+	}
+	return conversResult, nil
 }
 
 // ConversationByID is the resolver for the ConversationById field.
-func (r *queryResolver) ConversationByID(ctx context.Context) (*model.Conversation, error) {
-	panic(fmt.Errorf("not implemented: ConversationByID - ConversationById"))
+func (r *queryResolver) ConversationByID(ctx context.Context, id int32) (*model.Conversation, error) {
+	c, err := r.ChatService.GetConversationById(ctx, int(id))
+	if err != nil {
+		return nil, errors.New("Cannot get conversation by id")
+	}
+	messages := make([]*model.Message, 0)
+	for _, i := range c.Messages {
+		m := model.Message{
+			ID:        int32(i.ID),
+			Role:      model.MessageRole(i.Role),
+			Content:   i.Content,
+			CreatedAt: helpers.FormatRussian(i.CreatedAt),
+		}
+		messages = append(messages, &m)
+	}
+	conversation := model.Conversation{
+		ID:        int32(c.ID),
+		Title:     &c.Title,
+		Messages:  messages,
+		CreatedAt: c.CreatedAt.Format(time.RFC3339),
+		UpdatedAt: c.UpdatedAt.Format(time.RFC3339),
+	}
+	return &conversation, nil
 }
 
 // Query returns QueryResolver implementation.

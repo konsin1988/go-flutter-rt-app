@@ -1,4 +1,5 @@
 scalar Date
+scalar UUID
 
 type User {
   email: String!
@@ -38,7 +39,7 @@ extend type Query {
 
 # ai
 type Conversation {
-  id: ID!
+  id: Int!
   title: String
   messages(limit: Int, offset: Int): [Message!]!
   createdAt: Date!
@@ -46,12 +47,15 @@ type Conversation {
 } 
 
 type ConversationListItem {
-  id: ID!
-  title: String
+  id: Int!
+  title: String!
+  createdAt: Date!
+  updatedAt: Date!
+
 }
 
 type Message {
-  id: ID!
+  id: Int!
   role: MessageRole!
   content: String!
   createdAt: Date!
@@ -68,7 +72,7 @@ extend type Query {
 }
 
 extend type Query {
-  ConversationById: Conversation!
+  ConversationById(id: Int!): Conversation!
 }
 
 

@@ -14,11 +14,16 @@ func NewService (repo Repository) *Service {
 
 func (s *Service) GetConversationsList (ctx context.Context, id int) ([]ConversationListItem, error){
   c, err := s.repo.GetConversationsList(ctx, id) 
-
   if err != nil {
     return nil, err
   }
-
   return c, nil
 } 
 
+func (s *Service) GetConversationById(ctx context.Context, conversation_id int)(*ConversationById, error){
+  c, err := s.repo.GetConversationById(ctx, conversation_id)
+  if err != nil {
+    return nil, err
+  }
+  return c, nil
+}

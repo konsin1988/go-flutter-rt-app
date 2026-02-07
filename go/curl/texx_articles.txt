@@ -1,1 +1,0 @@
-curl -v GET https://texx.digital/api/articles?sort=Date:desc&pagination[page]=1&pagination[pageSize]=10

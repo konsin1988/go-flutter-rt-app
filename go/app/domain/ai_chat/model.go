@@ -3,24 +3,24 @@ package ai_chat
 import (
   "time"
 
-  "github.com/google/uuid"
+  _ "github.com/google/uuid"
 )
 
 type ConversationListItem struct {
-  ID		uuid.UUID  
-  UserID	uuid.UUID 
-  Title		string	 
-  CreatedAt	time.Time 
-  UpdatedAt	time.Time
+  ID		int	      `json:"id"` 
+  UserID	int	      `json:"user_id"` 
+  Title		string	      `json:"title"` 
+  CreatedAt	time.Time     `json:"created_at"` 
+  UpdatedAt	time.Time     `json:"updated_at"`
 }
 
 type ConversationById struct {
-  ID		uuid.UUID
-  UserID	uuid.UUID
-  Title		string
+  ID		int	      `json:"id"`	
+  UserID	int	      `json:"user_id"`	
+  Title		string	      `json:"title"`
   Messages	[]Message
-  CreatedAt	time.Time
-  UpdatedAt	time.Time
+  CreatedAt	time.Time     `json:"created_at"`
+  UpdatedAt	time.Time     `json:"updated_at"`
 }
 
 type MessageRole string
@@ -32,13 +32,13 @@ const (
 )
 
 type Message struct {
-  ID		    uuid.UUID	   
-  ConversationID    uuid.UUID	  
+  ID		    int 
+  ConversationID    int 
   Role		    MessageRole	 
   Content	    string
 
-  Model		    string
-  PromptTokens	    int
-  CompletionTokens  int
+  //Model		    string
+  //PromptTokens	    int
+  //CompletionTokens  int
   CreatedAt	    time.Time
 }

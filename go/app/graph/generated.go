@@ -55,8 +55,10 @@ type ComplexityRoot struct {
 	}
 
 	ConversationListItem struct {
-		ID    func(childComplexity int) int
-		Title func(childComplexity int) int
+		CreatedAt func(childComplexity int) int
+		ID        func(childComplexity int) int
+		Title     func(childComplexity int) int
+		UpdatedAt func(childComplexity int) int
 	}
 
 	Message struct {
@@ -67,7 +69,7 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
-		ConversationByID func(childComplexity int) int
+		ConversationByID func(childComplexity int, id int32) int
 		ConversationList func(childComplexity int) int
 		Me               func(childComplexity int) int
 		TexxPosts        func(childComplexity int) int
@@ -107,7 +109,7 @@ type QueryResolver interface {
 	Me(ctx context.Context) (*model.User, error)
 	TexxPosts(ctx context.Context) ([]*model.TexxPost, error)
 	ConversationList(ctx context.Context) ([]*model.ConversationListItem, error)
-	ConversationByID(ctx context.Context) (*model.Conversation, error)
+	ConversationByID(ctx context.Context, id int32) (*model.Conversation, error)
 }
 
 type executableSchema struct {
@@ -165,6 +167,12 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.complexity.Conversation.UpdatedAt(childComplexity), true
 
+	case "ConversationListItem.createdAt":
+		if e.complexity.ConversationListItem.CreatedAt == nil {
+			break
+		}
+
+		return e.complexity.ConversationListItem.CreatedAt(childComplexity), true
 	case "ConversationListItem.id":
 		if e.complexity.ConversationListItem.ID == nil {
 			break
@@ -177,6 +185,12 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.ConversationListItem.Title(childComplexity), true
+	case "ConversationListItem.updatedAt":
+		if e.complexity.ConversationListItem.UpdatedAt == nil {
+			break
+		}
+
+		return e.complexity.ConversationListItem.UpdatedAt(childComplexity), true
 
 	case "Message.content":
 		if e.complexity.Message.Content == nil {
@@ -208,7 +222,12 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 			break
 		}
 
-		return e.complexity.Query.ConversationByID(childComplexity), true
+		args, err := ec.field_Query_ConversationById_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.ConversationByID(childComplexity, args["id"].(int32)), true
 	case "Query.ConversationList":
 		if e.complexity.Query.ConversationList == nil {
 			break
@@ -475,6 +494,17 @@ func (ec *executionContext) field_Conversation_messages_args(ctx context.Context
 	return args, nil
 }
 
+func (ec *executionContext) field_Query_ConversationById_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "id", ec.unmarshalNInt2int32)
+	if err != nil {
+		return nil, err
+	}
+	args["id"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field_Query___type_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
 	args := map[string]any{}
@@ -548,7 +578,7 @@ func (ec *executionContext) _Conversation_id(ctx context.Context, field graphql.
 			return obj.ID, nil
 		},
 		nil,
-		ec.marshalNID2string,
+		ec.marshalNInt2int32,
 		true,
 		true,
 	)
@@ -561,7 +591,7 @@ func (ec *executionContext) fieldContext_Conversation_id(_ context.Context, fiel
 		IsMethod:   false,
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type ID does not have child fields")
+			return nil, errors.New("field of type Int does not have child fields")
 		},
 	}
 	return fc, nil
@@ -714,7 +744,7 @@ func (ec *executionContext) _ConversationListItem_id(ctx context.Context, field 
 			return obj.ID, nil
 		},
 		nil,
-		ec.marshalNID2string,
+		ec.marshalNInt2int32,
 		true,
 		true,
 	)
@@ -727,7 +757,7 @@ func (ec *executionContext) fieldContext_ConversationListItem_id(_ context.Conte
 		IsMethod:   false,
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type ID does not have child fields")
+			return nil, errors.New("field of type Int does not have child fields")
 		},
 	}
 	return fc, nil
@@ -743,9 +773,9 @@ func (ec *executionContext) _ConversationListItem_title(ctx context.Context, fie
 			return obj.Title, nil
 		},
 		nil,
-		ec.marshalOString2ᚖstring,
+		ec.marshalNString2string,
 		true,
-		false,
+		true,
 	)
 }
 
@@ -762,6 +792,64 @@ func (ec *executionContext) fieldContext_ConversationListItem_title(_ context.Co
 	return fc, nil
 }
 
+func (ec *executionContext) _ConversationListItem_createdAt(ctx context.Context, field graphql.CollectedField, obj *model.ConversationListItem) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_ConversationListItem_createdAt,
+		func(ctx context.Context) (any, error) {
+			return obj.CreatedAt, nil
+		},
+		nil,
+		ec.marshalNDate2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_ConversationListItem_createdAt(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ConversationListItem",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Date does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ConversationListItem_updatedAt(ctx context.Context, field graphql.CollectedField, obj *model.ConversationListItem) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_ConversationListItem_updatedAt,
+		func(ctx context.Context) (any, error) {
+			return obj.UpdatedAt, nil
+		},
+		nil,
+		ec.marshalNDate2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_ConversationListItem_updatedAt(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ConversationListItem",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Date does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Message_id(ctx context.Context, field graphql.CollectedField, obj *model.Message) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
 		ctx,
@@ -772,7 +860,7 @@ func (ec *executionContext) _Message_id(ctx context.Context, field graphql.Colle
 			return obj.ID, nil
 		},
 		nil,
-		ec.marshalNID2string,
+		ec.marshalNInt2int32,
 		true,
 		true,
 	)
@@ -785,7 +873,7 @@ func (ec *executionContext) fieldContext_Message_id(_ context.Context, field gra
 		IsMethod:   false,
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type ID does not have child fields")
+			return nil, errors.New("field of type Int does not have child fields")
 		},
 	}
 	return fc, nil
@@ -1002,6 +1090,10 @@ func (ec *executionContext) fieldContext_Query_ConversationList(_ context.Contex
 				return ec.fieldContext_ConversationListItem_id(ctx, field)
 			case "title":
 				return ec.fieldContext_ConversationListItem_title(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_ConversationListItem_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_ConversationListItem_updatedAt(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type ConversationListItem", field.Name)
 		},
@@ -1016,7 +1108,8 @@ func (ec *executionContext) _Query_ConversationById(ctx context.Context, field g
 		field,
 		ec.fieldContext_Query_ConversationById,
 		func(ctx context.Context) (any, error) {
-			return ec.resolvers.Query().ConversationByID(ctx)
+			fc := graphql.GetFieldContext(ctx)
+			return ec.resolvers.Query().ConversationByID(ctx, fc.Args["id"].(int32))
 		},
 		nil,
 		ec.marshalNConversation2ᚖkonsin1988ᚋrtᚑappᚋgraphᚋmodelᚐConversation,
@@ -1025,7 +1118,7 @@ func (ec *executionContext) _Query_ConversationById(ctx context.Context, field g
 	)
 }
 
-func (ec *executionContext) fieldContext_Query_ConversationById(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Query_ConversationById(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Query",
 		Field:      field,
@@ -1046,6 +1139,17 @@ func (ec *executionContext) fieldContext_Query_ConversationById(_ context.Contex
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Conversation", field.Name)
 		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_ConversationById_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
 	}
 	return fc, nil
 }
@@ -3266,6 +3370,19 @@ func (ec *executionContext) _ConversationListItem(ctx context.Context, sel ast.S
 			}
 		case "title":
 			out.Values[i] = ec._ConversationListItem_title(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "createdAt":
+			out.Values[i] = ec._ConversationListItem_createdAt(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "updatedAt":
+			out.Values[i] = ec._ConversationListItem_updatedAt(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -4099,6 +4216,22 @@ func (ec *executionContext) unmarshalNID2string(ctx context.Context, v any) (str
 func (ec *executionContext) marshalNID2string(ctx context.Context, sel ast.SelectionSet, v string) graphql.Marshaler {
 	_ = sel
 	res := graphql.MarshalID(v)
+	if res == graphql.Null {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			graphql.AddErrorf(ctx, "the requested element is null which the schema does not allow")
+		}
+	}
+	return res
+}
+
+func (ec *executionContext) unmarshalNInt2int32(ctx context.Context, v any) (int32, error) {
+	res, err := graphql.UnmarshalInt32(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNInt2int32(ctx context.Context, sel ast.SelectionSet, v int32) graphql.Marshaler {
+	_ = sel
+	res := graphql.MarshalInt32(v)
 	if res == graphql.Null {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			graphql.AddErrorf(ctx, "the requested element is null which the schema does not allow")

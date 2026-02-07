@@ -1,6 +1,0 @@
-curl -v -X POST http://localhost:8000/auth/login \
-  -H "Content-Type: application/json" \
-  -d '{
-    "email": "d.kondratenko@rt-techpriemka.ru",
-    "password": "jiptut-heRrec-1meggy"
-  }'

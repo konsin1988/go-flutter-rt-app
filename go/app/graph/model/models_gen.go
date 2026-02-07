@@ -10,7 +10,7 @@ import (
 )
 
 type Conversation struct {
-	ID        string     `json:"id"`
+	ID        int32      `json:"id"`
 	Title     *string    `json:"title,omitempty"`
 	Messages  []*Message `json:"messages"`
 	CreatedAt string     `json:"createdAt"`
@@ -18,12 +18,14 @@ type Conversation struct {
 }
 
 type ConversationListItem struct {
-	ID    string  `json:"id"`
-	Title *string `json:"title,omitempty"`
+	ID        int32  `json:"id"`
+	Title     string `json:"title"`
+	CreatedAt string `json:"createdAt"`
+	UpdatedAt string `json:"updatedAt"`
 }
 
 type Message struct {
-	ID        string      `json:"id"`
+	ID        int32       `json:"id"`
 	Role      MessageRole `json:"role"`
 	Content   string      `json:"content"`
 	CreatedAt string      `json:"createdAt"`
