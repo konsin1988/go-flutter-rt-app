@@ -63,7 +63,7 @@ class ProfilePage extends StatelessWidget {
   		  ),
 		  child: CircleAvatar(
                     backgroundImage: NetworkImage(
-		      '${user.imageURL}',
+		      '${user.photoURL}',
                     ),
 		  ),
 		),
@@ -121,12 +121,12 @@ class ProfilePage extends StatelessWidget {
 	      child: Column(
 	        crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-	          TextFields(field: 'Департамент:', value: '${user.dept}'),
+	          //TextFields(field: 'Департамент:', value: '${user.dept}'),
 		  TextFields(field: 'Должность:', value: '${user.position}'),
-	          TextFields(field: 'Рабочий телефон:', value: '${user.wphone}'),
-	          TextFields(field: 'Мобильный телефон:', value: '${user.phone}'),
+	          TextFields(field: 'Рабочий телефон:', value: '${user.inner}'),
+	          TextFields(field: 'Мобильный телефон:', value: '${user.mobile}'),
 	          TextFields(field: 'Электронная почта:', value: '${user.email}'),
-	          TextFields(field: 'Руководитель:', value: '${user.head}'),
+	          //TextFields(field: 'Руководитель:', value: '${user.head}'),
                 ],
               ),
 	    ),

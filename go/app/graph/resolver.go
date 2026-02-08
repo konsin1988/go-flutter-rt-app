@@ -5,18 +5,18 @@ import (
   "context"
   "errors"
   user "konsin1988/rt-app/domain/user"
-  ai_chat "konsin1988/rt-app/domain/ai_chat"
+  ai "konsin1988/rt-app/domain/ai"
 )
 
 type Resolver struct{
   UserService *user.Service
-  ChatService *ai_chat.Service
+  AiService *ai.Service
 }
 
-func NewResolver(userService *user.Service, chatService *ai_chat.Service) *Resolver{
+func NewResolver(userService *user.Service, aiService *ai.Service) *Resolver{
   return &Resolver{
     UserService: userService,
-    ChatService: chatService,
+    AiService: aiService,
   }
 }
 

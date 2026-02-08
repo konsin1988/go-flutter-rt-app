@@ -24,6 +24,18 @@ type ConversationListItem struct {
 	UpdatedAt string `json:"updatedAt"`
 }
 
+type Department struct {
+	ID     int32  `json:"id"`
+	Name   string `json:"name"`
+	Parent int32  `json:"parent"`
+	Head   int32  `json:"head"`
+}
+
+type Head struct {
+	ID  int32  `json:"id"`
+	Fio string `json:"fio"`
+}
+
 type Message struct {
 	ID        int32       `json:"id"`
 	Role      MessageRole `json:"role"`
@@ -44,17 +56,18 @@ type TexxPost struct {
 }
 
 type User struct {
-	Email      string  `json:"email"`
-	FirstName  string  `json:"firstName"`
-	LastName   string  `json:"lastName"`
-	SecondName string  `json:"secondName"`
-	Birthday   *string `json:"birthday,omitempty"`
-	Wphone     *string `json:"wphone,omitempty"`
-	Phone      *string `json:"phone,omitempty"`
-	Position   *string `json:"position,omitempty"`
-	Dept       *string `json:"dept,omitempty"`
-	Head       *string `json:"head,omitempty"`
-	ImageURL   *string `json:"imageURL,omitempty"`
+	ID         int32         `json:"id"`
+	FirstName  string        `json:"firstName"`
+	LastName   string        `json:"lastName"`
+	SecondName string        `json:"secondName"`
+	Email      string        `json:"email"`
+	Birthday   *string       `json:"birthday,omitempty"`
+	PhotoURL   *string       `json:"photoURL,omitempty"`
+	Mobile     *string       `json:"mobile,omitempty"`
+	Inner      *string       `json:"inner,omitempty"`
+	Position   *string       `json:"position,omitempty"`
+	DeptList   []*Department `json:"deptList"`
+	HeadList   []*Head       `json:"headList"`
 }
 
 type UserContact struct {

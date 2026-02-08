@@ -11,7 +11,7 @@ class UserRepository {
   Future<User?> getMe() async {
     final result = await _client.query(
       QueryOptions(
-        document: gql(UserQueries.me),
+        document: gql(UserQueries.mainUser),
         fetchPolicy: FetchPolicy.networkOnly,
       ),
     );
@@ -20,7 +20,7 @@ class UserRepository {
       throw result.exception!;
     }
 
-    final data = result.data?['me'];
+    final data = result.data?['mainUser'];
     if (data == null) return null;
 
     return User.fromJson(data);

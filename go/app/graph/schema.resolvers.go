@@ -18,8 +18,8 @@ import (
 	"time"
 )
 
-// Me is the resolver for the me field.
-func (r *queryResolver) Me(ctx context.Context) (*model.User, error) {
+// MainUser is the resolver for the mainUser field.
+func (r *queryResolver) MainUser(ctx context.Context) (*model.User, error) {
 	user := ctx.Value(jwt.AuthUserContextKey)
 	if user == nil {
 		return nil, errors.New("Unauthorized from resolver")
@@ -30,23 +30,44 @@ func (r *queryResolver) Me(ctx context.Context) (*model.User, error) {
 		return nil, errors.New("Invalid user in context")
 	}
 
-	bitrixUser, err := r.UserService.GetUser(ctx, authUser.Email)
+	mainUser, err := r.UserService.AuthUser(ctx, authUser.Email)
 	if err != nil {
 		return nil, err
 	}
 
+	depts := make([]*model.Department, 0)
+	heads := make([]*model.Head, 0)
+
+	for i := 0; i < len(mainUser.DeptList); i++ {
+		d := model.Department{
+			ID:     int32(mainUser.DeptList[i].ID),
+			Name:   mainUser.DeptList[i].Name,
+			Parent: int32(mainUser.DeptList[i].Parent),
+			Head:   int32(mainUser.DeptList[i].Head),
+		}
+		depts = append(depts, &d)
+
+		h := model.Head{
+			ID:  int32(mainUser.HeadList[i].ID),
+			Fio: mainUser.HeadList[i].FIO,
+		}
+		heads = append(heads, &h)
+	}
+
+
 	return &model.User{
-		Email:      bitrixUser.Email,
-		FirstName:  bitrixUser.FirstName,
-		LastName:   bitrixUser.LastName,
-		SecondName: bitrixUser.SecondName,
-		Wphone:     &bitrixUser.Wphone,
-		Phone:      &bitrixUser.Phone,
-		Position:   &bitrixUser.Position,
-		Birthday:   &bitrixUser.Birthday,
-		Dept:       &bitrixUser.Dept,
-		Head:       &bitrixUser.Head,
-		ImageURL:   &bitrixUser.PhotoURL,
+		ID:         int32(mainUser.ID),
+		FirstName:  mainUser.FirstName,
+		LastName:   mainUser.LastName,
+		SecondName: mainUser.SecondName,
+		Email:      mainUser.Email,
+		Birthday:   &mainUser.Birthday,
+		PhotoURL:   &mainUser.PhotoURL,
+		Mobile:     &mainUser.Mobile,
+		Inner:      &mainUser.Inner,
+		Position:   &mainUser.Position,
+		DeptList:   depts,
+		HeadList:   heads,
 	}, nil
 }
 
@@ -91,12 +112,12 @@ func (r *queryResolver) TexxPosts(ctx context.Context) ([]*model.TexxPost, error
 
 // ConversationList is the resolver for the ConversationList field.
 func (r *queryResolver) ConversationList(ctx context.Context) ([]*model.ConversationListItem, error) {
-	user, ok := ctx.Value(jwt.BitrixUserContextKey).(*user.MainUser)
+	user, ok := ctx.Value(jwt.MainUserContextKey).(*user.MainUser)
 	if !ok {
 		return nil, errors.New("Cannot load user from context")
 	}
 
-	c, err := r.ChatService.GetConversationsList(ctx, user.ID)
+	c, err := r.AiService.GetConversationsList(ctx, user.ID)
 	if err != nil {
 		return nil, errors.New("Cannot load conversation list")
 	}
@@ -115,7 +136,7 @@ func (r *queryResolver) ConversationList(ctx context.Context) ([]*model.Conversa
 
 // ConversationByID is the resolver for the ConversationById field.
 func (r *queryResolver) ConversationByID(ctx context.Context, id int32) (*model.Conversation, error) {
-	c, err := r.ChatService.GetConversationById(ctx, int(id))
+	c, err := r.AiService.GetConversationById(ctx, int(id))
 	if err != nil {
 		return nil, errors.New("Cannot get conversation by id")
 	}

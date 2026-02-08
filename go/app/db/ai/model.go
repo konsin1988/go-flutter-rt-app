@@ -1,12 +1,10 @@
-package ai_chat
+package ai
 
 import (
   "time"
-
-  _ "github.com/google/uuid"
 )
 
-type ConversationListItem struct {
+type ConversationListItemDTO struct {
   ID		int	      `json:"id"` 
   UserID	int	      `json:"user_id"` 
   Title		string	      `json:"title"` 
@@ -14,7 +12,7 @@ type ConversationListItem struct {
   UpdatedAt	time.Time     `json:"updated_at"`
 }
 
-type ConversationById struct {
+type ConversationByIdDTO struct {
   ID		int	      `json:"id"`	
   UserID	int	      `json:"user_id"`	
   Title		string	      `json:"title"`
@@ -32,13 +30,13 @@ const (
 )
 
 type Message struct {
-  ID		    int 
-  ConversationID    int 
-  Role		    MessageRole	 
-  Content	    string
+  ID		    int		  `json:"id"`
+  ConversationID    int		  `json:"conversation_id"`
+  Role		    MessageRole	  `json:"message_role"`
+  Content	    string	  `json:"content"`
 
   //Model		    string
   //PromptTokens	    int
   //CompletionTokens  int
-  CreatedAt	    time.Time
+  CreatedAt	    time.Time	  `json:"created_at"`
 }

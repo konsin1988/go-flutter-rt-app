@@ -36,7 +36,7 @@ class BottomNavScaffold extends StatelessWidget {
     if (location.startsWith('/profile')) return null;
     final userProvider = context.watch<UserProvider>();
     final user = userProvider.user;
-    return user?.imageURL;
+    return user?.photoURL;
   }
 
   @override

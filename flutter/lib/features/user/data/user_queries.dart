@@ -1,18 +1,27 @@
 class UserQueries {
-  static const String me = r'''
-    query Me {
-      me {
-        email
+  static const String mainUser = r'''
+    query mainUser {
+      mainUser {
+	id
 	lastName
 	firstName
 	secondName
-	wphone
-	phone
+        email
 	birthday	
-	dept	
-	head	
+	photoURL
+	mobile	
+	inner
 	position
-	imageURL
+	deptList {
+	  id
+	  name
+	  parent
+	  head
+	}
+	headList {
+	  id
+	  fio
+	}
       }
     }
   ''';

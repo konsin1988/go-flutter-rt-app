@@ -28,8 +28,10 @@ func GetRussianDate(date types.DateOnly) string {
   return fmt.Sprintf("%d %s %d", date.Day(), GetMonth(date.Month()), date.Year())
 }
 
-func GetRussianBD(date time.Time) string {
-  return fmt.Sprintf("%d %s", date.Day(), GetMonth(date.Month()))    
+func GetRussianBD(date *time.Time) string {
+  if date != nil {
+    return fmt.Sprintf("%d %s", date.Day(), GetMonth(date.Month()))    
+  } else { return "" }
 }
 
 func FormatRussian(t time.Time) string {

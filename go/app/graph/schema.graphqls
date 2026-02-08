@@ -1,26 +1,41 @@
 scalar Date
 scalar UUID
 
+type Department {
+  id: Int!
+  name: String!
+  parent: Int!
+  head: Int!
+}
+
+type Head {
+  id: Int!
+  fio: String!
+}
+
 type User {
-  email: String!
+  id: Int! 
   firstName: String!
   lastName: String!
   secondName: String!
+  email: String!
   birthday: String 
-  wphone: String
-  phone: String
+  photoURL: String
+  mobile: String
+  inner: String
   position: String
-  dept: String 
-  head: String 
-  imageURL: String
+  deptList: [Department!]!
+  headList: [Head!]!
 }
+
 type UserContact {
   label: String
   type: String!
   value: String!
 }
+
 type Query {
-  me: User
+  mainUser: User
 }
 
 # texx

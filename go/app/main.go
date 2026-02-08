@@ -3,20 +3,21 @@ package main
 import (
     "net/http"
     "log"
-    "os"
+    _ "os"
 
     "konsin1988/rt-app/config"
-    infraDB "konsin1988/rt-app/infrastructure/db"
+    infraDB "konsin1988/rt-app/db"
     "konsin1988/rt-app/health"
     transport "konsin1988/rt-app/transport/http"
     keycloak "konsin1988/rt-app/auth/keycloak"
-    keycloak_repo "konsin1988/rt-app/infrastructure/keycloak"
     jwt "konsin1988/rt-app/auth/jwt"
     graph "konsin1988/rt-app/graph"
-    repos "konsin1988/rt-app/infrastructure/db"
-    bitrix "konsin1988/rt-app/bitrix"
+    _ "konsin1988/rt-app/db"
+    _ "konsin1988/rt-app/bitrix"
     user "konsin1988/rt-app/domain/user"
-    ai_chat "konsin1988/rt-app/domain/ai_chat"
+    ai "konsin1988/rt-app/domain/ai"
+    ai_repo "konsin1988/rt-app/db/ai"
+    user_repo "konsin1988/rt-app/db/user"
     
     "github.com/99designs/gqlgen/graphql/handler"
     "github.com/99designs/gqlgen/graphql/playground"
@@ -30,12 +31,13 @@ func main() {
   }
   defer db.Close()
 
-  bitrixURL := os.Getenv("BITRIX24_URL")
+  // bitrixURL := os.Getenv("BITRIX24_URL")
 
-  userRepo := repos.NewPostgresRepo(db)
-  bitrixClient := bitrix.New(bitrixURL)
-  userService := user.NewService(bitrixClient) 
-  chatService := ai_chat.NewService(userRepo)
+  aiRepo := ai_repo.NewAiRepo(db)
+  userRepo := user_repo.NewUserRepo(db)
+
+  userService := user.NewService(userRepo) 
+  aiService := ai.NewService(aiRepo)
   
 
   kc := config.LoadKeycloakConfig()
@@ -48,13 +50,13 @@ func main() {
   jwtService := jwt.NewService(validator)
   jwtMiddleware := jwt.Middleware(jwtService, userService)
 
-  resolver := graph.NewResolver(userService, chatService)
+  resolver := graph.NewResolver(userService, aiService)
   schema := graph.NewExecutableSchema(graph.Config{Resolvers: resolver})
   graphqlHandler := handler.NewDefaultServer(schema)
 
 
 
-  authRepo := keycloak_repo.NewAuthRepository(
+  authRepo := keycloak.NewAuthRepository(
     kc.TokenURL,
     kc.ClientID,
     kc.ClientSecret,
