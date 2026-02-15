@@ -4,8 +4,8 @@ import (
   "konsin1988/rt-app/auth/jwt"
   "context"
   "errors"
-  user "konsin1988/rt-app/domain/user"
-  ai "konsin1988/rt-app/domain/ai"
+  user "konsin1988/rt-app/db/user"
+  ai "konsin1988/rt-app/db/ai"
 )
 
 type Resolver struct{

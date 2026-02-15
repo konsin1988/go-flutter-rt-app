@@ -5,9 +5,6 @@ func GetPostsForMainPage() ([]TexxPost, error) {
     if err != nil {
         return nil, err
     }
-
-    // optional: filter, limit, sort posts
-    // e.g., return only latest 10 posts
     if len(posts) > 20 {
         posts = posts[:20]
     }

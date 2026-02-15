@@ -11,9 +11,10 @@ import (
 	"fmt"
 	"konsin1988/rt-app/auth/jwt"
 	"konsin1988/rt-app/domain/texx"
-	"konsin1988/rt-app/domain/user"
+	_ "konsin1988/rt-app/db/user"
 	"konsin1988/rt-app/graph/model"
 	"konsin1988/rt-app/helpers"
+	"konsin1988/rt-app/db/models"
 	"strings"
 	"time"
 )
@@ -53,7 +54,6 @@ func (r *queryResolver) MainUser(ctx context.Context) (*model.User, error) {
 		}
 		heads = append(heads, &h)
 	}
-
 
 	return &model.User{
 		ID:         int32(mainUser.ID),
@@ -112,7 +112,7 @@ func (r *queryResolver) TexxPosts(ctx context.Context) ([]*model.TexxPost, error
 
 // ConversationList is the resolver for the ConversationList field.
 func (r *queryResolver) ConversationList(ctx context.Context) ([]*model.ConversationListItem, error) {
-	user, ok := ctx.Value(jwt.MainUserContextKey).(*user.MainUser)
+	user, ok := ctx.Value(jwt.MainUserContextKey).(*models.MainUser)
 	if !ok {
 		return nil, errors.New("Cannot load user from context")
 	}

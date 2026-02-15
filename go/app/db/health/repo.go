@@ -1,4 +1,4 @@
-package db 
+package health 
 
 import (
     "context"
@@ -16,4 +16,3 @@ func NewHealthRepository(db *sql.DB) *HealthRepository {
 func (r *HealthRepository) Ping(ctx context.Context) error {
     return r.db.PingContext(ctx)
 }
-

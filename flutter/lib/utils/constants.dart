@@ -29,6 +29,7 @@ class AppRoutes {
   static const String services = '/services';
   static const String profile = '/profile';
   static const String assistant = '/assistant';
+  static const String department = '/department';
   static const List<String> appRoutes = [
     login,
     init,
@@ -37,6 +38,7 @@ class AppRoutes {
     services,
     profile,
     assistant,
+    department,
   ];
 }
 
@@ -55,6 +57,7 @@ class AppBarTitles {
 
   static const routeTitles = {
     '/assistant': 'Ваш ассистент',
+    '/department': 'Департамент',
   };
 }
 

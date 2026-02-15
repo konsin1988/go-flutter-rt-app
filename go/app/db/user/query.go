@@ -8,7 +8,7 @@ import (
   "time"
 
   "konsin1988/rt-app/helpers"
-
+  models "konsin1988/rt-app/db/models"
 )
 
 
@@ -18,7 +18,7 @@ func parseIntList(s string) ([]int, error) {
     return result, err
 }
 
-func (r *UserRepo) AuthUser(ctx context.Context, email string) (*MainUserDB, error) {
+func (r *UserRepo) AuthUser(ctx context.Context, email string) (*models.MainUser, error) {
   const query = `
     SELECT
         u.id,
@@ -41,7 +41,7 @@ func (r *UserRepo) AuthUser(ctx context.Context, email string) (*MainUserDB, err
     where u.email = $1 
     GROUP BY u.id` 
 
-  u := &MainUserDB{}
+  u := &models.MainUser{}
   var deptString string
   var birthdayTime *time.Time
 
@@ -62,8 +62,8 @@ func (r *UserRepo) AuthUser(ctx context.Context, email string) (*MainUserDB, err
     return nil, errors.New("cannot convert string to int list")
   }
 
-  depts := make([]DepartmentDB, 0)
-  heads := make([]HeadDB, 0)
+  depts := make([]models.Department, 0)
+  heads := make([]models.Head, 0)
 
   for _, i := range deptList {
     d, err := r.getDept(ctx, i)
@@ -84,7 +84,7 @@ func (r *UserRepo) AuthUser(ctx context.Context, email string) (*MainUserDB, err
   return u, nil
 }
 
-func (r *UserRepo) getDept(ctx context.Context, id int) (*DepartmentDB, error) {
+func (r *UserRepo) getDept(ctx context.Context, id int) (*models.Department, error) {
   const query = `
     SELECT
       d.id,
@@ -94,7 +94,7 @@ func (r *UserRepo) getDept(ctx context.Context, id int) (*DepartmentDB, error) {
     from b_department d
     where d.id = $1
   `
-  d := DepartmentDB{}
+  d := models.Department{}
   err := r.db.QueryRowContext(ctx, query, id).
 	  Scan(&d.ID, &d.Name, &d.Parent, &d.Head)
   if err != nil {
@@ -103,7 +103,7 @@ func (r *UserRepo) getDept(ctx context.Context, id int) (*DepartmentDB, error) {
   return &d, nil
 }
 
-func (r *UserRepo) getHeadData(ctx context.Context, user_id int, d *DepartmentDB) (*HeadDB, error) {
+func (r *UserRepo) getHeadData(ctx context.Context, user_id int, d *models.Department) (*models.Head, error) {
   const head_query = `
     SELECT 
       u.id as id,
@@ -119,7 +119,7 @@ func (r *UserRepo) getHeadData(ctx context.Context, user_id int, d *DepartmentDB
     join b_department d on d.head = u.id
     where d.id = $1
   `
-  h := HeadDB{}
+  h := models.Head{}
   if d.Head != 0 && (user_id != d.Head || d.Parent == 0 ) {
     err := r.db.QueryRowContext(ctx, head_query, d.Head).
 	  Scan(&h.ID, h.FIO)

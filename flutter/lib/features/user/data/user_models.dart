@@ -1,3 +1,5 @@
+import 'package:rt_app/features/department/data/dept_models.dart';
+
 class User {
   final int id;
   final String lastName;
@@ -40,35 +42,35 @@ class User {
       birthday: json['birthday'] as String?,
       position: json['position'] as String?,
       photoURL: json['photoURL'] as String?,
-      deptList: (json['deptList'] as List<dynamic>)
-	  .map((e) => Department.fromJson(e as Map<String, dynamic>))
-	  .toList(),
-      headList: (json['headList'] as List<dynamic>)
-	.map((e) => Head.fromJson(e as Map<String, dynamic>))
-	.toList()
+      deptList: (json['deptList'] as List?)
+	  ?.map((e) => Department.fromJson(e as Map<String, dynamic>))
+	  .toList() ?? <Department>[],
+      headList: (json['headList'] as List?)
+	?.map((e) => Head.fromJson(e as Map<String, dynamic>))
+	.toList() ?? <Head>[],
     );
   }
 }
 
-class Department {
+class DepartmentUser {
   final int id;
-  final String name;
-  final int parent;
-  final int head;
-
-  Department({
+  final String fio;
+  final String? position;
+  final String? photoURL;
+  
+  DepartmentUser({
     required this.id,
-    required this.name,
-    required this.parent,
-    required this.head,
+    required this.fio,
+    this.position,
+    this.photoURL,
   });
-
-  factory Department.fromJson(Map<String, dynamic> json) {
-    return Department(
+  
+  factory DepartmentUser.fromJson(Map<String, dynamic> json) {
+    return DepartmentUser(
       id: json['id'] as int,
-      name: json['name'] as String,
-      parent: json['parent'] as int,
-      head: json['head'] as int,
+      fio: json['fio'] as String,
+      position: json['position'] as String?,
+      photoURL: json['photoURL'] as String?,
     );
   }
 }

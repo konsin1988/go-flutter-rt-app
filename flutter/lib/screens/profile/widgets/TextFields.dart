@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../../../style/colors.dart';
-import '../../../style/fonts.dart';
+import 'package:rt_app/style/colors.dart';
+import 'package:rt_app/style/fonts.dart';
 
 class TextFields extends StatelessWidget {
   final String field;

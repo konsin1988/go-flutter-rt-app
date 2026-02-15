@@ -6,12 +6,10 @@ import '../utils/constants.dart';
 
 class AppTopBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
-  final String? leadingImage;
 
   const AppTopBar({
     super.key,
     required this.title,
-    this.leadingImage,
   });
 
   @override
@@ -26,32 +24,6 @@ class AppTopBar extends StatelessWidget implements PreferredSizeWidget {
 	title,
 	style: RTFontStyle.appTitle.value 
       ),
-      leading: leadingImage != null
-	? InkWell(
-	    onTap: () {
-	      context.go(AppRoutes.profile);
-	    },
-	    child: Center( 
-	      child: Container(
-	          width: SW * 0.08,
-	          height: SW * 0.08,
-	          padding: const EdgeInsets.all(1),
-	          decoration: BoxDecoration(
-  	            shape: BoxShape.circle, 
-  	            border: Border.all(
-  	              color: RTColorStyle.beige900.value,
-  	              width: 0.5,
-  	            ),
-  	          ),
-	          child: CircleAvatar(
-	    	backgroundImage: NetworkImage(
-	    	  leadingImage!,
-		  ),
-	        ),
-	      ),
-	    ),
-	  )
-	: null,
     );
   }
 

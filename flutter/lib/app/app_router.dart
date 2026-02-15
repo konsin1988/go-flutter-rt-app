@@ -14,6 +14,9 @@ import '../screens/services/services_page.dart';
 import '../screens/profile/profile_page.dart';
 import '../screens/init/init_page.dart';
 import '../screens/assistant/assistant_page.dart';
+import 'package:rt_app/screens/department/department_page.dart';
+
+
 import '../utils/constants.dart';
 import '../widgets/bottom_nav_scaffold.dart';
 
@@ -110,10 +113,38 @@ GoRouter createAppRouter(BuildContext context) {
               GoRoute(
                 path: AppRoutes.profile,
                 pageBuilder: (context, state) {
-		  return NoTransitionPage(
-      	            child: ProfilePage(),
-		  );
+		  return CustomTransitionPage(
+		    key: state.pageKey,
+    		    transitionDuration: const Duration(milliseconds: 200), 
+    		    child: ProfilePage(),
+    		    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+    		      return SlideTransition(
+    		        position: Tween<Offset>(
+    		          begin: const Offset(1.0, 0.0),
+    		          end: Offset.zero,
+    		        ).animate(animation),
+    		        child: child,
+    		      );
+    		    },
+    		  );
 		},
+                //pageBuilder: (context, state) {
+		//  return NoTransitionPage(
+      	        //    child: ProfilePage(),
+		//  );
+		//},
+		routes: [
+		  GoRoute(
+      		    path: 'department/:id',
+		    pageBuilder: (context, state) {
+      		      final idString = state.pathParameters['id']!;
+      		      final departmentId = int.tryParse(idString)!;
+		      return NoTransitionPage(
+      	                child: DepartmentPage(departmentId: departmentId),
+		      );
+		    },
+      		  ),
+		],
               ),
             ],
           ),

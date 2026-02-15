@@ -11,8 +11,8 @@ enum RTFontStyle {
   PublishedAt,
   ProfileField,
   ProfileValue,
+  AlertTitle,
 
-  bodyL,
   bodyM,
   bodyS,
   bodyXS,
@@ -93,15 +93,16 @@ extension RTFontStyleExtension on RTFontStyle {
             fontWeight: FontWeight.w400,
             package: "design_system");
 
-
-
-      case RTFontStyle.bodyL:
-        return const TextStyle(
+      case RTFontStyle.AlertTitle:
+        return TextStyle(
             fontFamily: "MuseoSans",
             fontSize: 15,
             height: 20 / 15,
-            fontWeight: FontWeight.w400,
-            package: "design_system");
+            fontWeight: FontWeight.w600,
+            package: "design_system",
+	    color: RTColorStyle.dark800.value);
+
+
       case RTFontStyle.bodyM:
         return const TextStyle(
             fontFamily: "MuseoSans",

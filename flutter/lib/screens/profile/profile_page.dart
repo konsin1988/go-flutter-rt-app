@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../auth/auth_provider.dart';
-import '../../utils/constants.dart';
-import '../../features/user/state/user_provider.dart';
-import '../../widgets/app_top_bar.dart';
-import '../../style/colors.dart';
-import '../../style/fonts.dart';
+import 'package:rt_app/auth/auth_provider.dart';
+import 'package:rt_app/utils/constants.dart';
+import 'package:rt_app/features/user/state/user_provider.dart';
+import 'package:rt_app/widgets/app_top_bar.dart';
+import 'package:rt_app/style/colors.dart';
+import 'package:rt_app/style/fonts.dart';
 import 'widgets/TextFields.dart';
+import 'widgets/PhoneField.dart';
+import 'widgets/DepartmentField.dart';
 import 'helpers/helpers.dart';
 
 
@@ -121,12 +123,12 @@ class ProfilePage extends StatelessWidget {
 	      child: Column(
 	        crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-	          //TextFields(field: 'Департамент:', value: '${user.dept}'),
+	          DepartmentField(department: user.deptList[0]),
 		  TextFields(field: 'Должность:', value: '${user.position}'),
 	          TextFields(field: 'Рабочий телефон:', value: '${user.inner}'),
-	          TextFields(field: 'Мобильный телефон:', value: '${user.mobile}'),
+	          PhoneField(field: 'Мобильный телефон:', value: '${user.mobile}'),
 	          TextFields(field: 'Электронная почта:', value: '${user.email}'),
-	          //TextFields(field: 'Руководитель:', value: '${user.head}'),
+	          //LinkableField(field: 'Руководитель:', value: '${user.headList[0].fio}'),
                 ],
               ),
 	    ),

@@ -1,10 +1,10 @@
-package ai
+package models 
 
 import (
   "time"
 )
 
-type ConversationListItemDTO struct {
+type ConversationListItem struct {
   ID		int	      `json:"id"` 
   UserID	int	      `json:"user_id"` 
   Title		string	      `json:"title"` 
@@ -12,7 +12,7 @@ type ConversationListItemDTO struct {
   UpdatedAt	time.Time     `json:"updated_at"`
 }
 
-type ConversationByIdDTO struct {
+type ConversationById struct {
   ID		int	      `json:"id"`	
   UserID	int	      `json:"user_id"`	
   Title		string	      `json:"title"`

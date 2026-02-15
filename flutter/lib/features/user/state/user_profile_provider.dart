@@ -4,23 +4,25 @@ import 'package:flutter/foundation.dart';
 import 'package:rt_app/features/user/data/user_repository.dart';
 import 'package:rt_app/features/user/data/user_models.dart';
 
-class UserProvider extends ChangeNotifier {
+class UserProfileProvider extends ChangeNotifier {
   final UserRepository _repo;
-  User? user;
+
+  final Map<String, User> _users = {};
   bool loading = false;
 
-  UserProvider(this._repo){
-    loadMe();
-    debugPrint("UserProvider created;");
-  }
+  UserProfileProvider(this._repo);
 
-  Future<void> loadMe() async {
-    if (loading || user != null) return;
+  User? getUser(String id) => _users[id];
+
+  Future<void> loadUser(String id) async {
+    if (_users.containsKey(id)) return;
+
     loading = true;
     notifyListeners();
 
     try {
-      user = await _repo.getMe();
+      final user = await _repo.getUserById(id);
+      _users[id] = user;
     } finally {
       loading = false;
       notifyListeners();

@@ -9,7 +9,7 @@ import (
   "os"
   _ "log"
 
-  user "konsin1988/rt-app/domain/user"
+  user "konsin1988/rt-app/db/user"
 )
 
 type ContextKey string

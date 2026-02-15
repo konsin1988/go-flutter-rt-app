@@ -1,9 +1,6 @@
-package user
+package models
 
-import (
-)
-
-type MainUserDB struct {
+type MainUser struct {
   ID	      int	    `json:"id"`
   FirstName   string	    `json:"first_name"`
   LastName    string	    `json:"last_name"`
@@ -14,18 +11,19 @@ type MainUserDB struct {
   Mobile      string	    `json:"mobile,omitempty"`
   Position    string	    `json:"position"`
   Inner	      string	    `json:"phone_inner"`
-  DeptList    []DepartmentDB
-  HeadList    []HeadDB
+  DeptList    []Department
+  HeadList    []Head
 }
 
-type DepartmentDB struct {
-  ID	    int		`json:"id"`
-  Name	    string	`json:"name"`
-  Parent    int		`json:"parent,omitempty"`
-  Head	    int		`json:"head,omitempty"`
-}
 
-type HeadDB struct {
+type Head struct {
   ID	    int		`json:"id"`
   FIO	    string	`json:"fio"`
+}
+
+type DeptUser struct {
+  ID	      int	`json:"id"`
+  FIO	      string    `json:"fio"`
+  Position    string    `json:"position"`
+  PhotoURL    string	`json:"photo"`
 }

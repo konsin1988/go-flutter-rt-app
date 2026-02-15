@@ -8,6 +8,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import '../../widgets/app_top_bar.dart';
 import '../../style/colors.dart';
 import '../../style/fonts.dart';
+import 'BottomNavigationBarItem.dart';
 
 class BottomNavScaffold extends StatelessWidget {
   final StatefulNavigationShell navigationShell;
@@ -30,18 +31,20 @@ class BottomNavScaffold extends StatelessWidget {
       return routeTitle;
     }
     return AppBarTitles.tabTitles[navigationShell.currentIndex];
-  }
-  
-  String? appBarImage(BuildContext context, String location) {
-    if (location.startsWith('/profile')) return null;
-    final userProvider = context.watch<UserProvider>();
-    final user = userProvider.user;
-    return user?.photoURL;
+    return 'aa';
   }
 
+  
+  
   @override
   Widget build(BuildContext context) {
     final location = GoRouterState.of(context).uri.toString();
+    final SW = MediaQuery.of(context).size.width;
+    final SH = MediaQuery.of(context).size.height;
+    final userProvider = context.watch<UserProvider>();
+    final user = userProvider.user;
+    final imageSize = SW * 0.07;
+    final imageActiveSize = SW * 0.068;
 
     return Scaffold(
       body: DefaultTextStyle(
@@ -50,7 +53,6 @@ class BottomNavScaffold extends StatelessWidget {
       ),
       appBar: AppTopBar(
 	title: appBarTitle(location),
-	leadingImage: appBarImage(context, location),
       ),
       backgroundColor: RTColorStyle.dark900.value,
       bottomNavigationBar: BottomNavigationBar(
@@ -64,24 +66,59 @@ class BottomNavScaffold extends StatelessWidget {
       	unselectedLabelStyle: tabbarStyle,
       	iconSize: 22,
       	items: [
+	  buildNavItem(
+	      assetPath: AppIcons.home,
+  	      label: 'Главная',
+  	      imageSize: imageSize,
+  	      imageActiveSize: imageActiveSize,
+	  ),
+	  buildNavItem(
+	      assetPath: AppIcons.ai,
+  	      label: 'ИИ',
+  	      imageSize: imageSize,
+  	      imageActiveSize: imageActiveSize,
+	  ),
+	  buildNavItem(
+	      assetPath: AppIcons.services,
+  	      label: 'Сервисы',
+  	      imageSize: imageSize,
+  	      imageActiveSize: imageActiveSize,
+	  ),
       	  BottomNavigationBarItem(
-      	    icon: SvgPicture.asset(AppIcons.home, width: 24, height: 24),
-      	    activeIcon: SvgPicture.asset(AppIcons.home, colorFilter: ColorFilter.mode(RTColorStyle.beige900.value, BlendMode.srcIn)),
-      	    label: 'Главная',
-      	  ),
-      	  BottomNavigationBarItem(
-      	    icon: SvgPicture.asset(AppIcons.ai, width: 24, height: 24),
-      	    activeIcon: SvgPicture.asset(AppIcons.ai, colorFilter: ColorFilter.mode(RTColorStyle.beige900.value, BlendMode.srcIn)),
-      	    label: 'ИИ',
-      	  ),
-      	  BottomNavigationBarItem(
-      	    icon: SvgPicture.asset(AppIcons.services, width: 24, height: 24),
-      	    activeIcon: SvgPicture.asset(AppIcons.services, colorFilter: ColorFilter.mode(RTColorStyle.beige900.value, BlendMode.srcIn)),
-      	    label: 'Сервисы',
-      	  ),
-      	  BottomNavigationBarItem(
-      	    icon: SvgPicture.asset(AppIcons.profile, width: 24, height: 24),
-      	    activeIcon: SvgPicture.asset(AppIcons.profile, colorFilter: ColorFilter.mode(RTColorStyle.beige900.value, BlendMode.srcIn)),
+	    icon: Container(
+		  width: SW * 0.075,
+		  height: SW * 0.075,
+		  padding: const EdgeInsets.all(1),
+		  decoration: BoxDecoration(
+  		    shape: BoxShape.circle, 
+  		    border: Border.all(
+  		      color: RTColorStyle.dark800.value,
+  		      width: 1,
+  		    ),
+  		  ),
+		  child: CircleAvatar(
+                    backgroundImage: NetworkImage(
+		      '${user?.photoURL}',
+                    ),
+		  ),
+		),
+	    activeIcon: Container(
+		  width: SW * 0.075,
+		  height: SW * 0.075,
+		  padding: const EdgeInsets.all(1),
+		  decoration: BoxDecoration(
+  		    shape: BoxShape.circle, 
+  		    border: Border.all(
+  		      color: RTColorStyle.beige900.value,
+  		      width: 1
+  		    ),
+  		  ),
+		  child: CircleAvatar(
+                    backgroundImage: NetworkImage(
+		      '${user?.photoURL}',
+                    ),
+		  ),
+		),
       	    label: 'Профиль',
 	  ),
 	],

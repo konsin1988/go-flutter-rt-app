@@ -6,10 +6,11 @@ import (
   "errors"
   "log"
 
-  ai "konsin1988/rt-app/domain/ai"
+  "konsin1988/rt-app/db/models"
+
 )
 
-func (r *AiRepo) GetConversationsList (ctx context.Context, user_id int) ([]ai.ConversationListItem, error) {
+func (r *AiRepo) GetConversationsList (ctx context.Context, user_id int) ([]models.ConversationListItem, error) {
   const query = `
     select * 
     from ai_conversation
@@ -23,10 +24,10 @@ func (r *AiRepo) GetConversationsList (ctx context.Context, user_id int) ([]ai.C
   }
   defer rows.Close()
 
-  conversations := make([]ai.ConversationListItem, 0)
+  conversations := make([]models.ConversationListItem, 0)
 
   for rows.Next() {
-    var c ai.ConversationListItem
+    var c models.ConversationListItem
 
     if err := rows.Scan(
       &c.ID,
@@ -46,7 +47,7 @@ func (r *AiRepo) GetConversationsList (ctx context.Context, user_id int) ([]ai.C
   return conversations, nil
 }
 
-func (r *AiRepo) GetConversationById(ctx context.Context, conversation_id int) (*ai.ConversationById, error) {
+func (r *AiRepo) GetConversationById(ctx context.Context, conversation_id int) (*models.ConversationById, error) {
   query := `
     SELECT 
 	c.id, 
@@ -58,7 +59,7 @@ func (r *AiRepo) GetConversationById(ctx context.Context, conversation_id int) (
     WHERE c.id = $1
   `
 
-  var c ai.ConversationById
+  var c models.ConversationById
   log.Println(c)
   
   err := r.db.QueryRow(query, conversation_id).Scan(&c.ID, &c.UserID, &c.Title, &c.CreatedAt, &c.UpdatedAt)
@@ -85,9 +86,9 @@ func (r *AiRepo) GetConversationById(ctx context.Context, conversation_id int) (
   }
   defer rows.Close()
 
-  m := make([]ai.Message, 0)
+  m := make([]models.Message, 0)
   for rows.Next() {
-    var i ai.Message 
+    var i models.Message 
     if err := rows.Scan(&i.ID, &i.ConversationID, &i.Role, &i.Content, &i.CreatedAt); err != nil {
       return nil, err
     }
