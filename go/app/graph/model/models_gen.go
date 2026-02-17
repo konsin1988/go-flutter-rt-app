@@ -31,6 +31,23 @@ type Department struct {
 	Head   int32  `json:"head"`
 }
 
+type DeptByID struct {
+	ID           int32       `json:"id"`
+	Name         string      `json:"name"`
+	Parent       *int32      `json:"parent,omitempty"`
+	ParentName   *string     `json:"parentName,omitempty"`
+	Head         *int32      `json:"head,omitempty"`
+	HeadFio      *string     `json:"headFIO,omitempty"`
+	DeptUserList []*DeptUser `json:"deptUserList"`
+}
+
+type DeptUser struct {
+	ID       int32   `json:"id"`
+	Fio      string  `json:"fio"`
+	Position *string `json:"position,omitempty"`
+	PhotoURL *string `json:"photoURL,omitempty"`
+}
+
 type Head struct {
 	ID  int32  `json:"id"`
 	Fio string `json:"fio"`

@@ -8,6 +8,7 @@ import (
 
 type Repository interface {
   AuthUser(ctx context.Context, email string) (*models.MainUser, error)
+  UserById (ctx context.Context, user_id int) (*models.MainUser, error)
 }
 
 type Service struct {
@@ -21,6 +22,14 @@ func NewService (repo Repository) *Service {
 
 func (s *Service) AuthUser(ctx context.Context, email string) (*models.MainUser, error){
   user, err := s.repo.AuthUser(ctx, email)
+  if err != nil{
+    return nil, err
+  }
+  return user, nil
+}
+
+func (s *Service) UserById(ctx context.Context, user_id int)(*models.MainUser, error){
+  user, err := s.repo.UserById(ctx, user_id)
   if err != nil{
     return nil, err
   }

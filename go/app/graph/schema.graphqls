@@ -38,6 +38,10 @@ type Query {
   mainUser: User
 }
 
+extend type Query {
+  userById(user_id: Int!): User!
+}
+
 # texx
 type TexxPost {
   DocumentId:	ID!	  
@@ -91,8 +95,27 @@ extend type Query {
 }
 
 
+# Depts
+type DeptUser {
+  id: Int!
+  fio: String!
+  position: String
+  photoURL: String
+}
 
+type DeptById {
+  id: Int!
+  name: String!
+  parent: Int
+  parentName: String
+  head: Int
+  headFIO: String
+  deptUserList: [DeptUser!]!
+}
 
+extend type Query {
+  GetDeptById(dept_id: Int!): DeptById!
+}
 
 
 

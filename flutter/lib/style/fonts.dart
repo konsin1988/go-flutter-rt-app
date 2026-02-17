@@ -26,7 +26,7 @@ extension RTFontStyleExtension on RTFontStyle {
       case RTFontStyle.h1:
         return const TextStyle(
             fontFamily: "MuseoSans",
-            fontSize: 32,
+            fontSize: 26,
             height: 36 / 32,
             fontWeight: FontWeight.w700,
             package: "design_system");

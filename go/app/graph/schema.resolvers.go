@@ -10,11 +10,11 @@ import (
 	"errors"
 	"fmt"
 	"konsin1988/rt-app/auth/jwt"
-	"konsin1988/rt-app/domain/texx"
+	"konsin1988/rt-app/db/models"
 	_ "konsin1988/rt-app/db/user"
+	"konsin1988/rt-app/domain/texx"
 	"konsin1988/rt-app/graph/model"
 	"konsin1988/rt-app/helpers"
-	"konsin1988/rt-app/db/models"
 	"strings"
 	"time"
 )
@@ -35,40 +35,16 @@ func (r *queryResolver) MainUser(ctx context.Context) (*model.User, error) {
 	if err != nil {
 		return nil, err
 	}
+	return helpers.UserToGraphModel(mainUser), nil
+}
 
-	depts := make([]*model.Department, 0)
-	heads := make([]*model.Head, 0)
-
-	for i := 0; i < len(mainUser.DeptList); i++ {
-		d := model.Department{
-			ID:     int32(mainUser.DeptList[i].ID),
-			Name:   mainUser.DeptList[i].Name,
-			Parent: int32(mainUser.DeptList[i].Parent),
-			Head:   int32(mainUser.DeptList[i].Head),
-		}
-		depts = append(depts, &d)
-
-		h := model.Head{
-			ID:  int32(mainUser.HeadList[i].ID),
-			Fio: mainUser.HeadList[i].FIO,
-		}
-		heads = append(heads, &h)
+// UserByID is the resolver for the userById field.
+func (r *queryResolver) UserByID(ctx context.Context, userID int32) (*model.User, error) {
+	user, err := r.UserService.UserById(ctx, int(userID))
+	if err != nil {
+	  return nil, err
 	}
-
-	return &model.User{
-		ID:         int32(mainUser.ID),
-		FirstName:  mainUser.FirstName,
-		LastName:   mainUser.LastName,
-		SecondName: mainUser.SecondName,
-		Email:      mainUser.Email,
-		Birthday:   &mainUser.Birthday,
-		PhotoURL:   &mainUser.PhotoURL,
-		Mobile:     &mainUser.Mobile,
-		Inner:      &mainUser.Inner,
-		Position:   &mainUser.Position,
-		DeptList:   depts,
-		HeadList:   heads,
-	}, nil
+	return helpers.UserToGraphModel(user), nil
 }
 
 // TexxPosts is the resolver for the texxPosts field.
@@ -158,6 +134,39 @@ func (r *queryResolver) ConversationByID(ctx context.Context, id int32) (*model.
 		UpdatedAt: c.UpdatedAt.Format(time.RFC3339),
 	}
 	return &conversation, nil
+}
+
+// GetDeptByID is the resolver for the GetDeptById field.
+func (r *queryResolver) GetDeptByID(ctx context.Context, deptID int32) (*model.DeptByID, error) {
+	user, ok := ctx.Value(jwt.MainUserContextKey).(*models.MainUser)
+	if !ok {
+		return nil, errors.New("Cannot load user from context")
+	}
+
+	d, err := r.DeptService.GetDeptById(ctx, deptID, int32(user.ID))
+	if err != nil {
+		return nil, err
+	}
+
+	deptUserList := make([]*model.DeptUser, 0)
+	for _, val := range d.DeptUserList {
+		du := model.DeptUser{
+			ID:       val.ID,
+			Fio:      val.FIO,
+			Position: &val.Position,
+			PhotoURL: &val.PhotoURL,
+		}
+		deptUserList = append(deptUserList, &du)
+	}
+	return &model.DeptByID{
+		ID:           d.ID,
+		Name:         d.Name,
+		Parent:       &d.Parent,
+		ParentName:   &d.ParentName,
+		Head:         &d.Head,
+		HeadFio:      &d.HeadFIO,
+		DeptUserList: deptUserList,
+	}, nil
 }
 
 // Query returns QueryResolver implementation.

@@ -52,28 +52,6 @@ class User {
   }
 }
 
-class DepartmentUser {
-  final int id;
-  final String fio;
-  final String? position;
-  final String? photoURL;
-  
-  DepartmentUser({
-    required this.id,
-    required this.fio,
-    this.position,
-    this.photoURL,
-  });
-  
-  factory DepartmentUser.fromJson(Map<String, dynamic> json) {
-    return DepartmentUser(
-      id: json['id'] as int,
-      fio: json['fio'] as String,
-      position: json['position'] as String?,
-      photoURL: json['photoURL'] as String?,
-    );
-  }
-}
 
 class Head {
   final int id;

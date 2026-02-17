@@ -23,38 +23,62 @@ class Department {
   }
 }
 
-class DepartmentById {
+
+class DeptUser {
+  final int id;
+  final String fio;
+  final String? position;
+  final String? photoURL;
+  
+  DeptUser({
+    required this.id,
+    required this.fio,
+    this.position,
+    this.photoURL,
+  });
+  
+  factory DeptUser.fromJson(Map<String, dynamic> json) {
+    return DeptUser(
+      id: json['id'] as int,
+      fio: json['fio'] as String,
+      position: json['position'] as String?,
+      photoURL: json['photoURL'] as String?,
+    );
+  }
+}
+
+class DeptById {
   final int id;
   final String name;
-  final int parent;
-  final String parent_name;
-  final int head;
-  final String head_fio;
+  final int? parent;
+  final String? parent_name;
+  final int? head;
+  final String? head_fio;
 
-  final List<DepartmentUser> deptUsers;
+  final List<DeptUser> deptUsers;
   
-  DepartmentById({
+  DeptById({
     required this.id,
     required this.name,
-    required this.parent,
-    required this.parent_name,
-    required this.head,
-    required this.head_fio,
+    this.parent,
+    this.parent_name,
+    this.head,
+    this.head_fio,
     required this.deptUsers,
   });
 
-  factory DepartmentById.fromJson(Map<String, dynamic> json) {
-    return DepartmentById(
+  factory DeptById.fromJson(Map<String, dynamic> json) {
+    return DeptById(
       id: json['id'] as int,
       name: json['name'] as String,
-      parent: json['parent'] as int,
-      parent_name: json['parent_name'] as String,
-      head: json['head'] as int,
-      head_fio: json['head_fio'] as String,
+      parent: json['parent'] as int?,
+      parent_name: json['parentName'] as String?,
+      head: json['head'] as int?,
+      head_fio: json['headFIO'] as String?,
       
-      deptUsers: (json['dept_users'] as List?)
-	  ?.map((e) => DepartmentUser.fromJson(e as Map<String, dynamic>))
-	  .toList() ?? <DepartmentUser>[],
+      deptUsers: (json['deptUserList'] as List?)
+	  ?.map((e) => DeptUser.fromJson(e as Map<String, dynamic>))
+	  .toList() ?? <DeptUser>[],
     );
   }
 }

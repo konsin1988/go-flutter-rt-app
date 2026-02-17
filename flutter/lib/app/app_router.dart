@@ -7,13 +7,15 @@ import '../providers/protected_providers.dart';
 import '../auth/auth_provider.dart';
 import '../auth/auth_state.dart';
 import '../../widgets/app_top_bar.dart';
+import 'package:rt_app/features/user/state/user_provider.dart';
 
-import '../screens/home/home_page.dart';
-import '../screens/ai/ai_page.dart';
-import '../screens/services/services_page.dart';
-import '../screens/profile/profile_page.dart';
-import '../screens/init/init_page.dart';
-import '../screens/assistant/assistant_page.dart';
+import 'package:rt_app/screens/home/home_page.dart';
+import 'package:rt_app/screens/ai/ai_page.dart';
+import 'package:rt_app/screens/services/services_page.dart';
+import 'package:rt_app/screens/profile/profile_page.dart';
+import 'package:rt_app/screens/profile/UserPage.dart';
+import 'package:rt_app/screens/init/init_page.dart';
+import 'package:rt_app/screens/assistant/assistant_page.dart';
 import 'package:rt_app/screens/department/department_page.dart';
 
 
@@ -54,7 +56,8 @@ GoRouter createAppRouter(BuildContext context) {
       ),
       GoRoute(
         path: AppRoutes.login,
-        builder: (context, state) => const LoginPage(),
+	pageBuilder: (context, state) =>
+	    const NoTransitionPage(child: LoginPage()),
       ),
       StatefulShellRoute(
         navigatorContainerBuilder: (context, navigationShell, children) {
@@ -113,6 +116,8 @@ GoRouter createAppRouter(BuildContext context) {
               GoRoute(
                 path: AppRoutes.profile,
                 pageBuilder: (context, state) {
+		  final userProvider = context.watch<UserProvider>();
+		  final user = userProvider.authUser; 
 		  return CustomTransitionPage(
 		    key: state.pageKey,
     		    transitionDuration: const Duration(milliseconds: 200), 
@@ -128,11 +133,6 @@ GoRouter createAppRouter(BuildContext context) {
     		    },
     		  );
 		},
-                //pageBuilder: (context, state) {
-		//  return NoTransitionPage(
-      	        //    child: ProfilePage(),
-		//  );
-		//},
 		routes: [
 		  GoRoute(
       		    path: 'department/:id',
@@ -141,6 +141,16 @@ GoRouter createAppRouter(BuildContext context) {
       		      final departmentId = int.tryParse(idString)!;
 		      return NoTransitionPage(
       	                child: DepartmentPage(departmentId: departmentId),
+		      );
+		    },
+      		  ),
+		  GoRoute(
+      		    path: 'user/:id',
+		    pageBuilder: (context, state) {
+      		      final idString = state.pathParameters['id']!;
+      		      final userId = int.tryParse(idString)!;
+		      return NoTransitionPage(
+      	                child: UserPage(userId: userId),
 		      );
 		    },
       		  ),

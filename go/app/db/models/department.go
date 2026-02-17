@@ -10,11 +10,11 @@ type Department struct {
 
 
 type DeptById struct {
-  ID		int		`json:"id"`
+  ID		int32		`json:"id"`
   Name		string		`json:"name"`
-  Parent	int		`json:"parent,omitempty"`
+  Parent	int32		`json:"parent,omitempty"`
   ParentName	string		`json:"parent_name,omitempty"`
-  Head		int		`json:"head,omitempty"`
-  HeadFIO	int		`json:"head_fio,omitempty"`
+  Head		int32		`json:"head,omitempty"`
+  HeadFIO	string		`json:"head_fio,omitempty"`
   DeptUserList	[]DeptUser
 }

@@ -1,18 +1,18 @@
 class DeptQueries {
-  static const String ieptById = r'''
-    query deptById {
-      deptById {
+  static const String deptById = r'''
+    query DeptById($id: Int!) {
+      GetDeptById(dept_id: $id) {
 	id
     	name
     	parent
-    	parent_name
+    	parentName
     	head
-    	head_fio
-    	deptUsers {
-	  id;
-  	  fio;
-  	  position;
-  	  photoURL;
+    	headFIO
+    	deptUserList {
+	  id
+  	  fio
+  	  position
+  	  photoURL
 	}
       }
     }

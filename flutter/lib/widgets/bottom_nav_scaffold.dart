@@ -30,6 +30,9 @@ class BottomNavScaffold extends StatelessWidget {
     if (routeTitle != null) {
       return routeTitle;
     }
+    if (location.contains('department')) {
+      return "Департамент";
+    }
     return AppBarTitles.tabTitles[navigationShell.currentIndex];
     return 'aa';
   }
@@ -42,7 +45,7 @@ class BottomNavScaffold extends StatelessWidget {
     final SW = MediaQuery.of(context).size.width;
     final SH = MediaQuery.of(context).size.height;
     final userProvider = context.watch<UserProvider>();
-    final user = userProvider.user;
+    final user = userProvider.authUser;
     final imageSize = SW * 0.07;
     final imageActiveSize = SW * 0.068;
 

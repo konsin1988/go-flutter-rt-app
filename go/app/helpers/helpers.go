@@ -4,6 +4,8 @@ import (
   "fmt"
   "time"
   "konsin1988/rt-app/types"
+  models "konsin1988/rt-app/db/models"
+  model "konsin1988/rt-app/graph/model"
 )
 
 func GetMonth (num time.Month) string {
@@ -43,4 +45,41 @@ func FormatRussian(t time.Time) string {
       t.Minute(),
       t.Second(),
     )
+}
+
+
+func UserToGraphModel (mainUser *models.MainUser) (*model.User){
+	depts := make([]*model.Department, 0)
+	heads := make([]*model.Head, 0)
+
+	for i := 0; i < len(mainUser.DeptList); i++ {
+		d := model.Department{
+			ID:     int32(mainUser.DeptList[i].ID),
+			Name:   mainUser.DeptList[i].Name,
+			Parent: int32(mainUser.DeptList[i].Parent),
+			Head:   int32(mainUser.DeptList[i].Head),
+		}
+		depts = append(depts, &d)
+
+		h := model.Head{
+			ID:  int32(mainUser.HeadList[i].ID),
+			Fio: mainUser.HeadList[i].FIO,
+		}
+		heads = append(heads, &h)
+	}
+
+	return &model.User{
+		ID:         int32(mainUser.ID),
+		FirstName:  mainUser.FirstName,
+		LastName:   mainUser.LastName,
+		SecondName: mainUser.SecondName,
+		Email:      mainUser.Email,
+		Birthday:   &mainUser.Birthday,
+		PhotoURL:   &mainUser.PhotoURL,
+		Mobile:     &mainUser.Mobile,
+		Inner:      &mainUser.Inner,
+		Position:   &mainUser.Position,
+		DeptList:   depts,
+		HeadList:   heads,
+	}
 }

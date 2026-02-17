@@ -13,6 +13,7 @@ import (
     graph "konsin1988/rt-app/graph"
     user "konsin1988/rt-app/db/user"
     ai "konsin1988/rt-app/db/ai"
+    dept "konsin1988/rt-app/db/department"
     
     "github.com/99designs/gqlgen/graphql/handler"
     "github.com/99designs/gqlgen/graphql/playground"
@@ -42,12 +43,14 @@ func main() {
   healthRepo := health.NewHealthRepository(db)
   userRepo := user.NewUserRepo(db)
   aiRepo := ai.NewAiRepo(db)
+  deptRepo := dept.NewDeptRepo(db)
 
   // svc
   authService := keycloak.NewService(authRepo)
   healthService := health.NewService(healthRepo) 
   userService := user.NewService(userRepo) 
   aiService := ai.NewService(aiRepo)
+  deptService := dept.NewService(deptRepo)
   
 
 
@@ -55,7 +58,7 @@ func main() {
   jwtService := jwt.NewService(validator)
   jwtMiddleware := jwt.Middleware(jwtService, userService)
 
-  resolver := graph.NewResolver(userService, aiService)
+  resolver := graph.NewResolver(userService, aiService, deptService)
   schema := graph.NewExecutableSchema(graph.Config{Resolvers: resolver})
   graphqlHandler := handler.NewDefaultServer(schema)
 

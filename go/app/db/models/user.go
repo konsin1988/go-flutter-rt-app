@@ -6,7 +6,7 @@ type MainUser struct {
   LastName    string	    `json:"last_name"`
   SecondName  string	    `json:"second_name,omitempty"`
   Email	      string	    `json:"email"`
-  Birthday    string	    
+  Birthday    string	    `json:"birthday"`
   PhotoURL    string	    `json:"photo,omitempty"`
   Mobile      string	    `json:"mobile,omitempty"`
   Position    string	    `json:"position"`
@@ -22,8 +22,8 @@ type Head struct {
 }
 
 type DeptUser struct {
-  ID	      int	`json:"id"`
+  ID	      int32	`json:"id"`
   FIO	      string    `json:"fio"`
-  Position    string    `json:"position"`
-  PhotoURL    string	`json:"photo"`
+  Position    string    `json:"position,omitempty"`
+  PhotoURL    string	`json:"photo,omitempty"`
 }

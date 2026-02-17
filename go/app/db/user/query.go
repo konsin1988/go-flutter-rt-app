@@ -33,19 +33,75 @@ func (r *UserRepo) AuthUser(ctx context.Context, email string) (*models.MainUser
         u.phone_inner,
 	u.dept as dept_id
     FROM b_user u
-    JOIN LATERAL jsonb_array_elements_text(u.dept::jsonb) AS dept_id(id) ON true
-    JOIN b_department d ON d.id = dept_id.id::int
-    join b_user uh1 on d.head = uh1.id
-    join b_department d2 on d2.id = d.parent 
-    join b_user uh2 on d2.head = uh2.id
     where u.email = $1 
-    GROUP BY u.id` 
+    `
+
+  u := &models.MainUser{}
+  var deptString string
+  var birthdayTime sql.NullTime 
+
+  err := r.db.QueryRowContext(ctx, query, email).
+	      Scan(&u.ID, &u.FirstName, &u.LastName, &u.SecondName,
+	      &u.Email, &birthdayTime, &u.PhotoURL, &u.Mobile, &u.Position, &u.Inner,
+	      &deptString)
+  if errors.Is(err, sql.ErrNoRows) {
+    return nil, errors.New("user not found")
+  }
+  if birthdayTime.Valid{
+    u.Birthday = helpers.GetRussianBD(&birthdayTime.Time)
+  }
+
+  deptList, err := parseIntList(deptString)
+  if err != nil {
+    return nil, errors.New("cannot convert string to int list")
+  }
+
+  depts := make([]models.Department, 0)
+  heads := make([]models.Head, 0)
+
+  for _, i := range deptList {
+    d, err := r.getDept(ctx, i)
+    if err != nil {
+      return nil, err
+    }
+    depts = append(depts, *d)
+
+    h, err := r.getHeadData(ctx, u.ID, d)
+    if err != nil {
+      return nil, err
+    }
+    heads = append(heads, *h)
+  }
+  u.DeptList = depts
+  u.HeadList = heads
+
+  return u, nil
+}
+
+
+func (r *UserRepo) UserById (ctx context.Context, user_id int) (*models.MainUser, error) {
+  const query = `
+    SELECT
+        u.id,
+        u.first_name,
+        u.last_name,
+        u.second_name,
+        u.email,
+        u.birthday,
+        u.photo,
+        u.mobile,
+        u.position,
+        u.phone_inner,
+	u.dept as dept_id
+    FROM b_user u
+    where u.id = $1 
+    `
 
   u := &models.MainUser{}
   var deptString string
   var birthdayTime *time.Time
 
-  err := r.db.QueryRowContext(ctx, query, email).
+  err := r.db.QueryRowContext(ctx, query, user_id).
 	      Scan(&u.ID, &u.FirstName, &u.LastName, &u.SecondName,
 	      &u.Email, &birthdayTime, &u.PhotoURL, &u.Mobile, &u.Position, &u.Inner,
 	      &deptString)
@@ -83,6 +139,8 @@ func (r *UserRepo) AuthUser(ctx context.Context, email string) (*models.MainUser
 
   return u, nil
 }
+
+
 
 func (r *UserRepo) getDept(ctx context.Context, id int) (*models.Department, error) {
   const query = `
@@ -122,7 +180,7 @@ func (r *UserRepo) getHeadData(ctx context.Context, user_id int, d *models.Depar
   h := models.Head{}
   if d.Head != 0 && (user_id != d.Head || d.Parent == 0 ) {
     err := r.db.QueryRowContext(ctx, head_query, d.Head).
-	  Scan(&h.ID, h.FIO)
+	  Scan(&h.ID, &h.FIO)
     if err != nil {
       return nil, errors.New("Cannot get head by id part 1")
     }

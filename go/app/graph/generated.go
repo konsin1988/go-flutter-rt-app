@@ -68,6 +68,23 @@ type ComplexityRoot struct {
 		Parent func(childComplexity int) int
 	}
 
+	DeptById struct {
+		DeptUserList func(childComplexity int) int
+		Head         func(childComplexity int) int
+		HeadFio      func(childComplexity int) int
+		ID           func(childComplexity int) int
+		Name         func(childComplexity int) int
+		Parent       func(childComplexity int) int
+		ParentName   func(childComplexity int) int
+	}
+
+	DeptUser struct {
+		Fio      func(childComplexity int) int
+		ID       func(childComplexity int) int
+		PhotoURL func(childComplexity int) int
+		Position func(childComplexity int) int
+	}
+
 	Head struct {
 		Fio func(childComplexity int) int
 		ID  func(childComplexity int) int
@@ -83,8 +100,10 @@ type ComplexityRoot struct {
 	Query struct {
 		ConversationByID func(childComplexity int, id int32) int
 		ConversationList func(childComplexity int) int
+		GetDeptByID      func(childComplexity int, deptID int32) int
 		MainUser         func(childComplexity int) int
 		TexxPosts        func(childComplexity int) int
+		UserByID         func(childComplexity int, userID int32) int
 	}
 
 	TexxPost struct {
@@ -120,9 +139,11 @@ type ComplexityRoot struct {
 
 type QueryResolver interface {
 	MainUser(ctx context.Context) (*model.User, error)
+	UserByID(ctx context.Context, userID int32) (*model.User, error)
 	TexxPosts(ctx context.Context) ([]*model.TexxPost, error)
 	ConversationList(ctx context.Context) ([]*model.ConversationListItem, error)
 	ConversationByID(ctx context.Context, id int32) (*model.Conversation, error)
+	GetDeptByID(ctx context.Context, deptID int32) (*model.DeptByID, error)
 }
 
 type executableSchema struct {
@@ -230,6 +251,74 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.complexity.Department.Parent(childComplexity), true
 
+	case "DeptById.deptUserList":
+		if e.complexity.DeptById.DeptUserList == nil {
+			break
+		}
+
+		return e.complexity.DeptById.DeptUserList(childComplexity), true
+	case "DeptById.head":
+		if e.complexity.DeptById.Head == nil {
+			break
+		}
+
+		return e.complexity.DeptById.Head(childComplexity), true
+	case "DeptById.headFIO":
+		if e.complexity.DeptById.HeadFio == nil {
+			break
+		}
+
+		return e.complexity.DeptById.HeadFio(childComplexity), true
+	case "DeptById.id":
+		if e.complexity.DeptById.ID == nil {
+			break
+		}
+
+		return e.complexity.DeptById.ID(childComplexity), true
+	case "DeptById.name":
+		if e.complexity.DeptById.Name == nil {
+			break
+		}
+
+		return e.complexity.DeptById.Name(childComplexity), true
+	case "DeptById.parent":
+		if e.complexity.DeptById.Parent == nil {
+			break
+		}
+
+		return e.complexity.DeptById.Parent(childComplexity), true
+	case "DeptById.parentName":
+		if e.complexity.DeptById.ParentName == nil {
+			break
+		}
+
+		return e.complexity.DeptById.ParentName(childComplexity), true
+
+	case "DeptUser.fio":
+		if e.complexity.DeptUser.Fio == nil {
+			break
+		}
+
+		return e.complexity.DeptUser.Fio(childComplexity), true
+	case "DeptUser.id":
+		if e.complexity.DeptUser.ID == nil {
+			break
+		}
+
+		return e.complexity.DeptUser.ID(childComplexity), true
+	case "DeptUser.photoURL":
+		if e.complexity.DeptUser.PhotoURL == nil {
+			break
+		}
+
+		return e.complexity.DeptUser.PhotoURL(childComplexity), true
+	case "DeptUser.position":
+		if e.complexity.DeptUser.Position == nil {
+			break
+		}
+
+		return e.complexity.DeptUser.Position(childComplexity), true
+
 	case "Head.fio":
 		if e.complexity.Head.Fio == nil {
 			break
@@ -285,6 +374,17 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.Query.ConversationList(childComplexity), true
+	case "Query.GetDeptById":
+		if e.complexity.Query.GetDeptByID == nil {
+			break
+		}
+
+		args, err := ec.field_Query_GetDeptById_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.GetDeptByID(childComplexity, args["dept_id"].(int32)), true
 	case "Query.mainUser":
 		if e.complexity.Query.MainUser == nil {
 			break
@@ -297,6 +397,17 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.Query.TexxPosts(childComplexity), true
+	case "Query.userById":
+		if e.complexity.Query.UserByID == nil {
+			break
+		}
+
+		args, err := ec.field_Query_userById_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.UserByID(childComplexity, args["user_id"].(int32)), true
 
 	case "TexxPost.DocumentId":
 		if e.complexity.TexxPost.DocumentID == nil {
@@ -562,6 +673,17 @@ func (ec *executionContext) field_Query_ConversationById_args(ctx context.Contex
 	return args, nil
 }
 
+func (ec *executionContext) field_Query_GetDeptById_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "dept_id", ec.unmarshalNInt2int32)
+	if err != nil {
+		return nil, err
+	}
+	args["dept_id"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field_Query___type_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
 	args := map[string]any{}
@@ -570,6 +692,17 @@ func (ec *executionContext) field_Query___type_args(ctx context.Context, rawArgs
 		return nil, err
 	}
 	args["name"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_userById_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "user_id", ec.unmarshalNInt2int32)
+	if err != nil {
+		return nil, err
+	}
+	args["user_id"] = arg0
 	return args, nil
 }
 
@@ -1023,6 +1156,335 @@ func (ec *executionContext) fieldContext_Department_head(_ context.Context, fiel
 	return fc, nil
 }
 
+func (ec *executionContext) _DeptById_id(ctx context.Context, field graphql.CollectedField, obj *model.DeptByID) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_DeptById_id,
+		func(ctx context.Context) (any, error) {
+			return obj.ID, nil
+		},
+		nil,
+		ec.marshalNInt2int32,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_DeptById_id(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "DeptById",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _DeptById_name(ctx context.Context, field graphql.CollectedField, obj *model.DeptByID) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_DeptById_name,
+		func(ctx context.Context) (any, error) {
+			return obj.Name, nil
+		},
+		nil,
+		ec.marshalNString2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_DeptById_name(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "DeptById",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _DeptById_parent(ctx context.Context, field graphql.CollectedField, obj *model.DeptByID) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_DeptById_parent,
+		func(ctx context.Context) (any, error) {
+			return obj.Parent, nil
+		},
+		nil,
+		ec.marshalOInt2ᚖint32,
+		true,
+		false,
+	)
+}
+
+func (ec *executionContext) fieldContext_DeptById_parent(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "DeptById",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _DeptById_parentName(ctx context.Context, field graphql.CollectedField, obj *model.DeptByID) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_DeptById_parentName,
+		func(ctx context.Context) (any, error) {
+			return obj.ParentName, nil
+		},
+		nil,
+		ec.marshalOString2ᚖstring,
+		true,
+		false,
+	)
+}
+
+func (ec *executionContext) fieldContext_DeptById_parentName(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "DeptById",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _DeptById_head(ctx context.Context, field graphql.CollectedField, obj *model.DeptByID) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_DeptById_head,
+		func(ctx context.Context) (any, error) {
+			return obj.Head, nil
+		},
+		nil,
+		ec.marshalOInt2ᚖint32,
+		true,
+		false,
+	)
+}
+
+func (ec *executionContext) fieldContext_DeptById_head(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "DeptById",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _DeptById_headFIO(ctx context.Context, field graphql.CollectedField, obj *model.DeptByID) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_DeptById_headFIO,
+		func(ctx context.Context) (any, error) {
+			return obj.HeadFio, nil
+		},
+		nil,
+		ec.marshalOString2ᚖstring,
+		true,
+		false,
+	)
+}
+
+func (ec *executionContext) fieldContext_DeptById_headFIO(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "DeptById",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _DeptById_deptUserList(ctx context.Context, field graphql.CollectedField, obj *model.DeptByID) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_DeptById_deptUserList,
+		func(ctx context.Context) (any, error) {
+			return obj.DeptUserList, nil
+		},
+		nil,
+		ec.marshalNDeptUser2ᚕᚖkonsin1988ᚋrtᚑappᚋgraphᚋmodelᚐDeptUserᚄ,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_DeptById_deptUserList(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "DeptById",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_DeptUser_id(ctx, field)
+			case "fio":
+				return ec.fieldContext_DeptUser_fio(ctx, field)
+			case "position":
+				return ec.fieldContext_DeptUser_position(ctx, field)
+			case "photoURL":
+				return ec.fieldContext_DeptUser_photoURL(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type DeptUser", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _DeptUser_id(ctx context.Context, field graphql.CollectedField, obj *model.DeptUser) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_DeptUser_id,
+		func(ctx context.Context) (any, error) {
+			return obj.ID, nil
+		},
+		nil,
+		ec.marshalNInt2int32,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_DeptUser_id(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "DeptUser",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _DeptUser_fio(ctx context.Context, field graphql.CollectedField, obj *model.DeptUser) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_DeptUser_fio,
+		func(ctx context.Context) (any, error) {
+			return obj.Fio, nil
+		},
+		nil,
+		ec.marshalNString2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_DeptUser_fio(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "DeptUser",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _DeptUser_position(ctx context.Context, field graphql.CollectedField, obj *model.DeptUser) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_DeptUser_position,
+		func(ctx context.Context) (any, error) {
+			return obj.Position, nil
+		},
+		nil,
+		ec.marshalOString2ᚖstring,
+		true,
+		false,
+	)
+}
+
+func (ec *executionContext) fieldContext_DeptUser_position(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "DeptUser",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _DeptUser_photoURL(ctx context.Context, field graphql.CollectedField, obj *model.DeptUser) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_DeptUser_photoURL,
+		func(ctx context.Context) (any, error) {
+			return obj.PhotoURL, nil
+		},
+		nil,
+		ec.marshalOString2ᚖstring,
+		true,
+		false,
+	)
+}
+
+func (ec *executionContext) fieldContext_DeptUser_photoURL(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "DeptUser",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Head_id(ctx context.Context, field graphql.CollectedField, obj *model.Head) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
 		ctx,
@@ -1252,6 +1714,73 @@ func (ec *executionContext) fieldContext_Query_mainUser(_ context.Context, field
 	return fc, nil
 }
 
+func (ec *executionContext) _Query_userById(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Query_userById,
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.resolvers.Query().UserByID(ctx, fc.Args["user_id"].(int32))
+		},
+		nil,
+		ec.marshalNUser2ᚖkonsin1988ᚋrtᚑappᚋgraphᚋmodelᚐUser,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Query_userById(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_User_id(ctx, field)
+			case "firstName":
+				return ec.fieldContext_User_firstName(ctx, field)
+			case "lastName":
+				return ec.fieldContext_User_lastName(ctx, field)
+			case "secondName":
+				return ec.fieldContext_User_secondName(ctx, field)
+			case "email":
+				return ec.fieldContext_User_email(ctx, field)
+			case "birthday":
+				return ec.fieldContext_User_birthday(ctx, field)
+			case "photoURL":
+				return ec.fieldContext_User_photoURL(ctx, field)
+			case "mobile":
+				return ec.fieldContext_User_mobile(ctx, field)
+			case "inner":
+				return ec.fieldContext_User_inner(ctx, field)
+			case "position":
+				return ec.fieldContext_User_position(ctx, field)
+			case "deptList":
+				return ec.fieldContext_User_deptList(ctx, field)
+			case "headList":
+				return ec.fieldContext_User_headList(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_userById_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Query_texxPosts(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
 		ctx,
@@ -1381,6 +1910,63 @@ func (ec *executionContext) fieldContext_Query_ConversationById(ctx context.Cont
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Query_ConversationById_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_GetDeptById(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Query_GetDeptById,
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.resolvers.Query().GetDeptByID(ctx, fc.Args["dept_id"].(int32))
+		},
+		nil,
+		ec.marshalNDeptById2ᚖkonsin1988ᚋrtᚑappᚋgraphᚋmodelᚐDeptByID,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Query_GetDeptById(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_DeptById_id(ctx, field)
+			case "name":
+				return ec.fieldContext_DeptById_name(ctx, field)
+			case "parent":
+				return ec.fieldContext_DeptById_parent(ctx, field)
+			case "parentName":
+				return ec.fieldContext_DeptById_parentName(ctx, field)
+			case "head":
+				return ec.fieldContext_DeptById_head(ctx, field)
+			case "headFIO":
+				return ec.fieldContext_DeptById_headFIO(ctx, field)
+			case "deptUserList":
+				return ec.fieldContext_DeptById_deptUserList(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type DeptById", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_GetDeptById_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -3738,6 +4324,111 @@ func (ec *executionContext) _Department(ctx context.Context, sel ast.SelectionSe
 	return out
 }
 
+var deptByIdImplementors = []string{"DeptById"}
+
+func (ec *executionContext) _DeptById(ctx context.Context, sel ast.SelectionSet, obj *model.DeptByID) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, deptByIdImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("DeptById")
+		case "id":
+			out.Values[i] = ec._DeptById_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "name":
+			out.Values[i] = ec._DeptById_name(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "parent":
+			out.Values[i] = ec._DeptById_parent(ctx, field, obj)
+		case "parentName":
+			out.Values[i] = ec._DeptById_parentName(ctx, field, obj)
+		case "head":
+			out.Values[i] = ec._DeptById_head(ctx, field, obj)
+		case "headFIO":
+			out.Values[i] = ec._DeptById_headFIO(ctx, field, obj)
+		case "deptUserList":
+			out.Values[i] = ec._DeptById_deptUserList(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var deptUserImplementors = []string{"DeptUser"}
+
+func (ec *executionContext) _DeptUser(ctx context.Context, sel ast.SelectionSet, obj *model.DeptUser) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, deptUserImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("DeptUser")
+		case "id":
+			out.Values[i] = ec._DeptUser_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "fio":
+			out.Values[i] = ec._DeptUser_fio(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "position":
+			out.Values[i] = ec._DeptUser_position(ctx, field, obj)
+		case "photoURL":
+			out.Values[i] = ec._DeptUser_photoURL(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
 var headImplementors = []string{"Head"}
 
 func (ec *executionContext) _Head(ctx context.Context, sel ast.SelectionSet, obj *model.Head) graphql.Marshaler {
@@ -3874,6 +4565,28 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "userById":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_userById(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "texxPosts":
 			field := field
 
@@ -3928,6 +4641,28 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_ConversationById(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "GetDeptById":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_GetDeptById(ctx, field)
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}
@@ -4649,6 +5384,74 @@ func (ec *executionContext) marshalNDepartment2ᚖkonsin1988ᚋrtᚑappᚋgraph�
 	return ec._Department(ctx, sel, v)
 }
 
+func (ec *executionContext) marshalNDeptById2konsin1988ᚋrtᚑappᚋgraphᚋmodelᚐDeptByID(ctx context.Context, sel ast.SelectionSet, v model.DeptByID) graphql.Marshaler {
+	return ec._DeptById(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNDeptById2ᚖkonsin1988ᚋrtᚑappᚋgraphᚋmodelᚐDeptByID(ctx context.Context, sel ast.SelectionSet, v *model.DeptByID) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			graphql.AddErrorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._DeptById(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNDeptUser2ᚕᚖkonsin1988ᚋrtᚑappᚋgraphᚋmodelᚐDeptUserᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.DeptUser) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNDeptUser2ᚖkonsin1988ᚋrtᚑappᚋgraphᚋmodelᚐDeptUser(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) marshalNDeptUser2ᚖkonsin1988ᚋrtᚑappᚋgraphᚋmodelᚐDeptUser(ctx context.Context, sel ast.SelectionSet, v *model.DeptUser) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			graphql.AddErrorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._DeptUser(ctx, sel, v)
+}
+
 func (ec *executionContext) marshalNHead2ᚕᚖkonsin1988ᚋrtᚑappᚋgraphᚋmodelᚐHeadᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Head) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
@@ -4867,6 +5670,20 @@ func (ec *executionContext) marshalNTexxPost2ᚖkonsin1988ᚋrtᚑappᚋgraphᚋ
 		return graphql.Null
 	}
 	return ec._TexxPost(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNUser2konsin1988ᚋrtᚑappᚋgraphᚋmodelᚐUser(ctx context.Context, sel ast.SelectionSet, v model.User) graphql.Marshaler {
+	return ec._User(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNUser2ᚖkonsin1988ᚋrtᚑappᚋgraphᚋmodelᚐUser(ctx context.Context, sel ast.SelectionSet, v *model.User) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			graphql.AddErrorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._User(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalN__Directive2githubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐDirective(ctx context.Context, sel ast.SelectionSet, v introspection.Directive) graphql.Marshaler {

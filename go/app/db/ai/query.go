@@ -4,7 +4,6 @@ import (
   "context"
   _ "database/sql"
   "errors"
-  "log"
 
   "konsin1988/rt-app/db/models"
 
@@ -60,13 +59,11 @@ func (r *AiRepo) GetConversationById(ctx context.Context, conversation_id int) (
   `
 
   var c models.ConversationById
-  log.Println(c)
   
   err := r.db.QueryRow(query, conversation_id).Scan(&c.ID, &c.UserID, &c.Title, &c.CreatedAt, &c.UpdatedAt)
   if err != nil {
     return nil, errors.New("Cant get an conversation from database")
   }
-  log.Println(c)
 
   query = `
     SELECT 
