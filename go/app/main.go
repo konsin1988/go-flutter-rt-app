@@ -9,14 +9,14 @@ import (
     health "konsin1988/rt-app/db/health"
     transport "konsin1988/rt-app/transport/http"
     keycloak "konsin1988/rt-app/auth/keycloak"
-    _ "konsin1988/rt-app/bitrix"
+    _ "konsin1988/rt-app/services/bitrix"
     jwt "konsin1988/rt-app/auth/jwt"
     graph "konsin1988/rt-app/graph"
     user "konsin1988/rt-app/db/user"
     ai "konsin1988/rt-app/db/ai"
     dept "konsin1988/rt-app/db/department"
     
-    "github.com/99designs/gqlgen/graphql/handler"
+    _ "github.com/99designs/gqlgen/graphql/handler"
     "github.com/99designs/gqlgen/graphql/playground"
 
 )
@@ -57,14 +57,21 @@ func main() {
   deptService := dept.NewService(deptRepo)
   
 
-
   validator := jwt.NewValidator(jwks, kc.Issuer, kc.ClientID)
   jwtService := jwt.NewService(validator)
   jwtMiddleware := jwt.Middleware(jwtService, userService)
+  
 
+  // GraphQL
   resolver := graph.NewResolver(userService, aiService, deptService)
-  schema := graph.NewExecutableSchema(graph.Config{Resolvers: resolver})
-  graphqlHandler := handler.NewDefaultServer(schema)
+  //schema := graph.NewExecutableSchema(graph.Config{Resolvers: resolver})
+  //graphqlHandler := handler.NewDefaultServer(schema)
+  graphqlHandler := transport.NewGraphQLHandler(
+    resolver,
+    jwtService,
+    userService,
+  )
+
 
   authHandler := transport.NewAuthHandler(authService)
   healthHandler := transport.NewHealthHandler(healthService)

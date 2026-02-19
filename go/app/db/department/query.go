@@ -4,7 +4,6 @@ import (
   "database/sql"
   "context"
   "errors"
-  "log"
 
   models "konsin1988/rt-app/db/models"
 )
@@ -30,7 +29,6 @@ func (r *DeptRepo) GetDeptById (ctx context.Context, dept_id, user_id int32) (*m
   if errors.Is(err, sql.ErrNoRows) {
     return nil, errors.New("user not found")
   }
-  log.Println(d)
 
   users := make([]models.DeptUser, 0)
   query = `

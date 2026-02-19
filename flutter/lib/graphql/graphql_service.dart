@@ -36,3 +36,35 @@ class GraphQLService {
 
 }
 
+//class GraphQLService {
+//  static final GraphQLService _instance = GraphQLService._internal();
+//  factory GraphQLService() => _instance;
+//  GraphQLService._internal();
+//
+//  late GraphQLClient client;
+//
+//  Future<void> init() async {
+//    await initHiveForFlutter();
+//
+//    final AuthLink authLink = AuthLink(
+//      getToken: () async {
+//	final token = TokenStorage().accessToken;
+//	if (token == null) return null; 
+//	return 'Bearer $token';
+//      },
+//    );
+//
+//    final Link link = authLink.concat(HttpLink(AppLinks.graphqlURL));
+//
+//    client = GraphQLClient(
+//      cache: GraphQLCache(store: HiveStoreFactory.create()),
+//      link: link,
+//    );
+//  }
+//
+//  void clearCache() {
+//    client.cache.store.reset();
+//  }
+//
+//}
+

@@ -9,4 +9,5 @@ fi
 
 flutter run \
   --dart-define=BASE_URL=http://$IP_ADDRESS:8000 \
+  --dart-define=BASE_WS_URL=ws://$IP_ADDRESS:8000/graphql \
   -d 0xSZB888DABOBO 
