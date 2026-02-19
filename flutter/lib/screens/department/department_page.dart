@@ -9,6 +9,8 @@ import 'package:rt_app/features/department/data/dept_repository.dart';
 import 'package:rt_app/graphql/graphql_service.dart';
 import 'widgets/DepartmentField.dart';
 import 'widgets/UserField.dart';
+import 'widgets/DeptUserTile.dart';
+import 'widgets/GDField.dart';
 
 class DepartmentPage extends StatelessWidget {
   final int departmentId;
@@ -42,10 +44,10 @@ class DepartmentPage extends StatelessWidget {
 	final dept = snapshot.data!;
 
 	final department = Department(
-	  id: dept.parent ?? 0,
-	  name: dept.parent_name.toString() ?? '',
-	  parent: 0,
-	  head: 0,
+	  id: dept.id,
+	  name: dept.name.toString(),
+	  parent: dept.parent,
+	  head: dept.head,
 	);
 
 
@@ -55,17 +57,33 @@ class DepartmentPage extends StatelessWidget {
 	  child: Column( 
 	    children: [
 	      Padding(
-	        padding: EdgeInsets.symmetric(horizontal: SW * 0.08, vertical: SH * 0.01),
+	        padding: EdgeInsets.symmetric(horizontal: SW * 0.08, vertical: SH * 0.015),
 	        child: Center(
 		  child: Text(
 		    dept.name,
-		    style: RTFontStyle.h2.value 
+		    style: RTFontStyle.h2.value.copyWith(fontSize: 20), 
 		  ),
 		),
 	      ),
-	      UserField(user_id: dept.head ?? 0, name: dept.head_fio ?? ''),
-	      DepartmentField(department: department),
+	      dept.id == 108  
+		?  Padding(
+		    padding: EdgeInsets.only(top: SH * 0.01), 
+		    child: GDField(),
+		    )
+		: UserField(user_id: dept.head ?? 0, name: dept.head_fio ?? ''),
+	      dept.parent != null 
+		    ? DepartmentField(id: dept.parent!, deptName: dept.parent_name!) 
+		    : Text(''), 
 	      const Divider(),
+
+	      Expanded(
+	        child: ListView.builder(
+      	          itemCount: dept.deptUsers.length,
+      	          itemBuilder: (context, index) {
+		    return DeptUserTile(user: dept.deptUsers[index]);
+      	          },
+      	        ),
+      	      ),
 	    ],
 	  ),
 	);

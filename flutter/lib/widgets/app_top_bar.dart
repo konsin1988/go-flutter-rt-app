@@ -34,6 +34,15 @@ class AppTopBar extends StatelessWidget implements PreferredSizeWidget {
     return AppBar(
       centerTitle: true,
       backgroundColor: RTColorStyle.dark1000.value,
+      leading: IconButton(
+        icon: const Icon(Icons.arrow_back),
+        color: RTColorStyle.beige1000.value,
+        onPressed: () {
+	  if (context.canPop()) {
+	    context.pop();
+	  }
+        },
+      ),
       title: Text(
 	title,
 	style: RTFontStyle.appTitle.value 

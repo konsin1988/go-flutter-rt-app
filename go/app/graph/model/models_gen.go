@@ -76,7 +76,7 @@ type User struct {
 	ID         int32         `json:"id"`
 	FirstName  string        `json:"firstName"`
 	LastName   string        `json:"lastName"`
-	SecondName string        `json:"secondName"`
+	SecondName *string       `json:"secondName,omitempty"`
 	Email      string        `json:"email"`
 	Birthday   *string       `json:"birthday,omitempty"`
 	PhotoURL   *string       `json:"photoURL,omitempty"`

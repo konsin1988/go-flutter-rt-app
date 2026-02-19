@@ -3,8 +3,8 @@ import 'package:rt_app/features/user/data/user_models.dart';
 class Department {
   final int id;
   final String name;
-  final int parent;
-  final int head;
+  final int? parent;
+  final int? head;
 
   Department({
     required this.id,

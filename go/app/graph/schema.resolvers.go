@@ -42,7 +42,7 @@ func (r *queryResolver) MainUser(ctx context.Context) (*model.User, error) {
 func (r *queryResolver) UserByID(ctx context.Context, userID int32) (*model.User, error) {
 	user, err := r.UserService.UserById(ctx, int(userID))
 	if err != nil {
-	  return nil, err
+		return nil, err
 	}
 	return helpers.UserToGraphModel(user), nil
 }
@@ -154,17 +154,17 @@ func (r *queryResolver) GetDeptByID(ctx context.Context, deptID int32) (*model.D
 			ID:       val.ID,
 			Fio:      val.FIO,
 			Position: &val.Position,
-			PhotoURL: &val.PhotoURL,
+			PhotoURL: val.PhotoURL,
 		}
 		deptUserList = append(deptUserList, &du)
 	}
 	return &model.DeptByID{
 		ID:           d.ID,
 		Name:         d.Name,
-		Parent:       &d.Parent,
-		ParentName:   &d.ParentName,
-		Head:         &d.Head,
-		HeadFio:      &d.HeadFIO,
+		Parent:       d.Parent,
+		ParentName:   d.ParentName,
+		Head:         d.Head,
+		HeadFio:      d.HeadFIO,
 		DeptUserList: deptUserList,
 	}, nil
 }

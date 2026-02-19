@@ -1,16 +1,17 @@
 import 'package:flutter/material.dart';
 
+import 'package:url_launcher/url_launcher.dart';
 import 'package:rt_app/style/colors.dart';
 import 'package:rt_app/style/fonts.dart';
 
-class TextFields extends StatelessWidget {
+class EmailField extends StatelessWidget {
   final String field;
   final String value;
 
   double screenWidth(BuildContext context) =>
     MediaQuery.of(context).size.width;
 
-  const TextFields({
+  const EmailField({
     Key? key,
     required this.field,
     required this.value,
@@ -35,9 +36,25 @@ class TextFields extends StatelessWidget {
 				  right: SW * 0.05, 
 				  top: SW * 0.005, 
 				  bottom: SW * 0.015),
-	  child: Text(
-	    '$value',
-	    style: RTFontStyle.ProfileValue.value 
+	  child: InkWell(
+	    onTap: () async {
+  	      final Uri emailUri = Uri(
+  	        scheme: 'mailto',
+  	        path: value, // user email
+  	      );
+
+  	      if (await canLaunchUrl(emailUri)) {
+  	        await launchUrl(emailUri);
+  	      } else {
+  	        debugPrint('Could not launch email app');
+  	      }
+  	    },
+	    child: Text(
+	      '$value',
+	      style: RTFontStyle.ProfileValue.value.copyWith(
+	        //decoration: TextDecoration.underline,
+	      ),
+	    ),
 	  ),
 	),
     ]);

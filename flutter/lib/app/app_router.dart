@@ -17,6 +17,7 @@ import 'package:rt_app/screens/profile/UserPage.dart';
 import 'package:rt_app/screens/init/init_page.dart';
 import 'package:rt_app/screens/assistant/assistant_page.dart';
 import 'package:rt_app/screens/department/department_page.dart';
+import 'package:rt_app/screens/profile/widgets/FullScreenImagePage.dart';
 
 
 import '../utils/constants.dart';
@@ -58,6 +59,13 @@ GoRouter createAppRouter(BuildContext context) {
         path: AppRoutes.login,
 	pageBuilder: (context, state) =>
 	    const NoTransitionPage(child: LoginPage()),
+      ),
+      GoRoute(
+        path: AppRoutes.image,
+	pageBuilder: (context, state) { 
+	    final imageUrl = state.extra as String; 
+	    return NoTransitionPage(child: FullScreenImagePage(imageUrl: imageUrl));
+	},
       ),
       StatefulShellRoute(
         navigatorContainerBuilder: (context, navigationShell, children) {

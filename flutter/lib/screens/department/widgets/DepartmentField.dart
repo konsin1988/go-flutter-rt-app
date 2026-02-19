@@ -7,10 +7,12 @@ import 'package:rt_app/style/colors.dart';
 import 'package:rt_app/style/fonts.dart';
 
 class DepartmentField extends StatelessWidget {
-  final Department department;
+  final int id;
+  final String deptName;
 
   const DepartmentField({
-    required this.department,
+    required this.id,
+    required this.deptName,
     super.key,
   });
 
@@ -31,7 +33,7 @@ class DepartmentField extends StatelessWidget {
 	InkWell(
 	  splashFactory: NoSplash.splashFactory, 
 	  onTap: () {
-	    context.push('/profile/department/${department.id}');
+	    context.push('/profile/department/${id}');
 	  },
 	  child: Padding(
 	    padding: EdgeInsets.only(left: SW * 0.3, 
@@ -39,7 +41,7 @@ class DepartmentField extends StatelessWidget {
 	          		  top: SW * 0.005, 
 	          		  bottom: SW * 0.025),
 	    child: Text(
-	      '${department.name}',
+	      '${deptName}',
 	      style: RTFontStyle.ProfileValue.value 
 	    ),
 	  ),

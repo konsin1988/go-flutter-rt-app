@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 import 'package:rt_app/features/user/data/user_models.dart';
 import 'package:rt_app/style/colors.dart';
@@ -6,6 +7,7 @@ import 'package:rt_app/style/fonts.dart';
 import 'TextFields.dart';
 import 'PhoneField.dart';
 import 'DepartmentField.dart';
+import 'EmailField.dart';
 
 class UserInfo extends StatelessWidget {
   final User user;
@@ -27,23 +29,31 @@ class UserInfo extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
     	const Spacer(flex:1),
-    	Container(
-    	  width: SW * 0.4,
-    	  height: SW * 0.4,
-    	  padding: const EdgeInsets.all(4),
-    	  decoration: BoxDecoration(
-    	    shape: BoxShape.circle, 
-    	    border: Border.all(
-    	      color: RTColorStyle.beige900.value,
-    	      width: 2,
+	InkWell(
+	  onTap: () {
+	    context.push('/image', extra: user.photoURL);
+	  },
+	  child: Container(
+    	    width: SW * 0.4,
+    	    height: SW * 0.4,
+    	    padding: const EdgeInsets.all(4),
+    	    decoration: BoxDecoration(
+    	      shape: BoxShape.circle, 
+    	      border: Border.all(
+    	        color: RTColorStyle.beige900.value,
+    	        width: 2,
+    	      ),
+    	    ),
+    	    child: CircleAvatar(
+                backgroundImage: user.photoURL != null
+                    ? NetworkImage(user.photoURL!)
+                    : null,
+                child: user.photoURL == null
+                    ? const Icon(Icons.person)
+                    : null,
     	    ),
     	  ),
-    	  child: CircleAvatar(
-                backgroundImage: NetworkImage(
-    	      '${user.photoURL}',
-                ),
-    	  ),
-    	),
+	),
     	const Spacer(flex:1),
     
     	Column(
@@ -69,7 +79,7 @@ class UserInfo extends StatelessWidget {
     	        Icon(Icons.cake, size: 25, color: RTColorStyle.beige600.value),
     	        SizedBox(width:10),
                 	Text(
-    		  '${user.birthday}',
+    		  user.birthday != null ? '${user.birthday}' : '',
     		  style: RTFontStyle.appTitle.value.copyWith(fontSize: SW * 0.05),
     		),
     	      ],
@@ -98,11 +108,11 @@ class UserInfo extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              DepartmentField(department: user.deptList[0]),
-    	  TextFields(field: 'Должность:', value: '${user.position}'),
-              TextFields(field: 'Рабочий телефон:', value: '${user.inner}'),
-              PhoneField(field: 'Мобильный телефон:', value: '${user.mobile}'),
-              TextFields(field: 'Электронная почта:', value: '${user.email}'),
+              DepartmentField(departmentList: user.deptList),
+	      TextFields(field: 'Должность:', value: '${user.position}'),
+              TextFields(field: 'Рабочий телефон:', value: user.inner != null ? '${user.inner}' : ''),
+              PhoneField(field: 'Мобильный телефон:', value: user.mobile != null ? '${user.mobile}' : ''),
+              EmailField(field: 'Электронная почта:', value: '${user.email}'),
               //LinkableField(field: 'Руководитель:', value: '${user.headList[0].fio}'),
             ],
           ),

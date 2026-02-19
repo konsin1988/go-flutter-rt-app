@@ -29,7 +29,7 @@ class PhoneField extends StatelessWidget {
 	backgroundColor: RTColorStyle.light700.value.withOpacity(0.99),
         title: Container(
 	  width: SW * 0.9,
-	  padding: EdgeInsets.symmetric(horizontal: 0.06 * SW ),
+	  padding: EdgeInsets.symmetric(horizontal: 0.06 * SW),
 	  child: Text(
 	    'Начать вызов $number?',
 	    style: RTFontStyle.AlertTitle.value.copyWith(fontSize: SW * 0.052),

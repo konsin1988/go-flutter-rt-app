@@ -9,6 +9,7 @@ import (
     health "konsin1988/rt-app/db/health"
     transport "konsin1988/rt-app/transport/http"
     keycloak "konsin1988/rt-app/auth/keycloak"
+    _ "konsin1988/rt-app/bitrix"
     jwt "konsin1988/rt-app/auth/jwt"
     graph "konsin1988/rt-app/graph"
     user "konsin1988/rt-app/db/user"
@@ -32,6 +33,9 @@ func main() {
   if err != nil {
     log.Fatalf("Failed  to load JWKS: %v", err)
   }
+
+  //bitrixURL := os.Getenv("BITRIX24_URL")
+  //bitrixClient := bitrix.New(bitrixURL)
 
   // repos
   authRepo := keycloak.NewAuthRepository(

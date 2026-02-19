@@ -112,7 +112,6 @@ func (r *UserRepo) UserById (ctx context.Context, user_id int) (*models.MainUser
     u.Birthday = helpers.GetRussianBD(birthdayTime)
   } 
   
-
   deptList, err := parseIntList(deptString)
   if err != nil {
     return nil, errors.New("cannot convert string to int list")

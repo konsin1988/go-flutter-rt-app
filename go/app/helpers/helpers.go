@@ -30,10 +30,12 @@ func GetRussianDate(date types.DateOnly) string {
   return fmt.Sprintf("%d %s %d", date.Day(), GetMonth(date.Month()), date.Year())
 }
 
-func GetRussianBD(date *time.Time) string {
+func GetRussianBD(date *time.Time) *string {
+  var bd string
   if date != nil {
-    return fmt.Sprintf("%d %s", date.Day(), GetMonth(date.Month()))    
-  } else { return "" }
+    bd = fmt.Sprintf("%d %s", date.Day(), GetMonth(date.Month()))    
+  } else { bd = "" }
+  return &bd
 }
 
 func FormatRussian(t time.Time) string {
@@ -74,11 +76,11 @@ func UserToGraphModel (mainUser *models.MainUser) (*model.User){
 		LastName:   mainUser.LastName,
 		SecondName: mainUser.SecondName,
 		Email:      mainUser.Email,
-		Birthday:   &mainUser.Birthday,
-		PhotoURL:   &mainUser.PhotoURL,
-		Mobile:     &mainUser.Mobile,
-		Inner:      &mainUser.Inner,
-		Position:   &mainUser.Position,
+		Birthday:   mainUser.Birthday,
+		PhotoURL:   mainUser.PhotoURL,
+		Mobile:     mainUser.Mobile,
+		Inner:      mainUser.Inner,
+		Position:   mainUser.Position,
 		DeptList:   depts,
 		HeadList:   heads,
 	}

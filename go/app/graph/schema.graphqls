@@ -17,7 +17,7 @@ type User {
   id: Int! 
   firstName: String!
   lastName: String!
-  secondName: String!
+  secondName: String
   email: String!
   birthday: String 
   photoURL: String

@@ -24,7 +24,7 @@ class AIPage extends StatelessWidget {
       child: Column(
       	  children: [ 
 	    ElevatedButton(
-	      onPressed: () {context.go(AppRoutes.assistant);},
+	      onPressed: () {context.push(AppRoutes.assistant);},
 	      style: ElevatedButton.styleFrom(
 	        backgroundColor: RTColorStyle.dark800.value,
 	        foregroundColor: RTColorStyle.light700.value,

@@ -7,10 +7,10 @@ import 'package:rt_app/style/colors.dart';
 import 'package:rt_app/style/fonts.dart';
 
 class DepartmentField extends StatelessWidget {
-  final Department department;
+  final List<Department> departmentList;
 
   const DepartmentField({
-    required this.department,
+    required this.departmentList,
     super.key,
   });
 
@@ -28,23 +28,29 @@ class DepartmentField extends StatelessWidget {
 	    style: RTFontStyle.ProfileField.value 
 	  ),
 	),
-	InkWell(
-	  splashFactory: NoSplash.splashFactory, 
-	  onTap: () {
-	    context.push('/profile/department/${department.id}');
-	  },
-	  child: Padding(
-	    padding: EdgeInsets.only(left: SW * 0.3, 
-	          		  right: SW * 0.05, 
-	          		  top: SW * 0.005, 
-	          		  bottom: SW * 0.025),
-	    child: Text(
-	      '${department.name}',
-	      style: RTFontStyle.ProfileValue.value 
-	    ),
-	  ),
-	),
-    ]);
+	...List.generate(
+	    departmentList.length,
+	    (index) {
+	      final department = departmentList[index];
+	      return Padding(
+		padding: EdgeInsets.only(left: SW * 0.15 + index * 20, 
+					right: SW * 0.05, 
+					top: SW * 0.005, 
+					bottom: SW * 0.01),
+		child: InkWell(
+		  splashFactory: NoSplash.splashFactory, 
+	          onTap: () {
+	            context.push('/profile/department/${department.id}');
+	          },
+	          child: Text(
+	              '${department.name}',
+	              style: RTFontStyle.ProfileValue.value,
+	          ),
+		),
+	      );
+      	  }),
+	]
+    );
   }
 }
 

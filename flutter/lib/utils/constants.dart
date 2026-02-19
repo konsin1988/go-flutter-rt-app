@@ -30,6 +30,7 @@ class AppRoutes {
   static const String profile = '/profile';
   static const String assistant = '/assistant';
   static const String department = '/department';
+  static const String image = '/image';
   static const List<String> appRoutes = [
     login,
     init,
@@ -39,6 +40,7 @@ class AppRoutes {
     profile,
     assistant,
     department,
+    image,
   ];
 }
 
