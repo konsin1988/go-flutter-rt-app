@@ -59,8 +59,8 @@ extend type Query {
 # ai
 type Conversation {
   id: Int!
-  title: String
-  messages(limit: Int, offset: Int): [Message!]!
+  title: String!
+  messages(limit: Int!, before: Date): [Message!]!
   createdAt: Date!
   updatedAt: Date!
 } 
@@ -70,7 +70,6 @@ type ConversationListItem {
   title: String!
   createdAt: Date!
   updatedAt: Date!
-
 }
 
 type Message {
@@ -94,6 +93,13 @@ extend type Query {
   ConversationById(id: Int!): Conversation!
 }
 
+type Mutation {
+  createConversation(title: String!): Conversation!
+}
+
+extend type Mutation {
+  createMessage(conversationId: Int!, content: String!): Message!
+}
 
 # Depts
 type DeptUser {

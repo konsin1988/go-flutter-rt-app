@@ -6,7 +6,7 @@ import (
     "net/http"
     "strings"
     "time"
-
+    
     "github.com/99designs/gqlgen/graphql/handler/transport"
     "github.com/gorilla/websocket"
 
@@ -24,6 +24,7 @@ func NewWebsocketTransport(
             CheckOrigin: func(r *http.Request) bool {
                 return true // restrict in production
             },
+	    Subprotocols: []string{"graphql-transport-ws"},
         },
         KeepAlivePingInterval: 15 * time.Second,
   	  InitFunc: transport.WebsocketInitFunc(

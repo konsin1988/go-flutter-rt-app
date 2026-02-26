@@ -1,0 +1,19 @@
+User sends message
+
+Save to DB
+
+Publish event
+
+Call OpenAI (stream mode)
+
+For each token:
+
+append to buffer
+
+push through subscription channel
+
+When finished:
+
+Save full assistant message to DB
+
+Invalidate cache

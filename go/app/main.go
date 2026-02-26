@@ -15,6 +15,7 @@ import (
     user "konsin1988/rt-app/db/user"
     ai "konsin1988/rt-app/db/ai"
     dept "konsin1988/rt-app/db/department"
+    redis "konsin1988/rt-app/db/redis"
     
     _ "github.com/99designs/gqlgen/graphql/handler"
     "github.com/99designs/gqlgen/graphql/playground"
@@ -27,6 +28,12 @@ func main() {
     log.Fatal(err)
   }
   defer db.Close()
+
+  redisClient, err := redis.NewRedisClient()
+  if err != nil {
+    log.Fatal(err)
+  }
+  redisCache := redis.NewRedisCache(redisClient.Client)
   
   kc := config.LoadKeycloakConfig()
   jwks, err := jwt.LoadJWKS(kc.JWKSURL)
@@ -53,7 +60,7 @@ func main() {
   authService := keycloak.NewService(authRepo)
   healthService := health.NewService(healthRepo) 
   userService := user.NewService(userRepo) 
-  aiService := ai.NewService(aiRepo)
+  aiService := ai.NewService(aiRepo, redisCache)
   deptService := dept.NewService(deptRepo)
   
 

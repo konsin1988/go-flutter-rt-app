@@ -129,6 +129,10 @@ autobind:
 # modelgen, the others will be allowed when binding to fields. Configure them to
 # your liking
 models:
+  Conversation:
+    fields:
+      messages:
+        resolver: true
   ID:
     model:
       - github.com/99designs/gqlgen/graphql.ID
@@ -150,7 +154,7 @@ models:
   # behavior, and some GraphQL tools like Apollo Router will fail when
   # communicating numbers that overflow 32-bits.
   #
-  # You may choose to use the custom, built-in Int64 scalar to represent 64-bit
+  #You may choose to use the custom, built-in Int64 scalar to represent 64-bit
   # integers, or ignore the spec and bind Int to graphql.Int / graphql.Int64
   # (the default behavior of gqlgen). This is fine in simple use cases when you
   # do not need to worry about interoperability and only expect small numbers.

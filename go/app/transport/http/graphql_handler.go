@@ -36,16 +36,6 @@ func NewGraphQLHandler(
     return srv
 }
 
-
-//func NewGraphQLHandler(resolver *graph.Resolver) http.Handler{
-//  srv := handler.NewDefaultServer(
-//    graph.NewExecutableSchema(
-//      graph.Config{Resolvers: resolver},
-//    ),
-//  )
-//  return srv
-//}
-
 func PlaygroundHandler() http.Handler {
   return playground.Handler("GraphQL", "graphql")
 }

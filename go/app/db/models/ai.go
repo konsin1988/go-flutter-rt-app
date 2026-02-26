@@ -12,11 +12,19 @@ type ConversationListItem struct {
   UpdatedAt	time.Time     `json:"updated_at"`
 }
 
+type ConversationMeta struct {
+  ID		int	      `json:"id"`	
+  UserID	int	      `json:"user_id"`	
+  Title		string	      `json:"title"`
+  CreatedAt	time.Time     `json:"created_at"`
+  UpdatedAt	time.Time     `json:"updated_at"`
+
+}
 type ConversationById struct {
   ID		int	      `json:"id"`	
   UserID	int	      `json:"user_id"`	
   Title		string	      `json:"title"`
-  Messages	[]Message
+  Messages	[]*Message
   CreatedAt	time.Time     `json:"created_at"`
   UpdatedAt	time.Time     `json:"updated_at"`
 }
@@ -28,6 +36,32 @@ const (
   RoleAssistant	      MessageRole = "ASSISTANT"
   RoleSystem	      MessageRole = "SYSTEM"
 )
+
+func (r MessageRole) RoleID() int {
+    switch r {
+    case RoleUser:
+        return 1
+    case RoleAssistant:
+        return 2
+    case RoleSystem:
+        return 3
+    default:
+      return 0 
+    }
+}
+
+func FromRoleID(id int) MessageRole {
+    switch id {
+    case 1:
+        return RoleUser
+    case 2:
+        return RoleAssistant
+    case 3:
+        return RoleSystem
+    default: 
+	return RoleUser 
+    }
+}
 
 type Message struct {
   ID		    int		  `json:"id"`

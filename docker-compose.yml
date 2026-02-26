@@ -1,3 +1,4 @@
+---
 services:
   postgres:
     image: pgvector/pgvector:pg16
@@ -19,27 +20,34 @@ services:
     volumes:
       - ./volumes/postgres_data:/var/lib/postgresql/data
     networks:
-      - rt-app-net
+      - rt-app
 
   redis:
     image: redis:latest
-    container_name: redis
+    container_name: redis-ai
+    restart: always
     ports:
-      - '6379:6379'
+      - "6379:6379"
+    command: >
+      redis-server
+      --requirepass r13l02c1988
+      --appendonly yes
+      --maxmemory 512mb
+      --maxmemory-policy allkeys-lru
+    volumes:
+      - ./volumes/redis_data:/data
     depends_on:
       postgres:
         condition: service_healthy
-    volumes:
-      - ./volumes/redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     networks:
-      - rt-app-net
-
-
-volumes:
-  postgres_data:
-  redis_data:
+      - rt-app
 
 networks:
-  rt-app-net:
-    name: rt-app-net
-    external: false
+  rt-app:
+    name: rt-app
+    external: true

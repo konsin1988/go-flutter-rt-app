@@ -3,6 +3,8 @@ package helpers
 import (
   "fmt"
   "time"
+  "log"
+
   "konsin1988/rt-app/types"
   models "konsin1988/rt-app/db/models"
   model "konsin1988/rt-app/graph/model"
@@ -30,6 +32,10 @@ func GetRussianDate(date types.DateOnly) string {
   return fmt.Sprintf("%d %s %d", date.Day(), GetMonth(date.Month()), date.Year())
 }
 
+func GetRussianDateFromTime(date time.Time) string {
+  return fmt.Sprintf("%d %s %d", date.Day(), GetMonth(date.Month()), date.Year())
+}
+
 func GetRussianBD(date *time.Time) *string {
   var bd string
   if date != nil {
@@ -38,7 +44,19 @@ func GetRussianBD(date *time.Time) *string {
   return &bd
 }
 
-func FormatRussian(t time.Time) string {
+
+var msk *time.Location
+
+func init() {
+    var err error
+    msk, err = time.LoadLocation("Europe/Moscow")
+    if err != nil {
+        log.Println("Failed to load Moscow timezone: " + err.Error())
+    }
+}
+
+func FormatRussian(tWithoutTimezone time.Time) string {
+  t := tWithoutTimezone.In(msk)
   return fmt.Sprintf("%02d %s %d %02d:%02d:%02d", 
       t.Day(), 
       GetMonth(t.Month()), 

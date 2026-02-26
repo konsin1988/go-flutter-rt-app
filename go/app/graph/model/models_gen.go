@@ -11,7 +11,7 @@ import (
 
 type Conversation struct {
 	ID        int32      `json:"id"`
-	Title     *string    `json:"title,omitempty"`
+	Title     string     `json:"title"`
 	Messages  []*Message `json:"messages"`
 	CreatedAt string     `json:"createdAt"`
 	UpdatedAt string     `json:"updatedAt"`
@@ -58,6 +58,9 @@ type Message struct {
 	Role      MessageRole `json:"role"`
 	Content   string      `json:"content"`
 	CreatedAt string      `json:"createdAt"`
+}
+
+type Mutation struct {
 }
 
 type Query struct {

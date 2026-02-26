@@ -15,9 +15,76 @@ import (
 	"konsin1988/rt-app/domain/texx"
 	"konsin1988/rt-app/graph/model"
 	"konsin1988/rt-app/helpers"
+	"log"
 	"strings"
 	"time"
 )
+
+// Messages is the resolver for the messages field.
+func (r *conversationResolver) Messages(ctx context.Context, obj *model.Conversation, limit int32, before *string) ([]*model.Message, error) {
+	var beforeTime *time.Time
+	messages := make([]*model.Message, 0)
+	if before != nil {
+		t, err := time.Parse(time.RFC3339, *before)
+		if err != nil {
+			log.Printf("Invalid before date format: %v", err)
+			return messages, nil
+		}
+		beforeTime = &t
+	}
+	msgs, err := r.AiService.GetConversationMessages(ctx, int(obj.ID), int(limit), beforeTime)
+	if err != nil {
+		log.Printf("cant get messages from service: %v", err)
+		return messages, nil
+	}
+	for _, val := range msgs {
+		m := model.Message{
+			ID:        int32(val.ID),
+			Role:      model.MessageRole(val.Role),
+			Content:   val.Content,
+			CreatedAt: val.CreatedAt.Format(time.RFC3339),
+		}
+		messages = append(messages, &m)
+	}
+	return messages, nil
+}
+
+// CreateConversation is the resolver for the createConversation field.
+func (r *mutationResolver) CreateConversation(ctx context.Context, title string) (*model.Conversation, error) {
+	user := ctx.Value(jwt.MainUserContextKey).(*models.MainUser)
+	if user == nil {
+		return nil, errors.New("Unauthorized from resolver")
+	}
+	c, err := r.AiService.CreateConversation(ctx, user.ID, title)
+	if err != nil {
+		return nil, err
+	}
+	return &model.Conversation{
+		ID:        int32(c.ID),
+		Title:     c.Title,
+		CreatedAt: c.CreatedAt.Format(time.RFC3339),
+		UpdatedAt: c.UpdatedAt.Format(time.RFC3339),
+	}, nil
+}
+
+// CreateMessage is the resolver for the createMessage field.
+func (r *mutationResolver) CreateMessage(ctx context.Context, conversationID int32, content string) (*model.Message, error) {
+	user := ctx.Value(jwt.MainUserContextKey).(*models.MainUser)
+	if user == nil {
+		return nil, errors.New("Unauthorized from resolver")
+	}
+	m, err := r.AiService.CreateMessage(ctx, user.ID, int(conversationID), models.RoleUser, content)
+	if err != nil{
+	  return nil, err
+	}
+	return &model.Message{
+	  ID: int32(m.ID),
+	  Role: model.MessageRole(m.Role),
+	  Content: m.Content,
+	  CreatedAt: helpers.FormatRussian(m.CreatedAt),
+	}, nil
+}
+
 
 // MainUser is the resolver for the mainUser field.
 func (r *queryResolver) MainUser(ctx context.Context) (*model.User, error) {
@@ -92,48 +159,37 @@ func (r *queryResolver) ConversationList(ctx context.Context) ([]*model.Conversa
 	if !ok {
 		return nil, errors.New("Cannot load user from context")
 	}
-
-	c, err := r.AiService.GetConversationsList(ctx, user.ID)
+	c, err := r.AiService.GetConversationList(ctx, user.ID)
 	if err != nil {
-		return nil, errors.New("Cannot load conversation list")
+		return nil, fmt.Errorf("Error when get conversation list: %w", err)
 	}
-	conversResult := make([]*model.ConversationListItem, 0)
-	for _, v := range c {
-		listItem := model.ConversationListItem{
-			int32(v.ID),
-			v.Title,
-			v.CreatedAt.Format(time.RFC3339),
-			v.UpdatedAt.Format(time.RFC3339),
+
+	conversationList := make([]*model.ConversationListItem, 0)
+	for _, val := range c {
+		item := &model.ConversationListItem{
+			ID:        int32(val.ID),
+			Title:     val.Title,
+			CreatedAt: helpers.GetRussianDateFromTime(val.CreatedAt),
+			UpdatedAt: helpers.GetRussianDateFromTime(val.UpdatedAt),
 		}
-		conversResult = append(conversResult, &listItem)
+		conversationList = append(conversationList, item)
 	}
-	return conversResult, nil
+
+	return conversationList, nil
 }
 
 // ConversationByID is the resolver for the ConversationById field.
 func (r *queryResolver) ConversationByID(ctx context.Context, id int32) (*model.Conversation, error) {
-	c, err := r.AiService.GetConversationById(ctx, int(id))
+	c, err := r.AiService.GetConversationMeta(ctx, int(id))
 	if err != nil {
-		return nil, errors.New("Cannot get conversation by id")
+		return nil, err
 	}
-	messages := make([]*model.Message, 0)
-	for _, i := range c.Messages {
-		m := model.Message{
-			ID:        int32(i.ID),
-			Role:      model.MessageRole(i.Role),
-			Content:   i.Content,
-			CreatedAt: helpers.FormatRussian(i.CreatedAt),
-		}
-		messages = append(messages, &m)
-	}
-	conversation := model.Conversation{
+	return &model.Conversation{
 		ID:        int32(c.ID),
-		Title:     &c.Title,
-		Messages:  messages,
+		Title:     c.Title,
 		CreatedAt: c.CreatedAt.Format(time.RFC3339),
 		UpdatedAt: c.UpdatedAt.Format(time.RFC3339),
-	}
-	return &conversation, nil
+	}, nil
 }
 
 // GetDeptByID is the resolver for the GetDeptById field.
@@ -169,7 +225,15 @@ func (r *queryResolver) GetDeptByID(ctx context.Context, deptID int32) (*model.D
 	}, nil
 }
 
+// Conversation returns ConversationResolver implementation.
+func (r *Resolver) Conversation() ConversationResolver { return &conversationResolver{r} }
+
+// Mutation returns MutationResolver implementation.
+func (r *Resolver) Mutation() MutationResolver { return &mutationResolver{r} }
+
 // Query returns QueryResolver implementation.
 func (r *Resolver) Query() QueryResolver { return &queryResolver{r} }
 
+type conversationResolver struct{ *Resolver }
+type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }

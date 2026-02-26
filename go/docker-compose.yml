@@ -25,7 +25,7 @@ services:
     restart: unless-stopped
     command: air /app
     networks:
-      - rt-app-net 
+      - rt-app
 
   # -------------------------
   # Prod
@@ -41,9 +41,9 @@ services:
       - "8000:8000"
     restart: unless-stopped
     networks:
-      - rt-app-net
+      - rt-app
 
 networks:
-  rt-app-net:
-    name: rt-app-net 
+  rt-app:
+    name: rt-app
     external: True
