@@ -47,6 +47,19 @@ services:
     networks:
       - rt-app
 
+  ollama:
+    image: ollama/ollama:latest
+    container_name: ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ./volumes/ollama:/root/.ollama
+    restart: unless-stopped
+    environment:
+      - OLLAMA_HOST=0.0.0.0
+    networks:
+      - rt-app
+
 networks:
   rt-app:
     name: rt-app

@@ -93,12 +93,8 @@ extend type Query {
   ConversationById(id: Int!): Conversation!
 }
 
-type Mutation {
-  createConversation(title: String!): Conversation!
-}
-
 extend type Mutation {
-  createMessage(conversationId: Int!, content: String!): Message!
+  createMessage(conversationId: Int, content: String!): Int
 }
 
 # Depts

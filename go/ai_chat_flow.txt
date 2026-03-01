@@ -1,0 +1,18 @@
+1. User sends message via WebSocket 
+   ↓
+2. IMMEDIATELY: saveMessage("user", raw_text) + generate_embedding()
+   ↓
+3. Check if conversation exists for user/session
+   ├─ NO → LLM.generateTitle(user_msg) → createConversation(title)
+   └─ YES → continue
+   ↓  
+4. loadContext() ← pgvector recent(8) + semantic(3) 
+   ↓
+5. client.Chat() { Stream: true, Messages: context } ← SINGLE CALL
+   ├─ Model streams tokens → WebSocket → Flutter (real-time)
+   └─ Accumulate full response server-side
+   ↓
+6. await resp.Done == true  
+   ↓
+7. saveMessage("assistant", full_response) + generate_embedding()
+

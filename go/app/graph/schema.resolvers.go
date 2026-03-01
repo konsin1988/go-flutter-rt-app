@@ -16,6 +16,7 @@ import (
 	"konsin1988/rt-app/graph/model"
 	"konsin1988/rt-app/helpers"
 	"log"
+	"os"
 	"strings"
 	"time"
 )
@@ -49,42 +50,37 @@ func (r *conversationResolver) Messages(ctx context.Context, obj *model.Conversa
 	return messages, nil
 }
 
-// CreateConversation is the resolver for the createConversation field.
-func (r *mutationResolver) CreateConversation(ctx context.Context, title string) (*model.Conversation, error) {
+// CreateMessage is the resolver for the createMessage field.
+func (r *mutationResolver) CreateMessage(ctx context.Context, conversationID *int32, content string) (*int32, error) {
 	user := ctx.Value(jwt.MainUserContextKey).(*models.MainUser)
 	if user == nil {
 		return nil, errors.New("Unauthorized from resolver")
 	}
-	c, err := r.AiService.CreateConversation(ctx, user.ID, title)
+	if conversationID == nil {
+		aiPrompt := os.Getenv("AI_CHAT_CONVERSATION_TITLE_PROMPT") + content
+		title, err := r.OllamaClient.Prompt(aiPrompt)
+		if err != nil {
+			return nil, err
+		}
+		conv, err := r.AiService.CreateConversation(ctx, user.ID, title)
+		if err != nil {
+			return nil, err
+		}
+		t := int32(conv.ID)
+		conversationID = &t 
+	}
+	_, err := r.AiService.CreateMessage(ctx, user.ID, int(*conversationID), models.RoleUser, content)
 	if err != nil {
 		return nil, err
 	}
-	return &model.Conversation{
-		ID:        int32(c.ID),
-		Title:     c.Title,
-		CreatedAt: c.CreatedAt.Format(time.RFC3339),
-		UpdatedAt: c.UpdatedAt.Format(time.RFC3339),
-	}, nil
+	return conversationID, nil
+	//return &model.Message{
+	//	ID:        int32(m.ID),
+	//	Role:      model.MessageRole(m.Role),
+	//	Content:   m.Content,
+	//	CreatedAt: helpers.FormatRussian(m.CreatedAt),
+	//}, nil
 }
-
-// CreateMessage is the resolver for the createMessage field.
-func (r *mutationResolver) CreateMessage(ctx context.Context, conversationID int32, content string) (*model.Message, error) {
-	user := ctx.Value(jwt.MainUserContextKey).(*models.MainUser)
-	if user == nil {
-		return nil, errors.New("Unauthorized from resolver")
-	}
-	m, err := r.AiService.CreateMessage(ctx, user.ID, int(conversationID), models.RoleUser, content)
-	if err != nil{
-	  return nil, err
-	}
-	return &model.Message{
-	  ID: int32(m.ID),
-	  Role: model.MessageRole(m.Role),
-	  Content: m.Content,
-	  CreatedAt: helpers.FormatRussian(m.CreatedAt),
-	}, nil
-}
-
 
 // MainUser is the resolver for the mainUser field.
 func (r *queryResolver) MainUser(ctx context.Context) (*model.User, error) {

@@ -16,6 +16,7 @@ import (
     ai "konsin1988/rt-app/db/ai"
     dept "konsin1988/rt-app/db/department"
     redis "konsin1988/rt-app/db/redis"
+    ollama "konsin1988/rt-app/services/ollama"
     
     _ "github.com/99designs/gqlgen/graphql/handler"
     "github.com/99designs/gqlgen/graphql/playground"
@@ -40,6 +41,8 @@ func main() {
   if err != nil {
     log.Fatalf("Failed  to load JWKS: %v", err)
   }
+
+  OllamaClient := ollama.NewClient()
 
   //bitrixURL := os.Getenv("BITRIX24_URL")
   //bitrixClient := bitrix.New(bitrixURL)
@@ -70,7 +73,7 @@ func main() {
   
 
   // GraphQL
-  resolver := graph.NewResolver(userService, aiService, deptService)
+  resolver := graph.NewResolver(userService, aiService, deptService, OllamaClient)
   //schema := graph.NewExecutableSchema(graph.Config{Resolvers: resolver})
   //graphqlHandler := handler.NewDefaultServer(schema)
   graphqlHandler := transport.NewGraphQLHandler(

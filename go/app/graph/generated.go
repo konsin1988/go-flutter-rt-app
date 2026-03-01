@@ -100,8 +100,7 @@ type ComplexityRoot struct {
 	}
 
 	Mutation struct {
-		CreateConversation func(childComplexity int, title string) int
-		CreateMessage      func(childComplexity int, conversationID int32, content string) int
+		CreateMessage func(childComplexity int, conversationID *int32, content string) int
 	}
 
 	Query struct {
@@ -148,8 +147,7 @@ type ConversationResolver interface {
 	Messages(ctx context.Context, obj *model.Conversation, limit int32, before *string) ([]*model.Message, error)
 }
 type MutationResolver interface {
-	CreateConversation(ctx context.Context, title string) (*model.Conversation, error)
-	CreateMessage(ctx context.Context, conversationID int32, content string) (*model.Message, error)
+	CreateMessage(ctx context.Context, conversationID *int32, content string) (*int32, error)
 }
 type QueryResolver interface {
 	MainUser(ctx context.Context) (*model.User, error)
@@ -371,17 +369,6 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.complexity.Message.Role(childComplexity), true
 
-	case "Mutation.createConversation":
-		if e.complexity.Mutation.CreateConversation == nil {
-			break
-		}
-
-		args, err := ec.field_Mutation_createConversation_args(ctx, rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Mutation.CreateConversation(childComplexity, args["title"].(string)), true
 	case "Mutation.createMessage":
 		if e.complexity.Mutation.CreateMessage == nil {
 			break
@@ -392,7 +379,7 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 			return 0, false
 		}
 
-		return e.complexity.Mutation.CreateMessage(childComplexity, args["conversationId"].(int32), args["content"].(string)), true
+		return e.complexity.Mutation.CreateMessage(childComplexity, args["conversationId"].(*int32), args["content"].(string)), true
 
 	case "Query.ConversationById":
 		if e.complexity.Query.ConversationByID == nil {
@@ -714,21 +701,10 @@ func (ec *executionContext) field_Conversation_messages_args(ctx context.Context
 	return args, nil
 }
 
-func (ec *executionContext) field_Mutation_createConversation_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
-	var err error
-	args := map[string]any{}
-	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "title", ec.unmarshalNString2string)
-	if err != nil {
-		return nil, err
-	}
-	args["title"] = arg0
-	return args, nil
-}
-
 func (ec *executionContext) field_Mutation_createMessage_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
 	args := map[string]any{}
-	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "conversationId", ec.unmarshalNInt2int32)
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "conversationId", ec.unmarshalOInt2ᚖint32)
 	if err != nil {
 		return nil, err
 	}
@@ -1739,59 +1715,6 @@ func (ec *executionContext) fieldContext_Message_createdAt(_ context.Context, fi
 	return fc, nil
 }
 
-func (ec *executionContext) _Mutation_createConversation(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
-	return graphql.ResolveField(
-		ctx,
-		ec.OperationContext,
-		field,
-		ec.fieldContext_Mutation_createConversation,
-		func(ctx context.Context) (any, error) {
-			fc := graphql.GetFieldContext(ctx)
-			return ec.resolvers.Mutation().CreateConversation(ctx, fc.Args["title"].(string))
-		},
-		nil,
-		ec.marshalNConversation2ᚖkonsin1988ᚋrtᚑappᚋgraphᚋmodelᚐConversation,
-		true,
-		true,
-	)
-}
-
-func (ec *executionContext) fieldContext_Mutation_createConversation(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Mutation",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: true,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_Conversation_id(ctx, field)
-			case "title":
-				return ec.fieldContext_Conversation_title(ctx, field)
-			case "messages":
-				return ec.fieldContext_Conversation_messages(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_Conversation_createdAt(ctx, field)
-			case "updatedAt":
-				return ec.fieldContext_Conversation_updatedAt(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type Conversation", field.Name)
-		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Mutation_createConversation_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return fc, err
-	}
-	return fc, nil
-}
-
 func (ec *executionContext) _Mutation_createMessage(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
 		ctx,
@@ -1800,12 +1723,12 @@ func (ec *executionContext) _Mutation_createMessage(ctx context.Context, field g
 		ec.fieldContext_Mutation_createMessage,
 		func(ctx context.Context) (any, error) {
 			fc := graphql.GetFieldContext(ctx)
-			return ec.resolvers.Mutation().CreateMessage(ctx, fc.Args["conversationId"].(int32), fc.Args["content"].(string))
+			return ec.resolvers.Mutation().CreateMessage(ctx, fc.Args["conversationId"].(*int32), fc.Args["content"].(string))
 		},
 		nil,
-		ec.marshalNMessage2ᚖkonsin1988ᚋrtᚑappᚋgraphᚋmodelᚐMessage,
+		ec.marshalOInt2ᚖint32,
 		true,
-		true,
+		false,
 	)
 }
 
@@ -1816,17 +1739,7 @@ func (ec *executionContext) fieldContext_Mutation_createMessage(ctx context.Cont
 		IsMethod:   true,
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_Message_id(ctx, field)
-			case "role":
-				return ec.fieldContext_Message_role(ctx, field)
-			case "content":
-				return ec.fieldContext_Message_content(ctx, field)
-			case "createdAt":
-				return ec.fieldContext_Message_createdAt(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type Message", field.Name)
+			return nil, errors.New("field of type Int does not have child fields")
 		},
 	}
 	defer func() {
@@ -4764,20 +4677,10 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Mutation")
-		case "createConversation":
-			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
-				return ec._Mutation_createConversation(ctx, field)
-			})
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
 		case "createMessage":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_createMessage(ctx, field)
 			})
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -5807,10 +5710,6 @@ func (ec *executionContext) marshalNInt2int32(ctx context.Context, sel ast.Selec
 		}
 	}
 	return res
-}
-
-func (ec *executionContext) marshalNMessage2konsin1988ᚋrtᚑappᚋgraphᚋmodelᚐMessage(ctx context.Context, sel ast.SelectionSet, v model.Message) graphql.Marshaler {
-	return ec._Message(ctx, sel, &v)
 }
 
 func (ec *executionContext) marshalNMessage2ᚕᚖkonsin1988ᚋrtᚑappᚋgraphᚋmodelᚐMessageᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Message) graphql.Marshaler {
