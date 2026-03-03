@@ -74,12 +74,6 @@ func (r *mutationResolver) CreateMessage(ctx context.Context, conversationID *in
 		return nil, err
 	}
 	return conversationID, nil
-	//return &model.Message{
-	//	ID:        int32(m.ID),
-	//	Role:      model.MessageRole(m.Role),
-	//	Content:   m.Content,
-	//	CreatedAt: helpers.FormatRussian(m.CreatedAt),
-	//}, nil
 }
 
 // MainUser is the resolver for the mainUser field.

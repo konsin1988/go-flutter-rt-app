@@ -23,3 +23,13 @@ type PromptResponse struct {
   Response    string	`json:"response"`
   Done	      bool	`json:"done"`
 }
+
+type ChatResponseChunk struct {
+	ChunkMessage struct {
+		Content string `json:"content"`
+	} `json:"message"`
+	Done bool `json:"done"`
+}
+
+
+type ChatStreamCallback func(content string, done bool) error
