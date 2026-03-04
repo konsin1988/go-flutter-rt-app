@@ -17,6 +17,7 @@ import (
 	"konsin1988/rt-app/helpers"
 	"log"
 	"os"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -51,7 +52,7 @@ func (r *conversationResolver) Messages(ctx context.Context, obj *model.Conversa
 }
 
 // CreateMessage is the resolver for the createMessage field.
-func (r *mutationResolver) CreateMessage(ctx context.Context, conversationID *int32, content string) (*int32, error) {
+func (r *mutationResolver) CreateMessage(ctx context.Context, conversationID *int32, content string) (*model.Message, error) {
 	user := ctx.Value(jwt.MainUserContextKey).(*models.MainUser)
 	if user == nil {
 		return nil, errors.New("Unauthorized from resolver")
@@ -67,13 +68,19 @@ func (r *mutationResolver) CreateMessage(ctx context.Context, conversationID *in
 			return nil, err
 		}
 		t := int32(conv.ID)
-		conversationID = &t 
+		conversationID = &t
 	}
-	_, err := r.AiService.CreateMessage(ctx, user.ID, int(*conversationID), models.RoleUser, content)
+	m, err := r.AiService.CreateMessage(ctx, user.ID, int(*conversationID), models.RoleUser, content)
 	if err != nil {
 		return nil, err
 	}
-	return conversationID, nil
+	return &model.Message{
+		ID:             int32(m.ID),
+		ConversationID: int32(m.ConversationID),
+		Role:           model.MessageRole(m.Role),
+		Content:        m.Content,
+		CreatedAt:      helpers.FormatRussian(m.CreatedAt),
+	}, nil
 }
 
 // MainUser is the resolver for the mainUser field.
@@ -215,6 +222,41 @@ func (r *queryResolver) GetDeptByID(ctx context.Context, deptID int32) (*model.D
 	}, nil
 }
 
+// MessageStream is the resolver for the messageStream field.
+func (r *subscriptionResolver) MessageStream(ctx context.Context, messageID *int32, conversationID int32) (<-chan *model.ChatStreamChunk, error) {
+	if messageID == nil {
+		return nil, fmt.Errorf("messageID is required")
+	}
+	jobID := strconv.Itoa(int(*messageID))
+	
+	serviceCh, err := r.AiService.SubscribeToStream(ctx, jobID, int(conversationID))
+	if err != nil {
+		return nil, err
+	}
+	out := make(chan *model.ChatStreamChunk, 10)
+
+	go func() {
+		defer close(out)
+
+		for {
+			select {
+			case <-ctx.Done():
+				return
+			case chunk, ok := <-serviceCh:
+				if !ok {
+					return
+				}
+
+				out <- &model.ChatStreamChunk{
+					Chunk: chunk.Chunk,
+					Done:  chunk.Done,
+				}
+			}
+		}
+	}()
+	return out, nil
+}
+
 // Conversation returns ConversationResolver implementation.
 func (r *Resolver) Conversation() ConversationResolver { return &conversationResolver{r} }
 
@@ -224,6 +266,10 @@ func (r *Resolver) Mutation() MutationResolver { return &mutationResolver{r} }
 // Query returns QueryResolver implementation.
 func (r *Resolver) Query() QueryResolver { return &queryResolver{r} }
 
+// Subscription returns SubscriptionResolver implementation.
+func (r *Resolver) Subscription() SubscriptionResolver { return &subscriptionResolver{r} }
+
 type conversationResolver struct{ *Resolver }
 type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
+type subscriptionResolver struct{ *Resolver }

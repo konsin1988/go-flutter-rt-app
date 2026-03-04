@@ -42,12 +42,18 @@ type ResolverRoot interface {
 	Conversation() ConversationResolver
 	Mutation() MutationResolver
 	Query() QueryResolver
+	Subscription() SubscriptionResolver
 }
 
 type DirectiveRoot struct {
 }
 
 type ComplexityRoot struct {
+	ChatStreamChunk struct {
+		Chunk func(childComplexity int) int
+		Done  func(childComplexity int) int
+	}
+
 	Conversation struct {
 		CreatedAt func(childComplexity int) int
 		ID        func(childComplexity int) int
@@ -93,10 +99,11 @@ type ComplexityRoot struct {
 	}
 
 	Message struct {
-		Content   func(childComplexity int) int
-		CreatedAt func(childComplexity int) int
-		ID        func(childComplexity int) int
-		Role      func(childComplexity int) int
+		Content        func(childComplexity int) int
+		ConversationID func(childComplexity int) int
+		CreatedAt      func(childComplexity int) int
+		ID             func(childComplexity int) int
+		Role           func(childComplexity int) int
 	}
 
 	Mutation struct {
@@ -110,6 +117,10 @@ type ComplexityRoot struct {
 		MainUser         func(childComplexity int) int
 		TexxPosts        func(childComplexity int) int
 		UserByID         func(childComplexity int, userID int32) int
+	}
+
+	Subscription struct {
+		MessageStream func(childComplexity int, messageID *int32, conversationID int32) int
 	}
 
 	TexxPost struct {
@@ -147,7 +158,7 @@ type ConversationResolver interface {
 	Messages(ctx context.Context, obj *model.Conversation, limit int32, before *string) ([]*model.Message, error)
 }
 type MutationResolver interface {
-	CreateMessage(ctx context.Context, conversationID *int32, content string) (*int32, error)
+	CreateMessage(ctx context.Context, conversationID *int32, content string) (*model.Message, error)
 }
 type QueryResolver interface {
 	MainUser(ctx context.Context) (*model.User, error)
@@ -156,6 +167,9 @@ type QueryResolver interface {
 	ConversationList(ctx context.Context) ([]*model.ConversationListItem, error)
 	ConversationByID(ctx context.Context, id int32) (*model.Conversation, error)
 	GetDeptByID(ctx context.Context, deptID int32) (*model.DeptByID, error)
+}
+type SubscriptionResolver interface {
+	MessageStream(ctx context.Context, messageID *int32, conversationID int32) (<-chan *model.ChatStreamChunk, error)
 }
 
 type executableSchema struct {
@@ -176,6 +190,19 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 	ec := executionContext{nil, e, 0, 0, nil}
 	_ = ec
 	switch typeName + "." + field {
+
+	case "ChatStreamChunk.chunk":
+		if e.complexity.ChatStreamChunk.Chunk == nil {
+			break
+		}
+
+		return e.complexity.ChatStreamChunk.Chunk(childComplexity), true
+	case "ChatStreamChunk.done":
+		if e.complexity.ChatStreamChunk.Done == nil {
+			break
+		}
+
+		return e.complexity.ChatStreamChunk.Done(childComplexity), true
 
 	case "Conversation.createdAt":
 		if e.complexity.Conversation.CreatedAt == nil {
@@ -350,6 +377,12 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.Message.Content(childComplexity), true
+	case "Message.conversationId":
+		if e.complexity.Message.ConversationID == nil {
+			break
+		}
+
+		return e.complexity.Message.ConversationID(childComplexity), true
 	case "Message.createdAt":
 		if e.complexity.Message.CreatedAt == nil {
 			break
@@ -432,6 +465,18 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.Query.UserByID(childComplexity, args["user_id"].(int32)), true
+
+	case "Subscription.messageStream":
+		if e.complexity.Subscription.MessageStream == nil {
+			break
+		}
+
+		args, err := ec.field_Subscription_messageStream_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Subscription.MessageStream(childComplexity, args["messageId"].(*int32), args["conversationId"].(int32)), true
 
 	case "TexxPost.DocumentId":
 		if e.complexity.TexxPost.DocumentID == nil {
@@ -618,6 +663,23 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 				Data: buf.Bytes(),
 			}
 		}
+	case ast.Subscription:
+		next := ec._Subscription(ctx, opCtx.Operation.SelectionSet)
+
+		var buf bytes.Buffer
+		return func(ctx context.Context) *graphql.Response {
+			buf.Reset()
+			data := next(ctx)
+
+			if data == nil {
+				return nil
+			}
+			data.MarshalGQL(&buf)
+
+			return &graphql.Response{
+				Data: buf.Bytes(),
+			}
+		}
 
 	default:
 		return graphql.OneShot(graphql.ErrorResponse(ctx, "unsupported GraphQL operation"))
@@ -761,6 +823,22 @@ func (ec *executionContext) field_Query_userById_args(ctx context.Context, rawAr
 	return args, nil
 }
 
+func (ec *executionContext) field_Subscription_messageStream_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "messageId", ec.unmarshalOInt2ᚖint32)
+	if err != nil {
+		return nil, err
+	}
+	args["messageId"] = arg0
+	arg1, err := graphql.ProcessArgField(ctx, rawArgs, "conversationId", ec.unmarshalNInt2int32)
+	if err != nil {
+		return nil, err
+	}
+	args["conversationId"] = arg1
+	return args, nil
+}
+
 func (ec *executionContext) field___Directive_args_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
 	args := map[string]any{}
@@ -812,6 +890,64 @@ func (ec *executionContext) field___Type_fields_args(ctx context.Context, rawArg
 // endregion ************************** directives.gotpl **************************
 
 // region    **************************** field.gotpl *****************************
+
+func (ec *executionContext) _ChatStreamChunk_chunk(ctx context.Context, field graphql.CollectedField, obj *model.ChatStreamChunk) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_ChatStreamChunk_chunk,
+		func(ctx context.Context) (any, error) {
+			return obj.Chunk, nil
+		},
+		nil,
+		ec.marshalOString2ᚖstring,
+		true,
+		false,
+	)
+}
+
+func (ec *executionContext) fieldContext_ChatStreamChunk_chunk(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ChatStreamChunk",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ChatStreamChunk_done(ctx context.Context, field graphql.CollectedField, obj *model.ChatStreamChunk) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_ChatStreamChunk_done,
+		func(ctx context.Context) (any, error) {
+			return obj.Done, nil
+		},
+		nil,
+		ec.marshalOBoolean2ᚖbool,
+		true,
+		false,
+	)
+}
+
+func (ec *executionContext) fieldContext_ChatStreamChunk_done(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ChatStreamChunk",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	return fc, nil
+}
 
 func (ec *executionContext) _Conversation_id(ctx context.Context, field graphql.CollectedField, obj *model.Conversation) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
@@ -898,6 +1034,8 @@ func (ec *executionContext) fieldContext_Conversation_messages(ctx context.Conte
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_Message_id(ctx, field)
+			case "conversationId":
+				return ec.fieldContext_Message_conversationId(ctx, field)
 			case "role":
 				return ec.fieldContext_Message_role(ctx, field)
 			case "content":
@@ -1628,6 +1766,35 @@ func (ec *executionContext) fieldContext_Message_id(_ context.Context, field gra
 	return fc, nil
 }
 
+func (ec *executionContext) _Message_conversationId(ctx context.Context, field graphql.CollectedField, obj *model.Message) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Message_conversationId,
+		func(ctx context.Context) (any, error) {
+			return obj.ConversationID, nil
+		},
+		nil,
+		ec.marshalNInt2int32,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Message_conversationId(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Message",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Message_role(ctx context.Context, field graphql.CollectedField, obj *model.Message) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
 		ctx,
@@ -1726,9 +1893,9 @@ func (ec *executionContext) _Mutation_createMessage(ctx context.Context, field g
 			return ec.resolvers.Mutation().CreateMessage(ctx, fc.Args["conversationId"].(*int32), fc.Args["content"].(string))
 		},
 		nil,
-		ec.marshalOInt2ᚖint32,
+		ec.marshalNMessage2ᚖkonsin1988ᚋrtᚑappᚋgraphᚋmodelᚐMessage,
 		true,
-		false,
+		true,
 	)
 }
 
@@ -1739,7 +1906,19 @@ func (ec *executionContext) fieldContext_Mutation_createMessage(ctx context.Cont
 		IsMethod:   true,
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Int does not have child fields")
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Message_id(ctx, field)
+			case "conversationId":
+				return ec.fieldContext_Message_conversationId(ctx, field)
+			case "role":
+				return ec.fieldContext_Message_role(ctx, field)
+			case "content":
+				return ec.fieldContext_Message_content(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_Message_createdAt(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Message", field.Name)
 		},
 	}
 	defer func() {
@@ -2174,6 +2353,53 @@ func (ec *executionContext) fieldContext_Query___schema(_ context.Context, field
 			}
 			return nil, fmt.Errorf("no field named %q was found under type __Schema", field.Name)
 		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Subscription_messageStream(ctx context.Context, field graphql.CollectedField) (ret func(ctx context.Context) graphql.Marshaler) {
+	return graphql.ResolveFieldStream(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Subscription_messageStream,
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.resolvers.Subscription().MessageStream(ctx, fc.Args["messageId"].(*int32), fc.Args["conversationId"].(int32))
+		},
+		nil,
+		ec.marshalNChatStreamChunk2ᚖkonsin1988ᚋrtᚑappᚋgraphᚋmodelᚐChatStreamChunk,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Subscription_messageStream(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Subscription",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "chunk":
+				return ec.fieldContext_ChatStreamChunk_chunk(ctx, field)
+			case "done":
+				return ec.fieldContext_ChatStreamChunk_done(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type ChatStreamChunk", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Subscription_messageStream_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
 	}
 	return fc, nil
 }
@@ -4257,6 +4483,44 @@ func (ec *executionContext) fieldContext___Type_isOneOf(_ context.Context, field
 
 // region    **************************** object.gotpl ****************************
 
+var chatStreamChunkImplementors = []string{"ChatStreamChunk"}
+
+func (ec *executionContext) _ChatStreamChunk(ctx context.Context, sel ast.SelectionSet, obj *model.ChatStreamChunk) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, chatStreamChunkImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("ChatStreamChunk")
+		case "chunk":
+			out.Values[i] = ec._ChatStreamChunk_chunk(ctx, field, obj)
+		case "done":
+			out.Values[i] = ec._ChatStreamChunk_done(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
 var conversationImplementors = []string{"Conversation"}
 
 func (ec *executionContext) _Conversation(ctx context.Context, sel ast.SelectionSet, obj *model.Conversation) graphql.Marshaler {
@@ -4620,6 +4884,11 @@ func (ec *executionContext) _Message(ctx context.Context, sel ast.SelectionSet, 
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
+		case "conversationId":
+			out.Values[i] = ec._Message_conversationId(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
 		case "role":
 			out.Values[i] = ec._Message_role(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -4681,6 +4950,9 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_createMessage(ctx, field)
 			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -4881,6 +5153,26 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 	}
 
 	return out
+}
+
+var subscriptionImplementors = []string{"Subscription"}
+
+func (ec *executionContext) _Subscription(ctx context.Context, sel ast.SelectionSet) func(ctx context.Context) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, subscriptionImplementors)
+	ctx = graphql.WithFieldContext(ctx, &graphql.FieldContext{
+		Object: "Subscription",
+	})
+	if len(fields) != 1 {
+		graphql.AddErrorf(ctx, "must subscribe to exactly one stream")
+		return nil
+	}
+
+	switch fields[0].Name {
+	case "messageStream":
+		return ec._Subscription_messageStream(ctx, fields[0])
+	default:
+		panic("unknown field " + strconv.Quote(fields[0].Name))
+	}
 }
 
 var texxPostImplementors = []string{"TexxPost"}
@@ -5420,6 +5712,20 @@ func (ec *executionContext) marshalNBoolean2bool(ctx context.Context, sel ast.Se
 	return res
 }
 
+func (ec *executionContext) marshalNChatStreamChunk2konsin1988ᚋrtᚑappᚋgraphᚋmodelᚐChatStreamChunk(ctx context.Context, sel ast.SelectionSet, v model.ChatStreamChunk) graphql.Marshaler {
+	return ec._ChatStreamChunk(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNChatStreamChunk2ᚖkonsin1988ᚋrtᚑappᚋgraphᚋmodelᚐChatStreamChunk(ctx context.Context, sel ast.SelectionSet, v *model.ChatStreamChunk) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			graphql.AddErrorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._ChatStreamChunk(ctx, sel, v)
+}
+
 func (ec *executionContext) marshalNConversation2konsin1988ᚋrtᚑappᚋgraphᚋmodelᚐConversation(ctx context.Context, sel ast.SelectionSet, v model.Conversation) graphql.Marshaler {
 	return ec._Conversation(ctx, sel, &v)
 }
@@ -5710,6 +6016,10 @@ func (ec *executionContext) marshalNInt2int32(ctx context.Context, sel ast.Selec
 		}
 	}
 	return res
+}
+
+func (ec *executionContext) marshalNMessage2konsin1988ᚋrtᚑappᚋgraphᚋmodelᚐMessage(ctx context.Context, sel ast.SelectionSet, v model.Message) graphql.Marshaler {
+	return ec._Message(ctx, sel, &v)
 }
 
 func (ec *executionContext) marshalNMessage2ᚕᚖkonsin1988ᚋrtᚑappᚋgraphᚋmodelᚐMessageᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Message) graphql.Marshaler {

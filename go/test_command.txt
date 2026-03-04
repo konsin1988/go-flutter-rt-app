@@ -1,1 +1,0 @@
-go test konsin1988/rt-app/transport/http/ -v -tags=integration

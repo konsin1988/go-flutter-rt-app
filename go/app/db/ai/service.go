@@ -5,9 +5,12 @@ import (
   "fmt"
   "log"
   "time"
+  "encoding/json"
+  "strings"
 
   "konsin1988/rt-app/db/models"
   "konsin1988/rt-app/domain/cache"
+  "konsin1988/rt-app/db/redis"
 )
 
 type Repository interface {
@@ -21,12 +24,14 @@ type Repository interface {
 type Service struct {
   repo Repository
   cache  cache.Cache
+  queue	 redis.RedisQueue 
 }
 
-func NewService (repo Repository, cache  cache.Cache) *Service {
+func NewService (repo Repository, cache  cache.Cache, queue redis.RedisQueue) *Service {
   return &Service{
     repo: repo,
     cache: cache,
+    queue: queue,
   }
 }
 
@@ -145,6 +150,24 @@ func (s *Service) CreateMessage(
   if err != nil {
     return nil, err
   }
+  messages, err := s.GetConversationMessages(ctx, conversationID, 7, nil)
+  chatMessages := make([]models.ChatMessage, len(messages))
+  for _, val := range messages {
+    m := models.ChatMessage{
+      Role: string(val.Role),
+      Content: val.Content,
+    }
+    chatMessages = append(chatMessages, m)
+  }
+  jobID := "ai_jobs"
+  job := models.Job{
+    JobID: jobID,
+    Messages: chatMessages,
+  }
+  err = s.queue.Enqueue(ctx, job)
+  if err != nil {
+    return nil, err
+  }
 
   keys := []string{
     fmt.Sprintf("user:%d:conversations", userID),
@@ -156,4 +179,67 @@ func (s *Service) CreateMessage(
     return nil, fmt.Errorf("Error due caching: %v", err)
   }
   return m, nil
+}
+
+// subscribe to string
+func (s *Service) SubscribeToStream (
+  ctx context.Context,
+  jobID string,
+  conversationID int,
+) (<-chan *models.ChatStreamChunk, error){
+
+  channel := fmt.Sprintf("ai_streams:%s", jobID)
+  redisCh, err := s.queue.Subscribe(ctx, channel)
+  if err != nil{
+    return nil, err
+  }
+
+  out := make(chan *models.ChatStreamChunk, 10)
+
+  go func() {
+    defer close(out)
+
+    var fullAssistantMessage strings.Builder
+
+    for {
+      select {
+      case <-ctx.Done():
+	return
+      case msg, ok := <-redisCh:
+	if !ok {
+	  return
+	}
+	var chunk models.ChatStreamChunk 
+	if err := json.Unmarshal([]byte(msg.Payload), &chunk); err != nil{
+	  continue
+	}
+
+	if chunk.Chunk != nil {
+	  fullAssistantMessage.WriteString(*chunk.Chunk)
+	}
+
+	select {
+	case out <- &chunk:
+	case <-ctx.Done():
+	  return
+	}
+
+	if chunk.Done != nil && *chunk.Done {
+	  if fullAssistantMessage.Len() > 0 {
+	    _, err := s.repo.CreateMessage(
+	      ctx, 
+	      conversationID,
+	      models.FromRoleID(2),
+	      fullAssistantMessage.String(),
+	    )
+	    if err != nil {
+	      log.Printf("failed to save assistant message: %v", err )
+	    }
+	  }
+	  return 
+	}
+      }
+    }
+  }()
+  return out, nil
 }

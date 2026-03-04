@@ -74,3 +74,18 @@ type Message struct {
   //CompletionTokens  int
   CreatedAt	    time.Time	  `json:"created_at"`
 }
+
+type ChatMessage struct {
+  Role        string      `json:"role"`
+  Content     string      `json:"content"`
+}
+
+type Job struct {
+        JobID  string `json:"jobId"`
+        Messages []ChatMessage `json:"messages"`
+}
+
+type ChatStreamChunk struct {
+	Chunk *string `json:"chunk,omitempty"`
+	Done  *bool   `json:"done,omitempty"`
+}

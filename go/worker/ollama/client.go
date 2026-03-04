@@ -1,0 +1,98 @@
+package ollama
+
+import (
+  "net/http"
+  "os"
+  "time"
+  "encoding/json"
+  "bytes"
+  "fmt"
+  "log"
+  "io"
+  "bufio"
+  "context"
+
+  redis "github.com/redis/go-redis/v9"
+)
+
+type Client struct {
+  BaseURL	string
+  AiModel	string
+  RedisClient	*redis.Client
+  Client	*http.Client
+}
+
+
+func NewClient(redisClient *redis.Client) *Client {
+  baseURL := os.Getenv("AI_CHAT_BASE_URL") 
+  aiModel := os.Getenv("AI_CHAT_MODEL")
+
+  return &Client{
+    BaseURL: baseURL,
+    AiModel: aiModel,
+    RedisClient: redisClient,
+    Client: &http.Client{
+      Timeout: 60*time.Second,
+    },
+  }
+}
+
+func (c *Client) Chat(ctx context.Context, job Job) {
+  reqBody := ChatRequest{
+    Model:      c.AiModel,
+    Messages:   job.Messages,
+    Stream:     true,  
+  }
+  jsonData, err := json.Marshal(reqBody)
+  if err != nil {
+    log.Println(err)
+    return
+  }
+  req, err := http.NewRequest("POST", c.BaseURL+"/api/chat", bytes.NewBuffer(jsonData))
+  req.Header.Set("Content-Type", "application/json")
+  resp, err := c.Client.Do(req)
+  if err != nil {
+    log.Println(err)
+    return
+  }
+  defer resp.Body.Close()
+
+  if resp.StatusCode != http.StatusOK {
+    err = fmt.Errorf("ollama returned status %d", resp.StatusCode)
+    log.Println(err)
+    return
+  }
+  reader := bufio.NewReader(resp.Body)
+  jobChannel := fmt.Sprintf("ai_streams:%s", job.JobID)
+
+  for {
+    line, err := reader.ReadBytes('\n')
+    if err != nil {
+    	if err == io.EOF {
+    		break
+    	}
+    	fmt.Println("Stream read error:", err)
+    	break
+    }
+    // Skip empty lines
+    if len(bytes.TrimSpace(line)) == 0 {
+        continue
+    }
+    var chunk ChatResponseChunk 
+    if err := json.Unmarshal(line, &chunk); err != nil{
+      fmt.Println("Failed to unmarshal string: ", err)
+      continue
+    }
+    
+    message, _ := json.Marshal(map[string]ChatResponseChunk{
+    	"chunk": chunk,
+    })
+    
+    // Publish chunk to Redis Pub/Sub on the job-specific channel
+    if err := c.RedisClient.Publish(ctx, jobChannel, message).Err(); err != nil {
+    	fmt.Println("Redis publish error:", err)
+    }
+  }
+
+  fmt.Println("Job completed:", job.JobID)
+}

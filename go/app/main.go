@@ -35,6 +35,7 @@ func main() {
     log.Fatal(err)
   }
   redisCache := redis.NewRedisCache(redisClient.Client)
+  chatQueue := redis.NewRedisQueue(redisClient.Client, "ai_jobs")
   
   kc := config.LoadKeycloakConfig()
   jwks, err := jwt.LoadJWKS(kc.JWKSURL)
@@ -63,7 +64,7 @@ func main() {
   authService := keycloak.NewService(authRepo)
   healthService := health.NewService(healthRepo) 
   userService := user.NewService(userRepo) 
-  aiService := ai.NewService(aiRepo, redisCache)
+  aiService := ai.NewService(aiRepo, redisCache, *chatQueue)
   deptService := dept.NewService(deptRepo)
   
 

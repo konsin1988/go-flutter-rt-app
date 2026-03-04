@@ -74,6 +74,7 @@ type ConversationListItem {
 
 type Message {
   id: Int!
+  conversationId: Int!
   role: MessageRole!
   content: String!
   createdAt: Date!
@@ -94,7 +95,7 @@ extend type Query {
 }
 
 extend type Mutation {
-  createMessage(conversationId: Int, content: String!): Int
+  createMessage(conversationId: Int, content: String!): Message! 
 }
 
 # Depts
@@ -119,6 +120,14 @@ extend type Query {
   GetDeptById(dept_id: Int!): DeptById!
 }
 
+type ChatStreamChunk {
+  chunk: String
+  done: Boolean
+}
+
+type Subscription {
+  messageStream(messageId: Int, conversationId: Int!): ChatStreamChunk!
+}
 
 
 

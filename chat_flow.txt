@@ -17,3 +17,34 @@ When finished:
 Save full assistant message to DB
 
 Invalidate cache
+
+
+STEP 1 — Client Sends Message
+Client → POST /chat
+API:
+Validate request
+Create job_id
+Store job metadata in Redis
+Push job to jobs:llm
+Open SSE or WebSocket stream
+Subscribe to stream:{job_id}
+
+STEP 2 — Worker Picks Up Job
+Worker:
+BLPOP jobs:llm
+Parse job
+Call LLM with streaming enabled
+For each token:
+Publish to stream:{job_id}
+
+Example:
+PUBLISH stream:abc123 {"token":"Hello"}
+PUBLISH stream:abc123 {"token":" world"}
+PUBLISH stream:abc123 {"done":true}
+
+
+STEP 3 — API Streams to Client
+API container:
+Subscribed to stream:abc123
+Forwards each token to client immediately
+On {done:true}, closes stream

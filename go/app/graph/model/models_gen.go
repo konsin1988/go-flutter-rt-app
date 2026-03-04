@@ -8,6 +8,11 @@ import (
 	"io"
 	"strconv"
 )
+  
+type ChatStreamChunk struct {
+	Chunk *string `json:"chunk,omitempty"`
+	Done  *bool   `json:"done,omitempty"`
+}
 
 type Conversation struct {
 	ID        int32      `json:"id"`
@@ -54,16 +59,20 @@ type Head struct {
 }
 
 type Message struct {
-	ID        int32       `json:"id"`
-	Role      MessageRole `json:"role"`
-	Content   string      `json:"content"`
-	CreatedAt string      `json:"createdAt"`
+	ID             int32       `json:"id"`
+	ConversationID int32       `json:"conversationId"`
+	Role           MessageRole `json:"role"`
+	Content        string      `json:"content"`
+	CreatedAt      string      `json:"createdAt"`
 }
 
 type Mutation struct {
 }
 
 type Query struct {
+}
+
+type Subscription struct {
 }
 
 type TexxPost struct {
