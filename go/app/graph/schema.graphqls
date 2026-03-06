@@ -121,12 +121,12 @@ extend type Query {
 }
 
 type ChatStreamChunk {
-  chunk: String
-  done: Boolean
+  chunk: String!
+  done: Boolean!
 }
 
 type Subscription {
-  messageStream(messageId: Int, conversationId: Int!): ChatStreamChunk!
+  messageStream(messageId: Int!, conversationId: Int!): ChatStreamChunk!
 }
 
 

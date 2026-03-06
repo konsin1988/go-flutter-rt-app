@@ -3,7 +3,6 @@ package ollama
 import (
   "net/http"
   "os"
-  "time"
   "encoding/json"
   "bytes"
   "fmt"
@@ -31,9 +30,7 @@ func NewClient(redisClient *redis.Client) *Client {
     BaseURL: baseURL,
     AiModel: aiModel,
     RedisClient: redisClient,
-    Client: &http.Client{
-      Timeout: 60*time.Second,
-    },
+    Client: &http.Client{},
   }
 }
 
@@ -63,7 +60,7 @@ func (c *Client) Chat(ctx context.Context, job Job) {
     return
   }
   reader := bufio.NewReader(resp.Body)
-  jobChannel := fmt.Sprintf("ai_streams:%s", job.JobID)
+  jobChannel := fmt.Sprintf("ai_streams:%d", job.MessageID)
 
   for {
     line, err := reader.ReadBytes('\n')
@@ -78,15 +75,18 @@ func (c *Client) Chat(ctx context.Context, job Job) {
     if len(bytes.TrimSpace(line)) == 0 {
         continue
     }
-    var chunk ChatResponseChunk 
+    var chunk ChatStreamChunk 
     if err := json.Unmarshal(line, &chunk); err != nil{
       fmt.Println("Failed to unmarshal string: ", err)
       continue
     }
     
-    message, _ := json.Marshal(map[string]ChatResponseChunk{
-    	"chunk": chunk,
-    })
+
+    message, err := json.Marshal(chunk)
+    if err != nil {
+      log.Println("error due json Marshal")
+      continue
+    }
     
     // Publish chunk to Redis Pub/Sub on the job-specific channel
     if err := c.RedisClient.Publish(ctx, jobChannel, message).Err(); err != nil {
@@ -94,5 +94,5 @@ func (c *Client) Chat(ctx context.Context, job Job) {
     }
   }
 
-  fmt.Println("Job completed:", job.JobID)
+  fmt.Println("Job completed:", job.MessageID)
 }

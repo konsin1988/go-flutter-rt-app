@@ -120,7 +120,7 @@ type ComplexityRoot struct {
 	}
 
 	Subscription struct {
-		MessageStream func(childComplexity int, messageID *int32, conversationID int32) int
+		MessageStream func(childComplexity int, messageID int32, conversationID int32) int
 	}
 
 	TexxPost struct {
@@ -169,7 +169,7 @@ type QueryResolver interface {
 	GetDeptByID(ctx context.Context, deptID int32) (*model.DeptByID, error)
 }
 type SubscriptionResolver interface {
-	MessageStream(ctx context.Context, messageID *int32, conversationID int32) (<-chan *model.ChatStreamChunk, error)
+	MessageStream(ctx context.Context, messageID int32, conversationID int32) (<-chan *model.ChatStreamChunk, error)
 }
 
 type executableSchema struct {
@@ -476,7 +476,7 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 			return 0, false
 		}
 
-		return e.complexity.Subscription.MessageStream(childComplexity, args["messageId"].(*int32), args["conversationId"].(int32)), true
+		return e.complexity.Subscription.MessageStream(childComplexity, args["messageId"].(int32), args["conversationId"].(int32)), true
 
 	case "TexxPost.DocumentId":
 		if e.complexity.TexxPost.DocumentID == nil {
@@ -826,7 +826,7 @@ func (ec *executionContext) field_Query_userById_args(ctx context.Context, rawAr
 func (ec *executionContext) field_Subscription_messageStream_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
 	args := map[string]any{}
-	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "messageId", ec.unmarshalOInt2ᚖint32)
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "messageId", ec.unmarshalNInt2int32)
 	if err != nil {
 		return nil, err
 	}
@@ -901,9 +901,9 @@ func (ec *executionContext) _ChatStreamChunk_chunk(ctx context.Context, field gr
 			return obj.Chunk, nil
 		},
 		nil,
-		ec.marshalOString2ᚖstring,
+		ec.marshalNString2string,
 		true,
-		false,
+		true,
 	)
 }
 
@@ -930,9 +930,9 @@ func (ec *executionContext) _ChatStreamChunk_done(ctx context.Context, field gra
 			return obj.Done, nil
 		},
 		nil,
-		ec.marshalOBoolean2ᚖbool,
+		ec.marshalNBoolean2bool,
 		true,
-		false,
+		true,
 	)
 }
 
@@ -2365,7 +2365,7 @@ func (ec *executionContext) _Subscription_messageStream(ctx context.Context, fie
 		ec.fieldContext_Subscription_messageStream,
 		func(ctx context.Context) (any, error) {
 			fc := graphql.GetFieldContext(ctx)
-			return ec.resolvers.Subscription().MessageStream(ctx, fc.Args["messageId"].(*int32), fc.Args["conversationId"].(int32))
+			return ec.resolvers.Subscription().MessageStream(ctx, fc.Args["messageId"].(int32), fc.Args["conversationId"].(int32))
 		},
 		nil,
 		ec.marshalNChatStreamChunk2ᚖkonsin1988ᚋrtᚑappᚋgraphᚋmodelᚐChatStreamChunk,
@@ -4496,8 +4496,14 @@ func (ec *executionContext) _ChatStreamChunk(ctx context.Context, sel ast.Select
 			out.Values[i] = graphql.MarshalString("ChatStreamChunk")
 		case "chunk":
 			out.Values[i] = ec._ChatStreamChunk_chunk(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
 		case "done":
 			out.Values[i] = ec._ChatStreamChunk_done(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}

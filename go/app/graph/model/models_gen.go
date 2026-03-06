@@ -8,10 +8,10 @@ import (
 	"io"
 	"strconv"
 )
-  
+
 type ChatStreamChunk struct {
-	Chunk *string `json:"chunk,omitempty"`
-	Done  *bool   `json:"done,omitempty"`
+	Chunk string `json:"chunk"`
+	Done  bool   `json:"done"`
 }
 
 type Conversation struct {

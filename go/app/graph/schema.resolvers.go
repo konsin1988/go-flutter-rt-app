@@ -17,7 +17,6 @@ import (
 	"konsin1988/rt-app/helpers"
 	"log"
 	"os"
-	"strconv"
 	"strings"
 	"time"
 )
@@ -223,13 +222,8 @@ func (r *queryResolver) GetDeptByID(ctx context.Context, deptID int32) (*model.D
 }
 
 // MessageStream is the resolver for the messageStream field.
-func (r *subscriptionResolver) MessageStream(ctx context.Context, messageID *int32, conversationID int32) (<-chan *model.ChatStreamChunk, error) {
-	if messageID == nil {
-		return nil, fmt.Errorf("messageID is required")
-	}
-	jobID := strconv.Itoa(int(*messageID))
-	
-	serviceCh, err := r.AiService.SubscribeToStream(ctx, jobID, int(conversationID))
+func (r *subscriptionResolver) MessageStream(ctx context.Context, messageID int32, conversationID int32) (<-chan *model.ChatStreamChunk, error) {
+	serviceCh, err := r.AiService.SubscribeToStream(ctx, int(messageID), int(conversationID))
 	if err != nil {
 		return nil, err
 	}
@@ -248,7 +242,7 @@ func (r *subscriptionResolver) MessageStream(ctx context.Context, messageID *int
 				}
 
 				out <- &model.ChatStreamChunk{
-					Chunk: chunk.Chunk,
+					Chunk: chunk.Message.Content,
 					Done:  chunk.Done,
 				}
 			}

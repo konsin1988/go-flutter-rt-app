@@ -1,10 +1,15 @@
 package ollama
 
-type ChatResponseChunk struct {
-        ChunkMessage struct {
+type ChatStreamChunk struct {
+        Message struct {
                 Content string `json:"content"`
         } `json:"message"`
         Done bool `json:"done"`
+}
+
+type WorkerResponseChunk struct {
+    Chunk     string	`json:"chunk"`
+    Done      bool	`json:"done"`
 }
 
 type ChatMessage struct {
@@ -19,6 +24,6 @@ type ChatRequest  struct {
 }
 
 type Job struct {
-	JobID  string `json:"jobId"`
+	MessageID  int `json:"messageId"`
 	Messages []ChatMessage `json:"messages"`
 }

@@ -81,11 +81,17 @@ type ChatMessage struct {
 }
 
 type Job struct {
-        JobID  string `json:"jobId"`
+        MessageID  int `json:"messageId"`
         Messages []ChatMessage `json:"messages"`
 }
 
 type ChatStreamChunk struct {
-	Chunk *string `json:"chunk,omitempty"`
-	Done  *bool   `json:"done,omitempty"`
+        Message struct {
+                Content string `json:"content"`
+        } `json:"message"`
+        Done bool `json:"done"`
 }
+//type ChatStreamChunk struct {
+//	Chunk *string `json:"chunk,omitempty"`
+//	Done  *bool   `json:"done,omitempty"`
+//}

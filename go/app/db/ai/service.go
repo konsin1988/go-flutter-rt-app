@@ -159,9 +159,8 @@ func (s *Service) CreateMessage(
     }
     chatMessages = append(chatMessages, m)
   }
-  jobID := "ai_jobs"
   job := models.Job{
-    JobID: jobID,
+    MessageID: m.ID,
     Messages: chatMessages,
   }
   err = s.queue.Enqueue(ctx, job)
@@ -184,11 +183,11 @@ func (s *Service) CreateMessage(
 // subscribe to string
 func (s *Service) SubscribeToStream (
   ctx context.Context,
-  jobID string,
+  messageID int,
   conversationID int,
 ) (<-chan *models.ChatStreamChunk, error){
 
-  channel := fmt.Sprintf("ai_streams:%s", jobID)
+  channel := fmt.Sprintf("ai_streams:%d", messageID)
   redisCh, err := s.queue.Subscribe(ctx, channel)
   if err != nil{
     return nil, err
@@ -214,9 +213,7 @@ func (s *Service) SubscribeToStream (
 	  continue
 	}
 
-	if chunk.Chunk != nil {
-	  fullAssistantMessage.WriteString(*chunk.Chunk)
-	}
+	fullAssistantMessage.WriteString(chunk.Message.Content)
 
 	select {
 	case out <- &chunk:
@@ -224,7 +221,7 @@ func (s *Service) SubscribeToStream (
 	  return
 	}
 
-	if chunk.Done != nil && *chunk.Done {
+	if chunk.Done {
 	  if fullAssistantMessage.Len() > 0 {
 	    _, err := s.repo.CreateMessage(
 	      ctx, 
