@@ -165,8 +165,8 @@ func (r *queryResolver) ConversationList(ctx context.Context) ([]*model.Conversa
 		item := &model.ConversationListItem{
 			ID:        int32(val.ID),
 			Title:     val.Title,
-			CreatedAt: helpers.GetRussianDateFromTime(val.CreatedAt),
-			UpdatedAt: helpers.GetRussianDateFromTime(val.UpdatedAt),
+			CreatedAt: val.CreatedAt.Format(time.RFC3339),
+			UpdatedAt: val.UpdatedAt.Format(time.RFC3339),
 		}
 		conversationList = append(conversationList, item)
 	}

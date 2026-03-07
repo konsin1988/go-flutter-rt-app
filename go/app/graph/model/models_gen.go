@@ -99,12 +99,6 @@ type User struct {
 	HeadList   []*Head       `json:"headList"`
 }
 
-type UserContact struct {
-	Label *string `json:"label,omitempty"`
-	Type  string  `json:"type"`
-	Value string  `json:"value"`
-}
-
 type MessageRole string
 
 const (

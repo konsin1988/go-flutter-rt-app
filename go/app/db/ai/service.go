@@ -44,7 +44,7 @@ func (s *Service) GetConversationList (ctx context.Context, id int) ([]models.Co
   if err == nil {
     return conversations, nil
   }
-  //db
+  // db
   c, err := s.repo.GetConversationList(ctx, id) 
   if err != nil {
     return nil, err
@@ -52,7 +52,7 @@ func (s *Service) GetConversationList (ctx context.Context, id int) ([]models.Co
 
   const maxRetries = 3
   for i := 0; i < maxRetries; i++ {
-    if err := s.cache.Set(ctx, key, conversations, 10*time.Minute); err != nil {
+    if err := s.cache.Set(ctx, key, c, 10*time.Minute); err != nil {
       log.Printf("cache set failed attempt %d for user %d: %v", i+1, id, err)
       time.Sleep(50 * time.Millisecond) 
       continue

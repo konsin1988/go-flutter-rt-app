@@ -34,7 +34,7 @@ func (r *RedisCache) Set (ctx context.Context, key string, value interface{}, tt
   if err != nil {
     return err
   }
-  return r.client.Set(ctx, key, bytes,ttl).Err()
+  return r.client.Set(ctx, key, bytes, ttl).Err()
 }
 
 func (r *RedisCache) Delete (ctx context.Context, key string) error {

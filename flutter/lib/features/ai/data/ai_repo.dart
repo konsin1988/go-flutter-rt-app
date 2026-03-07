@@ -1,0 +1,58 @@
+import 'package:graphql_flutter/graphql_flutter.dart';
+import 'package:flutter/material.dart';
+
+import 'ai_queries.dart';
+import 'ai_models.dart';
+
+class AiRepository {
+  final GraphQLClient _client;
+
+  AiRepository(this._client);
+
+  Future<Conversation> conversationById(int id) async {
+    final result = await _client.query(
+      QueryOptions(
+        document: gql(AiQueries.ConversationById),
+	variables: {'id': id },
+        fetchPolicy: FetchPolicy.networkOnly,
+      ),
+    );
+
+    if (result.hasException) {
+      debugPrint('❌ GraphQL error: ${result.exception}');
+      throw result.exception!;
+    }
+
+    final data = result.data;
+    if (data == null || data['ConversationById'] == null) {
+      throw Exception('Conversation not found');
+    }
+    return Conversation.fromJson(data['ConversationById'] as Map<String, dynamic>);
+  }
+
+
+  Future<List<ConversationListItem>> ConversationList() async {
+    final result = await _client.query(
+      QueryOptions(
+        document: gql(AiQueries.ConversationList),
+        fetchPolicy: FetchPolicy.networkOnly,
+      ),
+    );
+
+
+    if (result.hasException) {
+      throw result.exception!;
+    }
+
+    final data = result.data;
+    if (data == null || data['ConversationList'] == null) return [];
+
+    final List ConversationsJson = data['ConversationList'] as List;
+
+    return ConversationsJson
+        .map(
+          (json) => ConversationListItem.fromJson(json as Map<String, dynamic>),
+        )
+        .toList();
+  }
+}

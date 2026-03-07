@@ -4,10 +4,12 @@ import 'package:flutter/widgets.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 
 import '../graphql/graphql_service.dart';
-import '../../features/user/state/user_provider.dart';
-import '../../features/user/data/user_repository.dart';
-import '../../features/posts/state/post_provider.dart';
-import '../../features/posts/data/post_repository.dart';
+import 'package:rt_app/features/user/state/user_provider.dart';
+import 'package:rt_app/features/user/data/user_repository.dart';
+import 'package:rt_app/features/posts/state/post_provider.dart';
+import 'package:rt_app/features/posts/data/post_repository.dart';
+import 'package:rt_app/features/ai/state/ai_provider.dart';
+import 'package:rt_app/features/ai/data/ai_repo.dart';
 
 List<SingleChildWidget> protectedProviders(BuildContext context) {
   return [
@@ -19,6 +21,11 @@ List<SingleChildWidget> protectedProviders(BuildContext context) {
     ChangeNotifierProvider(
       create: (_) => PostProvider(
         PostRepository(context.read<GraphQLClient>()),
+      ),
+    ),
+    ChangeNotifierProvider(
+      create: (_) => AiProvider(
+        AiRepository(context.read<GraphQLClient>()),
       ),
     ),
   ];

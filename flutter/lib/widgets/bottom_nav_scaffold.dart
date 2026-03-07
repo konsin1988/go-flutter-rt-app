@@ -9,6 +9,7 @@ import '../../widgets/app_top_bar.dart';
 import '../../style/colors.dart';
 import '../../style/fonts.dart';
 import 'BottomNavigationBarItem.dart';
+import 'AiDrawer.dart';
 
 class BottomNavScaffold extends StatelessWidget {
   final StatefulNavigationShell navigationShell;
@@ -57,6 +58,7 @@ class BottomNavScaffold extends StatelessWidget {
       appBar: AppTopBar(
 	title: appBarTitle(location),
       ),
+      drawer: AiDrawer(),
       backgroundColor: RTColorStyle.dark900.value,
       bottomNavigationBar: BottomNavigationBar(
 	currentIndex: navigationShell.currentIndex,

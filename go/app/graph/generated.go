@@ -146,12 +146,6 @@ type ComplexityRoot struct {
 		Position   func(childComplexity int) int
 		SecondName func(childComplexity int) int
 	}
-
-	UserContact struct {
-		Label func(childComplexity int) int
-		Type  func(childComplexity int) int
-		Value func(childComplexity int) int
-	}
 }
 
 type ConversationResolver interface {
@@ -587,25 +581,6 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.User.SecondName(childComplexity), true
-
-	case "UserContact.label":
-		if e.complexity.UserContact.Label == nil {
-			break
-		}
-
-		return e.complexity.UserContact.Label(childComplexity), true
-	case "UserContact.type":
-		if e.complexity.UserContact.Type == nil {
-			break
-		}
-
-		return e.complexity.UserContact.Type(childComplexity), true
-	case "UserContact.value":
-		if e.complexity.UserContact.Value == nil {
-			break
-		}
-
-		return e.complexity.UserContact.Value(childComplexity), true
 
 	}
 	return 0, false
@@ -1186,7 +1161,7 @@ func (ec *executionContext) _ConversationListItem_createdAt(ctx context.Context,
 			return obj.CreatedAt, nil
 		},
 		nil,
-		ec.marshalNDate2string,
+		ec.marshalNString2string,
 		true,
 		true,
 	)
@@ -1199,7 +1174,7 @@ func (ec *executionContext) fieldContext_ConversationListItem_createdAt(_ contex
 		IsMethod:   false,
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Date does not have child fields")
+			return nil, errors.New("field of type String does not have child fields")
 		},
 	}
 	return fc, nil
@@ -1215,7 +1190,7 @@ func (ec *executionContext) _ConversationListItem_updatedAt(ctx context.Context,
 			return obj.UpdatedAt, nil
 		},
 		nil,
-		ec.marshalNDate2string,
+		ec.marshalNString2string,
 		true,
 		true,
 	)
@@ -1228,7 +1203,7 @@ func (ec *executionContext) fieldContext_ConversationListItem_updatedAt(_ contex
 		IsMethod:   false,
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Date does not have child fields")
+			return nil, errors.New("field of type String does not have child fields")
 		},
 	}
 	return fc, nil
@@ -2937,93 +2912,6 @@ func (ec *executionContext) fieldContext_User_headList(_ context.Context, field 
 				return ec.fieldContext_Head_fio(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Head", field.Name)
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _UserContact_label(ctx context.Context, field graphql.CollectedField, obj *model.UserContact) (ret graphql.Marshaler) {
-	return graphql.ResolveField(
-		ctx,
-		ec.OperationContext,
-		field,
-		ec.fieldContext_UserContact_label,
-		func(ctx context.Context) (any, error) {
-			return obj.Label, nil
-		},
-		nil,
-		ec.marshalOString2ᚖstring,
-		true,
-		false,
-	)
-}
-
-func (ec *executionContext) fieldContext_UserContact_label(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "UserContact",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _UserContact_type(ctx context.Context, field graphql.CollectedField, obj *model.UserContact) (ret graphql.Marshaler) {
-	return graphql.ResolveField(
-		ctx,
-		ec.OperationContext,
-		field,
-		ec.fieldContext_UserContact_type,
-		func(ctx context.Context) (any, error) {
-			return obj.Type, nil
-		},
-		nil,
-		ec.marshalNString2string,
-		true,
-		true,
-	)
-}
-
-func (ec *executionContext) fieldContext_UserContact_type(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "UserContact",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _UserContact_value(ctx context.Context, field graphql.CollectedField, obj *model.UserContact) (ret graphql.Marshaler) {
-	return graphql.ResolveField(
-		ctx,
-		ec.OperationContext,
-		field,
-		ec.fieldContext_UserContact_value,
-		func(ctx context.Context) (any, error) {
-			return obj.Value, nil
-		},
-		nil,
-		ec.marshalNString2string,
-		true,
-		true,
-	)
-}
-
-func (ec *executionContext) fieldContext_UserContact_value(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "UserContact",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
 		},
 	}
 	return fc, nil
@@ -5295,52 +5183,6 @@ func (ec *executionContext) _User(ctx context.Context, sel ast.SelectionSet, obj
 			}
 		case "headList":
 			out.Values[i] = ec._User_headList(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
-		default:
-			panic("unknown field " + strconv.Quote(field.Name))
-		}
-	}
-	out.Dispatch(ctx)
-	if out.Invalids > 0 {
-		return graphql.Null
-	}
-
-	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
-
-	for label, dfs := range deferred {
-		ec.processDeferredGroup(graphql.DeferredGroup{
-			Label:    label,
-			Path:     graphql.GetPath(ctx),
-			FieldSet: dfs,
-			Context:  ctx,
-		})
-	}
-
-	return out
-}
-
-var userContactImplementors = []string{"UserContact"}
-
-func (ec *executionContext) _UserContact(ctx context.Context, sel ast.SelectionSet, obj *model.UserContact) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, userContactImplementors)
-
-	out := graphql.NewFieldSet(fields)
-	deferred := make(map[string]*graphql.FieldSet)
-	for i, field := range fields {
-		switch field.Name {
-		case "__typename":
-			out.Values[i] = graphql.MarshalString("UserContact")
-		case "label":
-			out.Values[i] = ec._UserContact_label(ctx, field, obj)
-		case "type":
-			out.Values[i] = ec._UserContact_type(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
-			}
-		case "value":
-			out.Values[i] = ec._UserContact_value(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}

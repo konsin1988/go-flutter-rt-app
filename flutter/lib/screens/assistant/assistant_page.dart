@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-
 import 'package:flutter/material.dart';
-import '../../style/colors.dart';
-import '../../style/fonts.dart';
+import 'package:rt_app/style/colors.dart';
+import 'package:rt_app/style/fonts.dart';
+import 'package:rt_app/features/ai/state/ai_provider.dart';
 
 class AssistantPage extends StatefulWidget {
   @override
@@ -24,7 +24,7 @@ class _AssistantPageState extends State<AssistantPage> {
       _messages.add(_ChatMessage(text: text, isUser: true));
 
       // Mock AI response
-      _messages.add(_ChatMessage(text: "HHello Hell Hello Hell Hello Hell Hello Hell Hello Hello oodfgdfgd dfgdfg dfgdfgdfgdfg dfgdf fdgddfhth ffgd fdgdffdg gfd dgdfsdds fddffgdfgddfgd fgdfd ooello Hello", isUser: false));
+      _messages.add(_ChatMessage(text: "Selected", isUser: false));
     });
 
     _controller.clear();
@@ -35,34 +35,50 @@ class _AssistantPageState extends State<AssistantPage> {
     final SW = MediaQuery.of(context).size.width;
     final SH = MediaQuery.of(context).size.height;
 
+    final aiProvider = context.watch<AiProvider>();
+    if (aiProvider.loading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+    final currentConversation = aiProvider.currentConversation;
+    debugPrint("Current conversation from assistant page: ${currentConversation?.Messages}");
+
     return Scaffold(
       backgroundColor: RTColorStyle.dark900.value,
       body: Column(
       	children: [
-      	  Expanded(
-      	    child: ListView.builder(
+	  Expanded(
+      	    child: 
+	      currentConversation == null 
+	      ? Center(child: Text("Введите Ваш запрос"))
+	      : ListView.builder(
       	      padding: EdgeInsets.all(SW * 0.03),
-      	      itemCount: _messages.length,
+      	      //itemCount: _messages.length,
+	      itemCount: currentConversation?.Messages.length,
       	      itemBuilder: (context, index) {
-      	        final message = _messages[index];
+      	        //final message = _messages[index];
+		final message = currentConversation?.Messages[index];
       	        return Align(
       	          alignment:
-      	              message.isUser ? Alignment.centerRight : Alignment.centerLeft,
+      	              message?.Role == "USER" ? Alignment.centerRight : Alignment.centerLeft,
       	          child: Container(
-		    margin: message.isUser
+		    margin: message?.Role == "USER"
 			  ? EdgeInsets.only(left: SW * 0.13, right: SW * 0.01, top: SH * 0.005, bottom: SH * 0.005)
 			  : EdgeInsets.only(right: SW * 0.13, left: SW * 0.01, top: SH * 0.005, bottom: SH * 0.005),
       	            padding: EdgeInsets.symmetric(vertical: SH * 0.01, horizontal: SW * 0.04),
       	            decoration: BoxDecoration(
-      	              color: message.isUser
+      	              color: message?.Role == "USER"
       	                  ? RTColorStyle.beige500.value 
       	                  : RTColorStyle.light800.value,
       	              borderRadius: BorderRadius.circular(12),
       	            ),
       	            child: Text(
-      	              message.text,
+      	              message?.Content ?? "",
       	              style: TextStyle(
-      	                color: message.isUser ? RTColorStyle.light1000.value : RTColorStyle.dark1000.value,
+      	                color: message?.Role == "USER" ? RTColorStyle.light1000.value : RTColorStyle.dark1000.value,
+			fontFamily: "MuseoSans",
+            		fontSize: 18,
+            		//height: 36 / 32,
+            		fontWeight: FontWeight.w500,
       	              ),
       	            ),
       	          ),
@@ -123,3 +139,11 @@ class _ChatMessage {
   _ChatMessage({required this.text, required this.isUser});
 }
 
+class EmptyAssistantPage extends StatelessWidget {
+  const EmptyAssistantPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const SizedBox.shrink();
+  }
+}
