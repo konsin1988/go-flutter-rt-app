@@ -1,4 +1,6 @@
 class AiQueries {
+
+  // Conversation list
   static const String ConversationList = r'''
     query ConversationList {
       ConversationList {
@@ -10,6 +12,7 @@ class AiQueries {
     }
   ''';
 
+  // Conversation By ID
   static const String ConversationById = r'''
     query GetConversationById($id: Int!) {
       ConversationById(id: $id) {
@@ -24,6 +27,19 @@ class AiQueries {
 	  content
 	  createdAt
 	}
+      }
+    }
+  ''';
+
+  // Create Message
+  static const String createMessage = r'''
+    mutation CreateMessage($ConversationId: Int, $content: String!){
+      createMessage(conversationId: $conversationId, content: $content) {
+	id
+	conversationId
+	role
+	content
+	createdAt
       }
     }
   ''';

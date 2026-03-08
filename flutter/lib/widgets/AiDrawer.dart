@@ -22,10 +22,10 @@ class AiDrawer extends StatelessWidget {
 
     return Drawer(
       backgroundColor: RTColorStyle.dark900.value, 
-      child: ListView(
-        children: [
+      child: Column(
+	children: [
 	  Container(
-	    height: SH * 0.06,
+	    height: SH * 0.1,
 	    padding: EdgeInsets.all(SW * 0.03),
 	    color: RTColorStyle.dark1000.value,
 	    alignment: Alignment.bottomLeft,
@@ -34,16 +34,39 @@ class AiDrawer extends StatelessWidget {
 	      style: RTFontStyle.appTitle.value,
 	    ),
 	  ),
-	  for (final c in conversationList)
-	    ListTile(
-              title: Text(c.Title),
-              onTap: () async {
-                aiProvider.selectConversation(c.ID);
-		await aiProvider.loadConversation(c.ID);
-		Navigator.of(context).pop();
+	  ListTile(
+            leading: const Icon(Icons.add),
+            title: const Text("Новый разговор"),
+            onTap: () {
+              aiProvider.clearCurrentConversation();
+              Navigator.of(context).pop();
+            },
+          ),
+
+          const Divider(),
+
+	  Expanded(
+            child: ListView.builder(
+              itemCount: conversationList.length,
+              itemBuilder: (context, index) {
+                final c = conversationList[index];
+
+                return ListTile(
+                  title: Text(c.Title),
+		  selected: aiProvider.selectedId == c.ID,
+                  onTap: () async {
+                    final aiProvider = context.read<AiProvider>();
+
+                    aiProvider.selectConversation(c.ID);
+                    await aiProvider.loadConversation(c.ID);
+
+                    Navigator.of(context).pop();
+                  },
+                );
               },
             ),
-        ],
+          ),
+	],
       ),
     );
   }

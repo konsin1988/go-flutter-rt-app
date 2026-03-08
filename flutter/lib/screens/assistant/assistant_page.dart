@@ -13,21 +13,15 @@ class AssistantPage extends StatefulWidget {
 
 class _AssistantPageState extends State<AssistantPage> {
   final TextEditingController _controller = TextEditingController();
-  final List<_ChatMessage> _messages = [];
 
-  void _sendMessage() {
+  Future<void> _sendMessage() async {
     final text = _controller.text.trim();
     if (text.isEmpty) return;
 
-    setState(() {
-      // Add user message
-      _messages.add(_ChatMessage(text: text, isUser: true));
-
-      // Mock AI response
-      _messages.add(_ChatMessage(text: "Selected", isUser: false));
-    });
-
+    final aiProvider = context.read<AiProvider>();
     _controller.clear();
+
+    await aiProvider.sendMessage(text);
   }
 
   @override
@@ -52,10 +46,8 @@ class _AssistantPageState extends State<AssistantPage> {
 	      ? Center(child: Text("Введите Ваш запрос"))
 	      : ListView.builder(
       	      padding: EdgeInsets.all(SW * 0.03),
-      	      //itemCount: _messages.length,
 	      itemCount: currentConversation?.Messages.length,
       	      itemBuilder: (context, index) {
-      	        //final message = _messages[index];
 		final message = currentConversation?.Messages[index];
       	        return Align(
       	          alignment:
@@ -132,12 +124,6 @@ class _AssistantPageState extends State<AssistantPage> {
   }
 }
 
-class _ChatMessage {
-  final String text;
-  final bool isUser;
-
-  _ChatMessage({required this.text, required this.isUser});
-}
 
 class EmptyAssistantPage extends StatelessWidget {
   const EmptyAssistantPage({super.key});

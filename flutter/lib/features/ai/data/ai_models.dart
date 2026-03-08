@@ -3,7 +3,7 @@ class Message {
   final int ConversationID;
   final String Role;
   final String Content;
-  final String CreatedAt;
+  final DateTime CreatedAt;
   
   Message({
     required this.ID,
@@ -19,7 +19,7 @@ class Message {
       ConversationID: json['conversationId'] as int,
       Role: json['role'] as String,
       Content: json['content'] as String,
-      CreatedAt: json['createdAt'] as String,
+      CreatedAt: DateTime.parse(json['createdAt'] as String),
     );
   }
 

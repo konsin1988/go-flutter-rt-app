@@ -9,6 +9,7 @@ class AiRepository {
 
   AiRepository(this._client);
 
+  // Conversation by ID
   Future<Conversation> conversationById(int id) async {
     final result = await _client.query(
       QueryOptions(
@@ -19,7 +20,7 @@ class AiRepository {
     );
 
     if (result.hasException) {
-      debugPrint('❌ GraphQL error: ${result.exception}');
+      debugPrint('GraphQL error: ${result.exception}');
       throw result.exception!;
     }
 
@@ -31,6 +32,7 @@ class AiRepository {
   }
 
 
+  // Conversation List
   Future<List<ConversationListItem>> ConversationList() async {
     final result = await _client.query(
       QueryOptions(
@@ -54,5 +56,27 @@ class AiRepository {
           (json) => ConversationListItem.fromJson(json as Map<String, dynamic>),
         )
         .toList();
+  }
+
+  Future<Message> createMessage({
+    required int conversationId, 
+    required String content,
+    }) async {
+    final result = await _client.mutate(
+      MutationOptions(
+	document: gql(AiQueries.createMessage),
+	variables: {
+	  'conversationId': conversationId,
+	  'content': content,
+	},
+      ), 
+    );
+
+    if (result.hasException) {
+      throw result.exception!;
+    }
+
+    final data = result.data!['createMessage'];
+    return Message.fromJson(data);
   }
 }

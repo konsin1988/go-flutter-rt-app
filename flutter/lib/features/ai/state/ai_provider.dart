@@ -59,13 +59,51 @@ class AiProvider extends ChangeNotifier{
     return conversation;
   }
 
+  // Conversation Setter
   void selectConversation(int id) {
     _selectedId = id;
     notifyListeners();
   }
 
+  // Conversation List Setter
   void setConversationList(List<ConversationListItem> list) {
     _conversationList = list;
+    notifyListeners();
+  }
+
+  // Create new conversation
+  void clearCurrentConversation() {
+  _currentConversation = null;
+  notifyListeners();
+  }
+
+  // CreateMessage
+  Future<void> sendMessage(String content) async {
+    if (_currentConversation == null) return;
+
+    final tempMessage = Message(
+      ID: -1,
+      ConversationID: _currentConversation!.ID,
+      Role: "USER",
+      Content: content,
+      CreatedAt: DateTime.now(),
+    );
+    
+    _currentConversation!.Messages.add(tempMessage);
+    notifyListeners();
+
+    try {
+      final message = await _repo.createMessage(
+	conversationId: _currentConversation!.ID,
+	content: content,
+      );
+      _currentConversation!.Messages.remove(tempMessage);
+      _currentConversation!.Messages.add(message);
+    } catch (e) {
+      _currentConversation!.Messages.remove(tempMessage);
+      rethrow;
+    }
+
     notifyListeners();
   }
 }
