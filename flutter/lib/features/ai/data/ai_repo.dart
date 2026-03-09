@@ -59,7 +59,7 @@ class AiRepository {
   }
 
   Future<Message> createMessage({
-    required int conversationId, 
+    required int? conversationId, 
     required String content,
     }) async {
     final result = await _client.mutate(
@@ -78,5 +78,21 @@ class AiRepository {
 
     final data = result.data!['createMessage'];
     return Message.fromJson(data);
+  }
+
+  // messageStream
+  Stream<QueryResult> messageStream({
+    required int messageId,
+    required int conversationId,
+  }) {
+    return _client.subscribe(
+      SubscriptionOptions(
+        document: gql(AiQueries.messageStream),
+        variables: {
+          "messageId": messageId,
+          "conversationId": conversationId,
+        },
+      ),
+    );
   }
 }

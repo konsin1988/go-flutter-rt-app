@@ -78,7 +78,7 @@ func (r *mutationResolver) CreateMessage(ctx context.Context, conversationID *in
 		ConversationID: int32(m.ConversationID),
 		Role:           model.MessageRole(m.Role),
 		Content:        m.Content,
-		CreatedAt:      helpers.FormatRussian(m.CreatedAt),
+		CreatedAt:	m.CreatedAt.Format(time.RFC3339),
 	}, nil
 }
 

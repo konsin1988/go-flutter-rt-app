@@ -12,6 +12,22 @@ class Message {
     required this.Content,
     required this.CreatedAt,
   });
+
+  Message copyWith({
+    int? ID,
+    int? ConversationID,
+    String? Role,
+    String? Content,
+    DateTime? CreatedAt,
+  }) {
+    return Message(
+      ID: ID ?? this.ID,
+      ConversationID: ConversationID ?? this.ConversationID,
+      Role: Role ?? this.Role,
+      Content: Content ?? this.Content,
+      CreatedAt: CreatedAt ?? this.CreatedAt,
+    );
+  }
   
   factory Message.fromJson(Map<String, dynamic> json) {
     return Message(

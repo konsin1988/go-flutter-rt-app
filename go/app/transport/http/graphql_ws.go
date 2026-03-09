@@ -29,10 +29,14 @@ func NewWebsocketTransport(
         KeepAlivePingInterval: 15 * time.Second,
   	  InitFunc: transport.WebsocketInitFunc(
 	    func(ctx context.Context, initPayload transport.InitPayload) (context.Context, *transport.InitPayload, error) {
-    	        authHeader, ok := initPayload["Authorization"].(string)
-    	        if !ok {
-    	            return ctx, nil, errors.New("missing Authorization token")
-    	        }
+		authHeader := initPayload.GetString("Authorization")
+		if authHeader == "" {
+        	    return ctx, nil, errors.New("missing Authorization token")
+        	}
+    	        //authHeader, ok := initPayload["Authorization"].(string)
+    	        //if !ok {
+    	        //    return ctx, nil, errors.New("missing Authorization token")
+    	        //}
 
     	        token := strings.TrimPrefix(authHeader, "Bearer ")
 

@@ -1,4 +1,5 @@
 import 'package:graphql_flutter/graphql_flutter.dart';
+import 'package:flutter/material.dart';
 
 import '../utils/constants.dart';
 import '../../auth/token_storage.dart';
@@ -22,7 +23,33 @@ class GraphQLService {
       },
     );
 
-    final Link link = authLink.concat(HttpLink(AppLinks.graphqlURL));
+    //final Link link = authLink.concat(HttpLink(AppLinks.graphqlURL));
+    final HttpLink httpLink = HttpLink(AppLinks.graphqlURL);
+
+    final WebSocketLink wsLink = WebSocketLink(
+      "ws://192.168.3.31:8000/graphql",
+      config: SocketClientConfig(
+        autoReconnect: true,
+        inactivityTimeout: Duration(seconds: 30),
+        initialPayload: () async {
+          //final token = TokenStorage().accessToken;
+          //if (token == null) return {};
+	  String? token;
+	  while ((token = TokenStorage().accessToken) == null) {
+	    await Future.delayed(Duration(milliseconds: 50));
+  	  }
+          return {
+            "Authorization": "Bearer ${token}",
+          };
+        },
+      ),
+    );
+
+    final Link link = Link.split(
+      (request) => request.isSubscription,
+      wsLink,
+      authLink.concat(httpLink),
+    );
 
     client = GraphQLClient(
       cache: GraphQLCache(store: HiveStoreFactory.create()),
@@ -33,5 +60,4 @@ class GraphQLService {
   void clearCache() {
     client.cache.store.reset();
   }
-
 }

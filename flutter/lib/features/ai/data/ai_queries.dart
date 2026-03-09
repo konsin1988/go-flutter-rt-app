@@ -33,7 +33,7 @@ class AiQueries {
 
   // Create Message
   static const String createMessage = r'''
-    mutation CreateMessage($ConversationId: Int, $content: String!){
+    mutation CreateMessage($conversationId: Int, $content: String!){
       createMessage(conversationId: $conversationId, content: $content) {
 	id
 	conversationId
@@ -43,5 +43,15 @@ class AiQueries {
       }
     }
   ''';
+
+  // messageStream
+  static const String messageStream = r'''
+    subscription MessageStream($messageId: Int!, $conversationId: Int!) {
+      messageStream(messageId: $messageId, conversationId: $conversationId) {
+        chunk
+        done
+      }
+    }
+    ''';
 }
 

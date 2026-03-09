@@ -34,7 +34,6 @@ class _AssistantPageState extends State<AssistantPage> {
       return const Center(child: CircularProgressIndicator());
     }
     final currentConversation = aiProvider.currentConversation;
-    debugPrint("Current conversation from assistant page: ${currentConversation?.Messages}");
 
     return Scaffold(
       backgroundColor: RTColorStyle.dark900.value,
