@@ -86,13 +86,13 @@ func (r *AiRepo) GetConversationMessages(ctx context.Context, conversation_id in
   if before != nil {
     baseQuery += `
         AND m.created_at < $2
-        ORDER BY m.created_at DESC
+        ORDER BY m.created_at DESC 
         LIMIT $3
     `
     rows, err = r.db.QueryContext(ctx, baseQuery, conversation_id, *before, limit)
   } else {
     baseQuery += `
-        ORDER BY m.created_at DESC
+        ORDER BY m.created_at DESC 
         LIMIT $2
     `
     rows, err = r.db.QueryContext(ctx, baseQuery, conversation_id, limit)

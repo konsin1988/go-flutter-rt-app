@@ -37,7 +37,16 @@ func NewClient(redisClient *redis.Client) *Client {
 func (c *Client) Chat(ctx context.Context, job Job) {
   reqBody := ChatRequest{
     Model:      c.AiModel,
-    Messages:   job.Messages,
+    Messages: append([]ChatMessage{
+      {
+        Role:    "system",
+        Content: `You are a helpful assistant. 
+        RESPOND ONLY to the LAST user message. 
+        Previous messages are conversation history for context only.
+        Do not answer previous questions. Do not repeat history.`,
+      },
+    },
+      job.Messages...), 
     Stream:     true,  
   }
   jsonData, err := json.Marshal(reqBody)

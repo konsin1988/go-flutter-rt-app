@@ -1,5 +1,6 @@
 import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:flutter/material.dart';
+import 'dart:async';
 
 import 'ai_queries.dart';
 import 'ai_models.dart';
@@ -69,8 +70,7 @@ class AiRepository {
 	  'conversationId': conversationId,
 	  'content': content,
 	},
-      ), 
-    );
+    ));
 
     if (result.hasException) {
       throw result.exception!;

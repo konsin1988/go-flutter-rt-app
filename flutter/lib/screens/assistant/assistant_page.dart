@@ -42,13 +42,26 @@ class _AssistantPageState extends State<AssistantPage> {
 	  Expanded(
       	    child: 
 	      currentConversation == null 
-	      ? Center(child: Text("Введите Ваш запрос"))
+	      ? Center(child: Text(
+		"Введите Ваш запрос",
+		style: TextStyle(
+		  fontSize: SW * 0.055,
+            	  fontWeight: FontWeight.w700,
+		  fontFamily: "MuseoSans",
+    		  color: RTColorStyle.light600.value,
+		  ),
+		),
+	      )
 	      : ListView.builder(
       	      padding: EdgeInsets.all(SW * 0.03),
+	      reverse: true,
+	      controller: ScrollController(),
 	      itemCount: currentConversation?.Messages.length,
       	      itemBuilder: (context, index) {
-		final message = currentConversation?.Messages[index];
-      	        return Align(
+		final reversedIndex = currentConversation!.Messages.length - 1 - index;
+		final message = currentConversation!.Messages[reversedIndex];
+      	        
+		return Align(
       	          alignment:
       	              message?.Role == "USER" ? Alignment.centerRight : Alignment.centerLeft,
       	          child: Container(
@@ -67,8 +80,7 @@ class _AssistantPageState extends State<AssistantPage> {
       	              style: TextStyle(
       	                color: message?.Role == "USER" ? RTColorStyle.light1000.value : RTColorStyle.dark1000.value,
 			fontFamily: "MuseoSans",
-            		fontSize: 18,
-            		//height: 36 / 32,
+            		fontSize: SW * 0.04,
             		fontWeight: FontWeight.w500,
       	              ),
       	            ),

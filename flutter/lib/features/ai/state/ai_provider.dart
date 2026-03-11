@@ -76,25 +76,16 @@ class AiProvider extends ChangeNotifier{
   // Create new conversation
   void clearCurrentConversation() {
   _currentConversation = null;
+  _selectedId = null;
   notifyListeners();
   }
 
   // CreateMessage
   Future<void> sendMessage(String content) async {
+    bool isNew = false;
     if (_currentConversation == null) {
-      try {
-        final message = await _repo.createMessage(
-          conversationId: null,
-          content: content,
-        );
-        debugPrint("Message: ${message}");
-	selectConversation(message.ConversationID);
-	loadConversation(message.ConversationID);
-        _currentConversation!.Messages.add(message);
-      } catch (e) {
-	debugPrint("Error from SendMessage: ${e}"); 
-        rethrow;
-      }
+      isNew = true;
+      _createOptimisticConversation();
     }
 
     final tempMessage = Message(
@@ -109,15 +100,19 @@ class AiProvider extends ChangeNotifier{
     notifyListeners();
 
     try {
+      final int? realConvId = isNew ? null : _currentConversation!.ID;
+      debugPrint("REAL CONVERSATION ID:  ------- ${realConvId}");
       final message = await _repo.createMessage(
-        conversationId: _currentConversation!.ID,
+        conversationId: realConvId,
         content: content,
       );
       debugPrint("Message: ${message}");
+      _currentConversation!.ID = message.ConversationID;
       _currentConversation!.Messages.remove(tempMessage);
       _currentConversation!.Messages.add(message);
       _createAssistantMessage();
       _subscribeToStream(message.ID, message.ConversationID);
+      loadConversationList();
     } catch (e) {
       _currentConversation!.Messages.remove(tempMessage);
       rethrow;
@@ -139,6 +134,22 @@ class AiProvider extends ChangeNotifier{
       ),
     );
   
+    notifyListeners();
+  }
+
+  // Create Optimistic conversation 
+  void _createOptimisticConversation() {
+    final now = DateTime.now();
+    final fakeConvId = -2;
+    //final fakeConvId = -DateTime.now().millisecondsSinceEpoch;
+    final conv = Conversation(
+      ID: fakeConvId,
+      Title: "",
+      CreatedAt: now,
+      UpdatedAt: now,
+      Messages: [],
+    ); 
+    _currentConversation = conv;
     notifyListeners();
   }
 

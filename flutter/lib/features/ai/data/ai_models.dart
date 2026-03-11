@@ -45,7 +45,7 @@ class Message {
 }
 
 class Conversation {
-  final int ID;
+  int ID;
   final String Title;
   final DateTime CreatedAt;
   final DateTime UpdatedAt;
@@ -58,6 +58,7 @@ class Conversation {
     required this.UpdatedAt,
     required this.Messages,
   });
+
 
   factory Conversation.fromJson(Map<String, dynamic> json){
     final messagesJson = json['messages'] as List?;

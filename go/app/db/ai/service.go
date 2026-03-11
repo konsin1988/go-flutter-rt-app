@@ -146,11 +146,19 @@ func (s *Service) CreateMessage(
   messageRole models.MessageRole,
   content string,
 ) (*models.Message, error) {
+  messages, err := s.GetConversationMessages(ctx, conversationID, 7, nil)
+  if err != nil {
+    return nil, err
+  }
   m, err := s.repo.CreateMessage(ctx, conversationID, messageRole, content)
   if err != nil {
     return nil, err
   }
-  messages, err := s.GetConversationMessages(ctx, conversationID, 7, nil)
+  for i, j := 0, len(messages)-1; i < j; i, j = i+1, j-1 {
+    messages[i], messages[j] = messages[j], messages[i]
+  }
+  messages = append(messages, *m)
+  
   chatMessages := make([]models.ChatMessage, len(messages))
   for _, val := range messages {
     m := models.ChatMessage{

@@ -73,16 +73,7 @@ class AiDrawer extends StatelessWidget {
                 itemCount: conversationList.length,
                 itemBuilder: (context, index) {
                   final c = conversationList[index];
-
-                  return ListTile(
-                    title: Text(
-		      c.Title,
-		      style: RTFontStyle.ProfileField.value.copyWith(
-			color: RTColorStyle.dark900.value, 
-			fontSize: SW * 0.037,
-			),
-		      ),
-	            selected: aiProvider.selectedId == c.ID,
+		  return InkWell(
                     onTap: () async {
                       final aiProvider = context.read<AiProvider>();
 
@@ -91,7 +82,41 @@ class AiDrawer extends StatelessWidget {
 
                       Navigator.of(context).pop();
                     },
-                  );
+    		    child: Container(
+    		      padding: EdgeInsets.symmetric(vertical: 4, horizontal: SW * 0.09),
+    		      child: Row(
+    		        children: [
+    		          //CircleAvatar(radius: 20), 
+    		          //SizedBox(width: 12),
+    		          Expanded(
+    		            child: Column(
+    		              crossAxisAlignment: CrossAxisAlignment.start,
+    		              mainAxisSize: MainAxisSize.min,
+    		              children: [
+    		                Text(
+				  c.Title, 
+				  style: TextStyle(
+		  		    color: RTColorStyle.dark900.value, 
+		  		    fontSize: SW * 0.035,
+		  		    fontWeight: FontWeight.w700,
+		  		  ),
+				),
+    		                //Text(conversation.preview, style: subtitleStyle),
+    		              ],
+    		            ),
+    		          ),
+			  Padding(
+			    padding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 1), 
+			    child: Icon(
+			      Icons.more_horiz, 
+			      size: 20,
+		  	      color: RTColorStyle.beige600.value, 
+			    ),
+			  )
+    		        ],
+    		      ),
+    		    ),
+    		  );
                 },
               ),
 	    ),
