@@ -75,8 +75,6 @@ func main() {
 
   // GraphQL
   resolver := graph.NewResolver(userService, aiService, deptService, OllamaClient)
-  //schema := graph.NewExecutableSchema(graph.Config{Resolvers: resolver})
-  //graphqlHandler := handler.NewDefaultServer(schema)
   graphqlHandler := transport.NewGraphQLHandler(
     resolver,
     jwtService,
@@ -93,7 +91,15 @@ func main() {
   mux.HandleFunc("/auth/login", authHandler.Login)
   mux.HandleFunc("/auth/refresh", authHandler.Refresh)
   mux.HandleFunc("/auth/logout", authHandler.Logout)
-  mux.Handle("/graphql", jwtMiddleware(graphqlHandler))
+  mux.Handle("/graphql", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+    if r.Header.Get("Upgrade") == "websocket" || 
+       r.Header.Get("Sec-WebSocket-Key") != "" {
+        graphqlHandler.ServeHTTP(w, r)
+        return
+    }
+    jwtMiddleware(graphqlHandler).ServeHTTP(w, r)
+  }))
+
 
   log.Println("Server started on :8000")
   log.Fatal(http.ListenAndServe(":8000", mux))

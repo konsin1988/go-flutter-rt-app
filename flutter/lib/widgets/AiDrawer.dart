@@ -25,46 +25,76 @@ class AiDrawer extends StatelessWidget {
       child: Column(
 	children: [
 	  Container(
-	    height: SH * 0.1,
-	    padding: EdgeInsets.all(SW * 0.03),
+	    height: SH * 0.105,
+	    padding: EdgeInsets.only(bottom: SW * 0.03, top: SW * 0.03, left: SW * 0.08),
 	    color: RTColorStyle.dark1000.value,
 	    alignment: Alignment.bottomLeft,
 	    child: Text(
-	      "Твои вопросы",
+	      "Твои беседы",
 	      style: RTFontStyle.appTitle.value,
 	    ),
 	  ),
 	  ListTile(
-            leading: const Icon(Icons.add),
-            title: const Text("Новый разговор"),
-            onTap: () {
-              aiProvider.clearCurrentConversation();
-              Navigator.of(context).pop();
-            },
-          ),
-
-          const Divider(),
+	    // leading: Icon(Icons.add, color: RTColorStyle.beige900.value),
+	    title: Padding(
+	      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 3),
+	      child: TextButton(
+	        onPressed: () {
+	          aiProvider.clearCurrentConversation();
+	          Navigator.of(context).pop();
+	        },
+	        style: TextButton.styleFrom(
+	          padding: EdgeInsets.zero, 
+	          backgroundColor: RTColorStyle.beige400.value,
+	          foregroundColor: RTColorStyle.light900.value,
+		  animationDuration: const Duration(milliseconds: 200),
+		  shadowColor: Colors.black26,
+	          shape: RoundedRectangleBorder(
+	            borderRadius: BorderRadius.circular(8), 
+	          ),
+	          elevation: 2, 
+	        ),
+	        child: Text(
+	          "Новая беседа",
+	          style: TextStyle(fontSize: SW * 0.04, fontWeight: FontWeight.bold),
+	        ),
+	      ),
+	    ),
+	  ),
+          Divider(
+	    color: RTColorStyle.light600.value,
+	    thickness: 2, 
+	  ),
 
 	  Expanded(
-            child: ListView.builder(
-              itemCount: conversationList.length,
-              itemBuilder: (context, index) {
-                final c = conversationList[index];
+	    child: Container(
+	      color: RTColorStyle.light600.value, 
+	      child: ListView.builder(
+                itemCount: conversationList.length,
+                itemBuilder: (context, index) {
+                  final c = conversationList[index];
 
-                return ListTile(
-                  title: Text(c.Title),
-		  selected: aiProvider.selectedId == c.ID,
-                  onTap: () async {
-                    final aiProvider = context.read<AiProvider>();
+                  return ListTile(
+                    title: Text(
+		      c.Title,
+		      style: RTFontStyle.ProfileField.value.copyWith(
+			color: RTColorStyle.dark900.value, 
+			fontSize: SW * 0.037,
+			),
+		      ),
+	            selected: aiProvider.selectedId == c.ID,
+                    onTap: () async {
+                      final aiProvider = context.read<AiProvider>();
 
-                    aiProvider.selectConversation(c.ID);
-                    await aiProvider.loadConversation(c.ID);
+                      aiProvider.selectConversation(c.ID);
+                      await aiProvider.loadConversation(c.ID);
 
-                    Navigator.of(context).pop();
-                  },
-                );
-              },
-            ),
+                      Navigator.of(context).pop();
+                    },
+                  );
+                },
+              ),
+	    ),
           ),
 	],
       ),

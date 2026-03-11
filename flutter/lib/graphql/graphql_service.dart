@@ -23,24 +23,32 @@ class GraphQLService {
       },
     );
 
-    //final Link link = authLink.concat(HttpLink(AppLinks.graphqlURL));
     final HttpLink httpLink = HttpLink(AppLinks.graphqlURL);
 
     final WebSocketLink wsLink = WebSocketLink(
-      "ws://192.168.3.31:8000/graphql",
+      AppLinks.graphqlWS,
       config: SocketClientConfig(
         autoReconnect: true,
         inactivityTimeout: Duration(seconds: 30),
         initialPayload: () async {
-          //final token = TokenStorage().accessToken;
-          //if (token == null) return {};
 	  String? token;
-	  while ((token = TokenStorage().accessToken) == null) {
-	    await Future.delayed(Duration(milliseconds: 50));
+	  int attempts = 0;
+	  while ((token = TokenStorage().accessToken) == null && attempts < 20) {
+  	    await Future.delayed(Duration(milliseconds: 50));
+  	    attempts++;
   	  }
-          return {
-            "Authorization": "Bearer ${token}",
-          };
+  	  
+  	  print('WS Token: ${token?.substring(0, 20)}...'); 
+  	  print('Token length: ${token?.length ?? 0}');
+    
+  	  if (token == null) {
+  	    print('NO TOKEN IN STORAGE!');
+  	    return null; 
+  	  }
+  	  
+  	  return {
+  	    "Authorization": "Bearer ${token}",
+  	  };
         },
       ),
     );

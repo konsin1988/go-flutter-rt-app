@@ -59,6 +59,7 @@ class BottomNavScaffold extends StatelessWidget {
 	title: appBarTitle(location),
       ),
       drawer: AiDrawer(),
+      drawerScrimColor: Colors.black.withOpacity(0.5),
       backgroundColor: RTColorStyle.dark900.value,
       bottomNavigationBar: BottomNavigationBar(
 	currentIndex: navigationShell.currentIndex,
