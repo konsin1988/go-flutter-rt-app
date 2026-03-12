@@ -19,6 +19,7 @@ type Repository interface {
   GetConversationMessages(ctx context.Context, conversation_id int, limit int, before *time.Time)([]models.Message, error) 
   CreateConversation(ctx context.Context, userID int, title string)(*models.ConversationListItem, error)
   CreateMessage(ctx context.Context, conversationId int, messageRole models.MessageRole, content string) (*models.Message, error)
+  DeleteConversation(ctx context.Context, conversationId int)(error)
 }
 
 type Service struct {
@@ -247,4 +248,12 @@ func (s *Service) SubscribeToStream (
     }
   }()
   return out, nil
+}
+
+func (s *Service) DeleteConversation(ctx context.Context, conversationId int) error {
+  err := s.repo.DeleteConversation(ctx, conversationId)
+  if err != nil {
+    return err
+  }
+  return nil
 }

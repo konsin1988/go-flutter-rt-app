@@ -98,6 +98,9 @@ class _AssistantPageState extends State<AssistantPage> {
       	        children: [
       	          Expanded(
       	            child: TextField(
+		      maxLines: null,
+		      minLines: 1,
+		      keyboardType: TextInputType.multiline,
       	              controller: _controller,
 		      cursorColor: RTColorStyle.dark800.value,
       	              decoration: InputDecoration(

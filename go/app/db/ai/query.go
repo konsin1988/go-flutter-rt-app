@@ -157,3 +157,29 @@ func (r *AiRepo) CreateMessage(
   m.Content = content
   return &m, nil
 }
+
+func (r *AiRepo) DeleteConversation(ctx context.Context, conversationId int) error {
+  query := `
+    DELETE FROM ai_conversation
+    WHERE id = $1
+  `
+  result, err := r.db.ExecContext(ctx, query, conversationId)
+  if err != nil {
+    return err
+  }
+  rowAffected, _ := result.RowsAffected()
+  if rowAffected == 0 { return err }
+
+  query = `
+    DELETE FROM ai_message
+    WHERE conversationId = $1
+  `
+  result, err = r.db.ExecContext(ctx, query, conversationId)
+  if err != nil {
+    return err
+  }
+  rowAffected, _ = result.RowsAffected()
+  if rowAffected == 0 { return err }
+
+  return nil
+}

@@ -92,6 +92,10 @@ extend type Mutation {
   createMessage(conversationId: Int, content: String!): Message! 
 }
 
+extend type Mutation {
+  deleteConversation(conversationId: Int!): Boolean! 
+}
+
 # Depts
 type DeptUser {
   id: Int!

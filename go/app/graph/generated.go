@@ -107,7 +107,8 @@ type ComplexityRoot struct {
 	}
 
 	Mutation struct {
-		CreateMessage func(childComplexity int, conversationID *int32, content string) int
+		CreateMessage      func(childComplexity int, conversationID *int32, content string) int
+		DeleteConversation func(childComplexity int, conversationID int32) int
 	}
 
 	Query struct {
@@ -153,6 +154,7 @@ type ConversationResolver interface {
 }
 type MutationResolver interface {
 	CreateMessage(ctx context.Context, conversationID *int32, content string) (*model.Message, error)
+	DeleteConversation(ctx context.Context, conversationID int32) (bool, error)
 }
 type QueryResolver interface {
 	MainUser(ctx context.Context) (*model.User, error)
@@ -407,6 +409,17 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.Mutation.CreateMessage(childComplexity, args["conversationId"].(*int32), args["content"].(string)), true
+	case "Mutation.deleteConversation":
+		if e.complexity.Mutation.DeleteConversation == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_deleteConversation_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.DeleteConversation(childComplexity, args["conversationId"].(int32)), true
 
 	case "Query.ConversationById":
 		if e.complexity.Query.ConversationByID == nil {
@@ -751,6 +764,17 @@ func (ec *executionContext) field_Mutation_createMessage_args(ctx context.Contex
 		return nil, err
 	}
 	args["content"] = arg1
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_deleteConversation_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "conversationId", ec.unmarshalNInt2int32)
+	if err != nil {
+		return nil, err
+	}
+	args["conversationId"] = arg0
 	return args, nil
 }
 
@@ -1904,6 +1928,47 @@ func (ec *executionContext) fieldContext_Mutation_createMessage(ctx context.Cont
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_createMessage_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_deleteConversation(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Mutation_deleteConversation,
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.resolvers.Mutation().DeleteConversation(ctx, fc.Args["conversationId"].(int32))
+		},
+		nil,
+		ec.marshalNBoolean2bool,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Mutation_deleteConversation(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_deleteConversation_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -4843,6 +4908,13 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 		case "createMessage":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_createMessage(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "deleteConversation":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_deleteConversation(ctx, field)
 			})
 			if out.Values[i] == graphql.Null {
 				out.Invalids++

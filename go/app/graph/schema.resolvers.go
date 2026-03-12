@@ -78,8 +78,17 @@ func (r *mutationResolver) CreateMessage(ctx context.Context, conversationID *in
 		ConversationID: int32(m.ConversationID),
 		Role:           model.MessageRole(m.Role),
 		Content:        m.Content,
-		CreatedAt:	m.CreatedAt.Format(time.RFC3339),
+		CreatedAt:      m.CreatedAt.Format(time.RFC3339),
 	}, nil
+}
+
+// DeleteConversation is the resolver for the deleteConversation field.
+func (r *mutationResolver) DeleteConversation(ctx context.Context, conversationID int32) (bool, error) {
+	err := r.AiService.DeleteConversation(ctx, int(conversationID))
+	if err != nil{
+	  return false, err
+	}
+	return true, nil
 }
 
 // MainUser is the resolver for the mainUser field.

@@ -31,6 +31,7 @@ class AppTopBar extends StatelessWidget implements PreferredSizeWidget {
       } 
     }
 
+    List<String> assistantTitles = ['Ваш ассистент', 'Главная', 'Профиль'];
     return AppBar(
       centerTitle: true,
       backgroundColor: RTColorStyle.dark1000.value,
@@ -40,7 +41,7 @@ class AppTopBar extends StatelessWidget implements PreferredSizeWidget {
       leading: title == 'Ваш ассистент' 
 	? null
 	: IconButton(
-      	  icon: const Icon(Icons.arrow_back),
+	  icon: const Icon(Icons.arrow_back),
       	  color: RTColorStyle.beige1000.value,
       	  onPressed: () {
       	    if (context.canPop()) {
