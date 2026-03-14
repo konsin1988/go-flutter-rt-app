@@ -3,13 +3,12 @@ package main
 import (
     "net/http"
     "log"
-    _ "os"
 
     "konsin1988/rt-app/config"
     health "konsin1988/rt-app/db/health"
     transport "konsin1988/rt-app/transport/http"
     keycloak "konsin1988/rt-app/auth/keycloak"
-    _ "konsin1988/rt-app/services/bitrix"
+    bitrix "konsin1988/rt-app/services/bitrix"
     jwt "konsin1988/rt-app/auth/jwt"
     graph "konsin1988/rt-app/graph"
     user "konsin1988/rt-app/db/user"
@@ -44,9 +43,7 @@ func main() {
   }
 
   OllamaClient := ollama.NewClient()
-
-  //bitrixURL := os.Getenv("BITRIX24_URL")
-  //bitrixClient := bitrix.New(bitrixURL)
+  bitrixClient := bitrix.New()
 
   // repos
   authRepo := keycloak.NewAuthRepository(
@@ -74,7 +71,7 @@ func main() {
   
 
   // GraphQL
-  resolver := graph.NewResolver(userService, aiService, deptService, OllamaClient)
+  resolver := graph.NewResolver(userService, aiService, deptService, OllamaClient, bitrixClient)
   graphqlHandler := transport.NewGraphQLHandler(
     resolver,
     jwtService,

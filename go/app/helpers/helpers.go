@@ -36,6 +36,23 @@ func GetRussianDateFromTime(date time.Time) string {
   return fmt.Sprintf("%d %s %d", date.Day(), GetMonth(date.Month()), date.Year())
 }
 
+func AbsenceDateToString(date string) (string, error) {
+  t, err := time.Parse(time.RFC3339, date)
+  if err != nil {
+    return "", err
+  }
+  
+  loc := time.FixedZone("MSK", 3*60*60)
+  t = t.In(loc)
+  day := t.Format("02")
+  month := GetMonth(t.Month())
+  year := t.Format("2006")
+  hour := t.Format("15")
+  minute := t.Format("04")
+    
+  return fmt.Sprintf("%s %s %s %s:%s", day, month, year, hour, minute), nil
+}
+
 func GetRussianBD(date *time.Time) *string {
   var bd string
   if date != nil {

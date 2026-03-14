@@ -120,7 +120,7 @@ func (s *Service) GetConversationMessages(
     return msgs, nil
 }
 
-
+// create Conversation
 func (s *Service) CreateConversation(
   ctx context.Context, 
   userID int, 
@@ -140,6 +140,7 @@ func (s *Service) CreateConversation(
     return conv, nil
 }
 
+// Create Message
 func (s *Service) CreateMessage(
   ctx context.Context,
   userID int,
@@ -168,7 +169,8 @@ func (s *Service) CreateMessage(
     }
     chatMessages = append(chatMessages, m)
   }
-  job := models.Job{
+  job := models.ChatJob{
+    Type: "chat",
     MessageID: m.ID,
     Messages: chatMessages,
   }
@@ -257,3 +259,29 @@ func (s *Service) DeleteConversation(ctx context.Context, conversationId int) er
   }
   return nil
 }
+
+func (s *Service) CreateAbsence(ctx context.Context, userID int, prompt string)(*models.OllamaAbsenceData, error){
+  epoch := time.Now().Unix()
+  jobID := fmt.Sprintf("%d:%d", userID, epoch)
+  job := models.AbsenceJob{
+    Type: "absence",
+    JobID: jobID,
+    Prompt: prompt,
+  }
+  err := s.queue.Enqueue(ctx, job)
+  if err != nil {
+    return nil, err
+  }
+
+  channel := fmt.Sprintf("absence:%s", jobID)
+  msg, err := s.queue.ReceiveOnce(ctx, channel, 60*time.Second)
+  if err != nil{
+    return nil, err
+  }
+
+  var ollamaAbsenceData models.OllamaAbsenceData
+  if err := json.Unmarshal([]byte(msg.Payload), &ollamaAbsenceData); err != nil {
+    return nil, err 
+  }
+  return &ollamaAbsenceData, nil
+} 

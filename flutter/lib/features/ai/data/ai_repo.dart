@@ -95,4 +95,21 @@ class AiRepository {
       ),
     );
   }
+  
+  Future<void> DeleteConversation(int conversationId) async {
+    final result = await _client.query(
+      QueryOptions(
+        document: gql(AiQueries.deleteConversation),
+	variables: {'conversationId': conversationId},
+        fetchPolicy: FetchPolicy.networkOnly,
+      ),
+    );
+
+    if (result.hasException) {
+      debugPrint('GraphQL error: ${result.exception}');
+      throw result.exception!;
+    }
+  }
 }
+
+  

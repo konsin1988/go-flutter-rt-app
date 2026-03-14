@@ -1,29 +1,85 @@
 package bitrix
 
-//import (
-//  "bytes"
-//  "context"
-//  "encoding/json"
-//  "net/http"
-//  "errors"
-//  "strconv"
-//  "fmt"
-//  "time"
-//
-//  user "konsin1988/rt-app/domain/user"
-//  "konsin1988/rt-app/helpers"
-//)
-//
-//type Client struct {
-//  userUrl     string
-//  deptUrl     string
-//}
-//
-//func New(baseUrl string) *Client {
-//  return &Client{userUrl: baseUrl + "user.search", deptUrl: baseUrl + "department.get"}
-//}
-//
-//func (c *Client) GetBitrixUser(ctx context.Context, email string) (*user.MainUser, error) {
+import (
+  "bytes"
+  "context"
+  "encoding/json"
+  "net/http"
+  "os"
+  _ "errors"
+  _ "strconv"
+  _ "fmt"
+  "time"
+
+  _ "konsin1988/rt-app/helpers"
+)
+
+type Client struct {
+  absenceUrl	  string
+}
+
+func New() *Client {
+  baseUrl := os.Getenv("BITRIX24_URL")
+  return &Client{ 
+    absenceUrl: baseUrl + "crm.item.add",
+  }
+}
+// Department
+func (c *Client) CreateAbsence(ctx context.Context, 
+    userID int, 
+    dateStart string, 
+    dateEnd string, 
+    typeOfAbsence int, 
+  ) (*AbsenceResponse, error) {
+  now := time.Now().UTC()
+  nowString := now.Format(time.RFC3339)
+  bitrixFields := AbsenceBitrixFields{
+    CreatedBy: 1, 
+    CreatedTime: nowString, 
+    UpdatedTime: nowString,
+    StageID: "DT169_26:NEW", 
+    UfCrm14_1629993971: dateStart, 
+    UfCrm14_1629994007: dateEnd,
+    UfCrm14_1629994024: userID,
+    UfCrm14_1629994055: typeOfAbsence,
+    UfCrm14_1629994264: "",
+  }
+  absenceBitrix := AbsenceBitrix{
+    EntityTypeID: "169",
+    Fields: bitrixFields,
+  }
+  body, err := json.Marshal(absenceBitrix)
+  if err != nil {
+    return nil, err 
+  }
+
+  req, err := http.NewRequestWithContext(
+    ctx, 
+    http.MethodPost,
+    c.absenceUrl,
+    bytes.NewReader(body),
+  )
+  if err != nil {
+    return nil, err
+  }
+  req.Header.Set("Content-Type", "application/json")
+
+  resp, err := http.DefaultClient.Do(req)
+  if err != nil{
+    return nil, err
+  }
+  defer resp.Body.Close()
+
+  var absenceResponse AbsenceResponse
+  if err := json.NewDecoder(resp.Body).Decode(&absenceResponse); err != nil {
+    return nil, err
+  }
+
+  return &absenceResponse, nil
+}
+
+
+  //func (c *Client) GetBitrixUser(ctx context.Context, email string) (*user.MainUser, error) {
 //  body, _ := json.Marshal(map[string]string{"EMAIL": email})
 //  req, err := http.NewRequestWithContext(
 //    ctx, 

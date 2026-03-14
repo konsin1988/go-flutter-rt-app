@@ -49,6 +49,14 @@ type DirectiveRoot struct {
 }
 
 type ComplexityRoot struct {
+	AbsenceUI struct {
+		CreatedBy     func(childComplexity int) int
+		ID            func(childComplexity int) int
+		TimeFrom      func(childComplexity int) int
+		TimeTo        func(childComplexity int) int
+		TypeOfAbsence func(childComplexity int) int
+	}
+
 	ChatStreamChunk struct {
 		Chunk func(childComplexity int) int
 		Done  func(childComplexity int) int
@@ -107,6 +115,7 @@ type ComplexityRoot struct {
 	}
 
 	Mutation struct {
+		CreateAbsence      func(childComplexity int, absencePrompt string) int
 		CreateMessage      func(childComplexity int, conversationID *int32, content string) int
 		DeleteConversation func(childComplexity int, conversationID int32) int
 	}
@@ -155,6 +164,7 @@ type ConversationResolver interface {
 type MutationResolver interface {
 	CreateMessage(ctx context.Context, conversationID *int32, content string) (*model.Message, error)
 	DeleteConversation(ctx context.Context, conversationID int32) (bool, error)
+	CreateAbsence(ctx context.Context, absencePrompt string) (*model.AbsenceUI, error)
 }
 type QueryResolver interface {
 	MainUser(ctx context.Context) (*model.User, error)
@@ -186,6 +196,37 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 	ec := executionContext{nil, e, 0, 0, nil}
 	_ = ec
 	switch typeName + "." + field {
+
+	case "AbsenceUI.CreatedBy":
+		if e.complexity.AbsenceUI.CreatedBy == nil {
+			break
+		}
+
+		return e.complexity.AbsenceUI.CreatedBy(childComplexity), true
+	case "AbsenceUI.ID":
+		if e.complexity.AbsenceUI.ID == nil {
+			break
+		}
+
+		return e.complexity.AbsenceUI.ID(childComplexity), true
+	case "AbsenceUI.TimeFrom":
+		if e.complexity.AbsenceUI.TimeFrom == nil {
+			break
+		}
+
+		return e.complexity.AbsenceUI.TimeFrom(childComplexity), true
+	case "AbsenceUI.TimeTo":
+		if e.complexity.AbsenceUI.TimeTo == nil {
+			break
+		}
+
+		return e.complexity.AbsenceUI.TimeTo(childComplexity), true
+	case "AbsenceUI.TypeOfAbsence":
+		if e.complexity.AbsenceUI.TypeOfAbsence == nil {
+			break
+		}
+
+		return e.complexity.AbsenceUI.TypeOfAbsence(childComplexity), true
 
 	case "ChatStreamChunk.chunk":
 		if e.complexity.ChatStreamChunk.Chunk == nil {
@@ -398,6 +439,17 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.complexity.Message.Role(childComplexity), true
 
+	case "Mutation.createAbsence":
+		if e.complexity.Mutation.CreateAbsence == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_createAbsence_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.CreateAbsence(childComplexity, args["absencePrompt"].(string)), true
 	case "Mutation.createMessage":
 		if e.complexity.Mutation.CreateMessage == nil {
 			break
@@ -751,6 +803,17 @@ func (ec *executionContext) field_Conversation_messages_args(ctx context.Context
 	return args, nil
 }
 
+func (ec *executionContext) field_Mutation_createAbsence_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "absencePrompt", ec.unmarshalNString2string)
+	if err != nil {
+		return nil, err
+	}
+	args["absencePrompt"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field_Mutation_createMessage_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
 	args := map[string]any{}
@@ -889,6 +952,151 @@ func (ec *executionContext) field___Type_fields_args(ctx context.Context, rawArg
 // endregion ************************** directives.gotpl **************************
 
 // region    **************************** field.gotpl *****************************
+
+func (ec *executionContext) _AbsenceUI_ID(ctx context.Context, field graphql.CollectedField, obj *model.AbsenceUI) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_AbsenceUI_ID,
+		func(ctx context.Context) (any, error) {
+			return obj.ID, nil
+		},
+		nil,
+		ec.marshalNInt2int32,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_AbsenceUI_ID(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "AbsenceUI",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _AbsenceUI_CreatedBy(ctx context.Context, field graphql.CollectedField, obj *model.AbsenceUI) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_AbsenceUI_CreatedBy,
+		func(ctx context.Context) (any, error) {
+			return obj.CreatedBy, nil
+		},
+		nil,
+		ec.marshalNString2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_AbsenceUI_CreatedBy(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "AbsenceUI",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _AbsenceUI_TimeFrom(ctx context.Context, field graphql.CollectedField, obj *model.AbsenceUI) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_AbsenceUI_TimeFrom,
+		func(ctx context.Context) (any, error) {
+			return obj.TimeFrom, nil
+		},
+		nil,
+		ec.marshalNString2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_AbsenceUI_TimeFrom(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "AbsenceUI",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _AbsenceUI_TimeTo(ctx context.Context, field graphql.CollectedField, obj *model.AbsenceUI) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_AbsenceUI_TimeTo,
+		func(ctx context.Context) (any, error) {
+			return obj.TimeTo, nil
+		},
+		nil,
+		ec.marshalNString2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_AbsenceUI_TimeTo(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "AbsenceUI",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _AbsenceUI_TypeOfAbsence(ctx context.Context, field graphql.CollectedField, obj *model.AbsenceUI) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_AbsenceUI_TypeOfAbsence,
+		func(ctx context.Context) (any, error) {
+			return obj.TypeOfAbsence, nil
+		},
+		nil,
+		ec.marshalNString2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_AbsenceUI_TypeOfAbsence(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "AbsenceUI",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
 
 func (ec *executionContext) _ChatStreamChunk_chunk(ctx context.Context, field graphql.CollectedField, obj *model.ChatStreamChunk) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
@@ -1969,6 +2177,59 @@ func (ec *executionContext) fieldContext_Mutation_deleteConversation(ctx context
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_deleteConversation_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_createAbsence(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Mutation_createAbsence,
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.resolvers.Mutation().CreateAbsence(ctx, fc.Args["absencePrompt"].(string))
+		},
+		nil,
+		ec.marshalNAbsenceUI2ᚖkonsin1988ᚋrtᚑappᚋgraphᚋmodelᚐAbsenceUI,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Mutation_createAbsence(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "ID":
+				return ec.fieldContext_AbsenceUI_ID(ctx, field)
+			case "CreatedBy":
+				return ec.fieldContext_AbsenceUI_CreatedBy(ctx, field)
+			case "TimeFrom":
+				return ec.fieldContext_AbsenceUI_TimeFrom(ctx, field)
+			case "TimeTo":
+				return ec.fieldContext_AbsenceUI_TimeTo(ctx, field)
+			case "TypeOfAbsence":
+				return ec.fieldContext_AbsenceUI_TypeOfAbsence(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type AbsenceUI", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_createAbsence_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -4436,6 +4697,65 @@ func (ec *executionContext) fieldContext___Type_isOneOf(_ context.Context, field
 
 // region    **************************** object.gotpl ****************************
 
+var absenceUIImplementors = []string{"AbsenceUI"}
+
+func (ec *executionContext) _AbsenceUI(ctx context.Context, sel ast.SelectionSet, obj *model.AbsenceUI) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, absenceUIImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("AbsenceUI")
+		case "ID":
+			out.Values[i] = ec._AbsenceUI_ID(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "CreatedBy":
+			out.Values[i] = ec._AbsenceUI_CreatedBy(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "TimeFrom":
+			out.Values[i] = ec._AbsenceUI_TimeFrom(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "TimeTo":
+			out.Values[i] = ec._AbsenceUI_TimeTo(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "TypeOfAbsence":
+			out.Values[i] = ec._AbsenceUI_TypeOfAbsence(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
 var chatStreamChunkImplementors = []string{"ChatStreamChunk"}
 
 func (ec *executionContext) _ChatStreamChunk(ctx context.Context, sel ast.SelectionSet, obj *model.ChatStreamChunk) graphql.Marshaler {
@@ -4915,6 +5235,13 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 		case "deleteConversation":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_deleteConversation(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "createAbsence":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_createAbsence(ctx, field)
 			})
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
@@ -5615,6 +5942,20 @@ func (ec *executionContext) ___Type(ctx context.Context, sel ast.SelectionSet, o
 // endregion **************************** object.gotpl ****************************
 
 // region    ***************************** type.gotpl *****************************
+
+func (ec *executionContext) marshalNAbsenceUI2konsin1988ᚋrtᚑappᚋgraphᚋmodelᚐAbsenceUI(ctx context.Context, sel ast.SelectionSet, v model.AbsenceUI) graphql.Marshaler {
+	return ec._AbsenceUI(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNAbsenceUI2ᚖkonsin1988ᚋrtᚑappᚋgraphᚋmodelᚐAbsenceUI(ctx context.Context, sel ast.SelectionSet, v *model.AbsenceUI) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			graphql.AddErrorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._AbsenceUI(ctx, sel, v)
+}
 
 func (ec *executionContext) unmarshalNBoolean2bool(ctx context.Context, v any) (bool, error) {
 	res, err := graphql.UnmarshalBoolean(v)

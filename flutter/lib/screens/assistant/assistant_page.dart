@@ -24,6 +24,7 @@ class _AssistantPageState extends State<AssistantPage> {
     await aiProvider.sendMessage(text);
   }
 
+
   @override
   Widget build(BuildContext context) {
     final SW = MediaQuery.of(context).size.width;

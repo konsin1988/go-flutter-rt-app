@@ -3,6 +3,7 @@ package redis
 import (
   "context"
   "encoding/json"
+  "time"
   
   "github.com/redis/go-redis/v9"
 )
@@ -72,3 +73,26 @@ func (r *RedisQueue) Subscribe(ctx context.Context, channel string) (<-chan *red
   }()
   return out, nil
 }
+
+// Receive one message
+func (r *RedisQueue) ReceiveOnce(ctx context.Context, channel string, timeout time.Duration) (*redis.Message, error) {
+    ctx, cancel := context.WithTimeout(ctx, timeout)
+    defer cancel()
+    
+    pubsub := r.client.Subscribe(ctx, channel)
+    defer pubsub.Close()
+    
+    if _, err := pubsub.Receive(ctx); err != nil {
+        return nil, err
+    }
+    
+    ch := pubsub.Channel()
+    
+    select {
+    case msg := <-ch:
+        return msg, nil
+    case <-ctx.Done():
+        return nil, ctx.Err()
+    }
+}
+

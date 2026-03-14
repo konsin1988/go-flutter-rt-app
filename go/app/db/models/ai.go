@@ -69,7 +69,7 @@ type Message struct {
   Role		    MessageRole	  `json:"message_role"`
   Content	    string	  `json:"content"`
 
-  //Model		    string
+  Model		    string
   //PromptTokens	    int
   //CompletionTokens  int
   CreatedAt	    time.Time	  `json:"created_at"`
@@ -80,9 +80,17 @@ type ChatMessage struct {
   Content     string      `json:"content"`
 }
 
-type Job struct {
+
+type ChatJob struct {
+	Type	  string  `json:"type"`
         MessageID  int `json:"messageId"`
         Messages []ChatMessage `json:"messages"`
+}
+
+type AbsenceJob struct {
+	Type	  string  `json:"type"`
+	JobID	  string  `json:"job_id"`
+	Prompt	  string  `json:"prompt"`
 }
 
 type ChatStreamChunk struct {
@@ -91,7 +99,33 @@ type ChatStreamChunk struct {
         } `json:"message"`
         Done bool `json:"done"`
 }
-//type ChatStreamChunk struct {
-//	Chunk *string `json:"chunk,omitempty"`
-//	Done  *bool   `json:"done,omitempty"`
-//}
+
+type OllamaAbsenceData struct {
+  TimestampStart      string    `json:"timestamp_start"`
+  TimestampEnd        string    `json:"timestamp_end"`
+  TypeOfAbsence       string    `json:"type_of_absence"`
+}
+
+type AbsenceType int
+const (
+    Meeting AbsenceType = 703
+    Health  AbsenceType = 704
+    Boss    AbsenceType = 705
+    Other   AbsenceType = 1032
+    Remote  AbsenceType = 1511
+    Pass    AbsenceType = 2332
+)
+var absenceNames = map[AbsenceType]string{
+    Meeting: "Встреча",
+    Health:  "По состоянию здоровья", 
+    Boss:    "По поручению руководителя",
+    Other:   "Другое",
+    Remote:  "Удаленная работа",
+    Pass:    "Забытый пропуск",
+}
+func (at AbsenceType) GetName() string {
+    if name, ok := absenceNames[at]; ok {
+        return name
+    }
+    return "Unknown"
+}

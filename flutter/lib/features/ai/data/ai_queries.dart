@@ -44,6 +44,13 @@ class AiQueries {
     }
   ''';
 
+  // Delete Conversation 
+  static const String deleteConversation = r'''
+    mutation deleteConversation($conversationId: Int!){
+      deleteConversation(conversationId: $conversationId) 
+    }
+  ''';
+
   // messageStream
   static const String messageStream = r'''
     subscription MessageStream($messageId: Int!, $conversationId: Int!) {

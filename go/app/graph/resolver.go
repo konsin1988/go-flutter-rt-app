@@ -8,6 +8,7 @@ import (
   ai "konsin1988/rt-app/db/ai"
   dept "konsin1988/rt-app/db/department"
   ollama "konsin1988/rt-app/services/ollama"
+  bitrix "konsin1988/rt-app/services/bitrix"
 )
 
 type Resolver struct{
@@ -15,18 +16,21 @@ type Resolver struct{
   AiService *ai.Service
   DeptService *dept.Service
   OllamaClient *ollama.Client 
+  BitrixClient *bitrix.Client
 }
 
 func NewResolver(userService *user.Service, 
 		  aiService *ai.Service,
 		  deptService *dept.Service,
 		  ollamaClient *ollama.Client,
+		  bitrixClient *bitrix.Client,
 		) *Resolver{
   return &Resolver{
     UserService: userService,
     AiService: aiService,
     DeptService: deptService,
     OllamaClient: ollamaClient,
+    BitrixClient: bitrixClient,
   }
 }
 

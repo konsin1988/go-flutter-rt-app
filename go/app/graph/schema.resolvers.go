@@ -17,6 +17,7 @@ import (
 	"konsin1988/rt-app/helpers"
 	"log"
 	"os"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -85,10 +86,49 @@ func (r *mutationResolver) CreateMessage(ctx context.Context, conversationID *in
 // DeleteConversation is the resolver for the deleteConversation field.
 func (r *mutationResolver) DeleteConversation(ctx context.Context, conversationID int32) (bool, error) {
 	err := r.AiService.DeleteConversation(ctx, int(conversationID))
-	if err != nil{
-	  return false, err
+	if err != nil {
+		return false, err
 	}
 	return true, nil
+}
+
+// CreateAbsence is the resolver for the createAbsence field.
+func (r *mutationResolver) CreateAbsence(ctx context.Context, absencePrompt string) (*model.AbsenceUI, error) {
+	user, ok := ctx.Value(jwt.MainUserContextKey).(*models.MainUser)
+	if !ok {
+		return nil, errors.New("Cannot load user from context")
+	}
+	ollamaAbsenceData, err := r.AiService.CreateAbsence(ctx, user.ID, absencePrompt)
+	if err != nil {
+		return nil, err
+	}
+	typeOfAbsence, err := strconv.Atoi(ollamaAbsenceData.TypeOfAbsence)
+	if err != nil {
+		return nil, err
+	}
+	bitrixResponse, err := r.BitrixClient.CreateAbsence(
+		ctx,
+		user.ID,
+		ollamaAbsenceData.TimestampStart,
+		ollamaAbsenceData.TimestampEnd,
+		typeOfAbsence,
+	)
+
+	timeFromString, err := helpers.AbsenceDateToString(ollamaAbsenceData.TimestampStart)
+	if err != nil {
+		return nil, err
+	}
+	timeToString, err := helpers.AbsenceDateToString(ollamaAbsenceData.TimestampEnd)
+	if err != nil {
+		return nil, err
+	}
+	return &model.AbsenceUI{
+		ID:            int32(bitrixResponse.ID),
+		CreatedBy:     fmt.Sprintf("%s %s", user.FirstName, *user.SecondName),
+		TimeFrom:      timeFromString,
+		TimeTo:        timeToString,
+		TypeOfAbsence: models.AbsenceType(typeOfAbsence).GetName(),
+	}, nil
 }
 
 // MainUser is the resolver for the mainUser field.

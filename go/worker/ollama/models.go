@@ -7,6 +7,16 @@ type ChatStreamChunk struct {
         Done bool `json:"done"`
 }
 
+type OllamaGenerateResponse struct {
+  Response	string	  `json:"response"`
+}
+
+type OllamaAbsenceData struct {
+  TimestampStart      string	`json:"timestamp_start"`
+  TimestampEnd	      string	`json:"timestamp_end"`
+  TypeOfAbsence	      string	`json:"type_of_absence"`
+}
+
 type WorkerResponseChunk struct {
     Chunk     string	`json:"chunk"`
     Done      bool	`json:"done"`
@@ -23,7 +33,24 @@ type ChatRequest  struct {
   Stream    bool            `json:"stream"`
 }
 
-type Job struct {
-	MessageID  int `json:"messageId"`
-	Messages []ChatMessage `json:"messages"`
+type GenerateRequest struct {
+  Model	    string	  `json:"model"`
+  Prompt    string	  `json:"prompt"`
+  Stream    bool	  `json:"stream"`
+}
+
+type BaseJob struct {
+  Type string `json:"type"`
+}
+
+type ChatJob struct {
+  BaseJob
+  MessageID  int `json:"messageId"`
+  Messages []ChatMessage `json:"messages"`
+}
+
+type AbsenceJob struct {
+  BaseJob
+  JobID	    string  `json:"job_id"`
+  Prompt    string  `json:"prompt"`
 }

@@ -10,6 +10,7 @@ import (
   "io"
   "bufio"
   "context"
+  "time"
 
   redis "github.com/redis/go-redis/v9"
 )
@@ -34,7 +35,7 @@ func NewClient(redisClient *redis.Client) *Client {
   }
 }
 
-func (c *Client) Chat(ctx context.Context, job Job) {
+func (c *Client) Chat(ctx context.Context, job ChatJob) {
   reqBody := ChatRequest{
     Model:      c.AiModel,
     Messages: append([]ChatMessage{
@@ -89,7 +90,6 @@ func (c *Client) Chat(ctx context.Context, job Job) {
       fmt.Println("Failed to unmarshal string: ", err)
       continue
     }
-    
 
     message, err := json.Marshal(chunk)
     if err != nil {
@@ -104,4 +104,59 @@ func (c *Client) Chat(ctx context.Context, job Job) {
   }
 
   fmt.Println("Job completed:", job.MessageID)
+}
+
+func (c *Client) SetAbsence(ctx context.Context, job AbsenceJob) {
+  now := time.Now().UTC()
+  nowString := now.Format(time.RFC3339)
+  prompt := fmt.Sprintf("По тексту определи дату и время начала отстутствия, дату и время конца отсутствия, причину отстутствия. Возможные причины отсутствия: Встреча: 703,  По состоянию здоровья: 704, По поручению руководителя: 705, Другое: 1032, Удаленная работа: 1511, Забытый пропуск: 2332. Дата и время сегодня: %s . Если не указано время начала отсутствия, - то ставь 09:00. Если не указано время окончания отсутствия, - то ставь 18:00. Дата может быть указана в следующих форматах: завтра, послезавтра (day after tommorow), 18.05 (число, месяц), 16 марта (число и месяц на русском языке), следующий понедельник (смотришь, какой сегодня день недели и высчитываешь, какое число будет в следующий понедельник). В ответ пришли следующую структуру, один вариант, без рассуждений: {timestapm_start: 2026-02-25T18:00:00+03:00, timestamp_end: 2026-02-25T18:00:00+03:00, type_of_absence: номер отсутствия (в формате строки)}. Ответ возвращай в формате json. Текст, в котором это нужно определить: %s", nowString, job.Prompt)
+  reqBody := GenerateRequest{
+    Model:      c.AiModel,
+    Prompt:	prompt,
+    Stream:     false,  
+  }
+  jsonData, err := json.Marshal(reqBody)
+  if err != nil {
+    log.Println(err)
+    return
+  }
+  req, err := http.NewRequest("POST", c.BaseURL+"/api/generate", bytes.NewBuffer(jsonData))
+  req.Header.Set("Content-Type", "application/json")
+  resp, err := c.Client.Do(req)
+  if err != nil {
+    log.Println(err)
+    return
+  }
+  body, err := io.ReadAll(resp.Body)
+  if err != nil {
+      return
+  }
+  defer resp.Body.Close()
+
+  if resp.StatusCode != http.StatusOK {
+    err = fmt.Errorf("ollama returned status %d", resp.StatusCode)
+    log.Println(err)
+    return
+  }
+
+  var ollamaResp  OllamaGenerateResponse
+  if err := json.Unmarshal([]byte(body), &ollamaResp); err != nil {
+    log.Println(err)
+    return
+  }
+  var absenceData OllamaAbsenceData
+  if err := json.Unmarshal([]byte(ollamaResp.Response), &absenceData); err != nil {
+    log.Println(err)
+    return
+  }
+
+  jobChannel := fmt.Sprintf("absence:%s", job.JobID)
+
+  // Publish chunk to Redis Pub/Sub on the job-specific channel
+  message, err := json.Marshal(absenceData)
+  if err := c.RedisClient.Publish(ctx, jobChannel, string(message)).Err(); err != nil {
+  	fmt.Println("Redis publish error:", err)
+  }
+
+  fmt.Println("Job completed:", job.JobID)
 }

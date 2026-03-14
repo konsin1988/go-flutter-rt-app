@@ -24,3 +24,30 @@ type BitrixDept	struct {
   Parent	  string      `json:"PARENT"`
   UFHead	  string      `json:"UF_HEAD"`
 }
+
+type AbsenceBitrix struct {
+    EntityTypeID string		      `json:"entityTypeId"`
+    Fields       AbsenceBitrixFields  `json:"fields"`
+}
+
+type AbsenceBitrixFields struct {
+    CreatedBy     int       `json:"createdBy"`
+    CreatedTime   string    `json:"createdTime"`
+    UpdatedTime   string    `json:"updatedTime"`
+    StageID       string    `json:"stageId"`
+    UfCrm14_1629993971 string `json:"ufCrm14_1629993971"`
+    UfCrm14_1629994007 string `json:"ufCrm14_1629994007"`
+    UfCrm14_1629994024 int    `json:"ufCrm14_1629994024"`
+    UfCrm14_1629994055 int    `json:"ufCrm14_1629994055"`
+    UfCrm14_1629994264 string `json:"ufCrm14_1629994264"`
+}
+
+type BitrixResponse struct {
+    Result struct {
+        ID int `json:"id"`
+    } `json:"result"`
+}
+
+type AbsenceResponse struct {
+    ID	  int `json:"id"`
+}

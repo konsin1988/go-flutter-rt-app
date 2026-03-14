@@ -9,6 +9,14 @@ import (
 	"strconv"
 )
 
+type AbsenceUI struct {
+	ID            int32  `json:"ID"`
+	CreatedBy     string `json:"CreatedBy"`
+	TimeFrom      string `json:"TimeFrom"`
+	TimeTo        string `json:"TimeTo"`
+	TypeOfAbsence string `json:"TypeOfAbsence"`
+}
+
 type ChatStreamChunk struct {
 	Chunk string `json:"chunk"`
 	Done  bool   `json:"done"`

@@ -5,6 +5,7 @@ import (
   "database/sql"
   "fmt"
   "time"
+  "os"
 
   "konsin1988/rt-app/db/models"
 
@@ -141,13 +142,15 @@ func (r *AiRepo) CreateMessage(
   messageRole models.MessageRole,
   content string,
 ) (*models.Message, error){
+  modelName := os.Getenv("AI_CHAT_MODEL")
+
   query := `
-    INSERT INTO ai_message(conversation_id, message_role_id, content)
-    VALUES ($1, $2, $3)
+    INSERT INTO ai_message(conversation_id, message_role_id, content, model)
+    VALUES ($1, $2, $3, $4)
     RETURNING id, created_at
   `
   var m models.Message
-  err := r.db.QueryRowContext(ctx, query, conversationId, messageRole.RoleID(), content).
+  err := r.db.QueryRowContext(ctx, query, conversationId, messageRole.RoleID(), content, modelName).
     Scan(&m.ID, &m.CreatedAt)
   if err != nil {
     return nil, err
@@ -172,7 +175,7 @@ func (r *AiRepo) DeleteConversation(ctx context.Context, conversationId int) err
 
   query = `
     DELETE FROM ai_message
-    WHERE conversationId = $1
+    WHERE conversation_id = $1
   `
   result, err = r.db.ExecContext(ctx, query, conversationId)
   if err != nil {

@@ -26,14 +26,14 @@ class AiProvider extends ChangeNotifier{
 
   }
 
-  ConversationListItem? get selectedConversation {
-    if (_conversationList.isEmpty) return null;
-    if (_selectedId == null) return _conversationList.first;
-    return _conversationList.firstWhere(
-      (c) => c.ID == _selectedId,
-      orElse: () => _conversationList.first,
-    );
-  }
+  //ConversationListItem? get selectedConversation {
+  //  if (_conversationList.isEmpty) return null;
+  //  if (_selectedId == null) return _conversationList.first;
+  //  return _conversationList.firstWhere(
+  //    (c) => c.ID == _selectedId,
+  //    orElse: () => _conversationList.first,
+  //  );
+  //}
 
   // Conversation List
   Future<void> loadConversationList() async {
@@ -78,6 +78,19 @@ class AiProvider extends ChangeNotifier{
   _currentConversation = null;
   _selectedId = null;
   notifyListeners();
+  }
+
+  // DeleteConversation
+  Future<void> deleteConversation(int id) async {
+    await _repo.DeleteConversation(id);
+    final updatedList = _conversationList.where((item) => item.ID != id).toList();
+    
+    if (_currentConversation != null) {
+      if (id == _currentConversation!.ID) {
+	_currentConversation = null;
+      }
+    }
+    setConversationList(updatedList);
   }
 
   // CreateMessage

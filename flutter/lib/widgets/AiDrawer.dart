@@ -9,10 +9,19 @@ import 'package:rt_app/features/ai/state/ai_provider.dart';
 class AiDrawer extends StatelessWidget {
   const AiDrawer({super.key});
 
+  Future<void> _deleteConversation(int id) async {
+    
+  }
+
   @override
   Widget build(BuildContext context) {
     final SW = MediaQuery.of(context).size.width;
     final SH = MediaQuery.of(context).size.height;
+    final menuItems = [
+      {'value': 'pin', 'label': 'Закрепить', 'color': RTColorStyle.light900.value},
+      {'value': 'rename', 'label': 'Переименовать', 'color': RTColorStyle.light900.value},
+      {'value': 'delete', 'label': 'Удалить', 'color': Colors.red},
+    ];
 
     final aiProvider = context.watch<AiProvider>();
     if (aiProvider.loading) {
@@ -35,7 +44,7 @@ class AiDrawer extends StatelessWidget {
 	    ),
 	  ),
 	  ListTile(
-	    // leading: Icon(Icons.add, color: RTColorStyle.beige900.value),
+	    //leading: Icon(Icons.add, color: RTColorStyle.beige900.value),
 	    title: Padding(
 	      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 3),
 	      child: TextButton(
@@ -83,10 +92,10 @@ class AiDrawer extends StatelessWidget {
                       Navigator.of(context).pop();
                     },
     		    child: Container(
-    		      padding: EdgeInsets.symmetric(vertical: 4, horizontal: SW * 0.09),
+    		      padding: EdgeInsets.symmetric(vertical: SH * 0.001, horizontal: SW * 0.09),
     		      child: Row(
     		        children: [
-    		          //CircleAvatar(radius: 20), 
+    		          //CircleAvatar(radius: 5), 
     		          //SizedBox(width: 12),
     		          Expanded(
     		            child: Column(
@@ -106,13 +115,41 @@ class AiDrawer extends StatelessWidget {
     		            ),
     		          ),
 			  Padding(
-			    padding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 1), 
-			    child: Icon(
-			      Icons.more_horiz, 
-			      size: 20,
-		  	      color: RTColorStyle.beige600.value, 
-			    ),
-			  )
+		      	    padding: EdgeInsets.symmetric(horizontal: 8.0, vertical: SH * 0.0001), 
+		      	    child: PopupMenuButton<String>(
+			      color: RTColorStyle.beige400.value, 
+  			      shape: RoundedRectangleBorder(
+  			        borderRadius: BorderRadius.circular(12), 
+  			        side: BorderSide(color: RTColorStyle.beige300.value, width: 1),
+  			      ),
+		      	      offset: Offset(SW * 0.3, -(SW * 0.23)),
+  		      	      icon: Icon(
+  		      	        Icons.more_horiz,
+  		      	        size: 20,
+  		      	        color: RTColorStyle.beige600.value,
+  		      	      ),
+  		      	      onSelected: (String value) {
+  		      	        if (value == 'delete') {
+				  aiProvider.deleteConversation(c.ID); 
+  		      	        }
+  		      	      },
+			      itemBuilder: (BuildContext context) => [
+			        for (var item in menuItems)
+			          PopupMenuItem(
+			            value: item['value'] as String,
+				    height: SH * 0.026,
+			            child: Text(
+			              item['label'] as String,
+			              style: TextStyle(
+			                color: item['color'] as Color,
+			                fontWeight: FontWeight.w700,
+			                fontSize: SH * 0.015,
+			              ),
+			            ),
+			          ),
+			      ],
+  		      	    ),
+		      	  )
     		        ],
     		      ),
     		    ),

@@ -96,6 +96,19 @@ extend type Mutation {
   deleteConversation(conversationId: Int!): Boolean! 
 }
 
+# Absence
+type AbsenceUI {
+  ID: Int!
+  CreatedBy: String! 
+  TimeFrom: String!
+  TimeTo: String!
+  TypeOfAbsence: String!
+}
+
+extend type Mutation {
+  createAbsence(absencePrompt: String!): AbsenceUI!
+}
+
 # Depts
 type DeptUser {
   id: Int!
