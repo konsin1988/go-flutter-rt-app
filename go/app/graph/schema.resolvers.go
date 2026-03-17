@@ -92,8 +92,8 @@ func (r *mutationResolver) DeleteConversation(ctx context.Context, conversationI
 	return true, nil
 }
 
-// CreateAbsence is the resolver for the createAbsence field.
-func (r *mutationResolver) CreateAbsence(ctx context.Context, absencePrompt string) (*model.AbsenceUI, error) {
+// CreateAbsenceData is the resolver for the createAbsenceData field.
+func (r *mutationResolver) CreateAbsenceData(ctx context.Context, absencePrompt string) (*model.AbsenceUI, error) {
 	user, ok := ctx.Value(jwt.MainUserContextKey).(*models.MainUser)
 	if !ok {
 		return nil, errors.New("Cannot load user from context")
@@ -102,32 +102,39 @@ func (r *mutationResolver) CreateAbsence(ctx context.Context, absencePrompt stri
 	if err != nil {
 		return nil, err
 	}
-	typeOfAbsence, err := strconv.Atoi(ollamaAbsenceData.TypeOfAbsence)
-	if err != nil {
-		return nil, err
-	}
-	bitrixResponse, err := r.BitrixClient.CreateAbsence(
-		ctx,
-		user.ID,
-		ollamaAbsenceData.TimestampStart,
-		ollamaAbsenceData.TimestampEnd,
-		typeOfAbsence,
-	)
-
-	timeFromString, err := helpers.AbsenceDateToString(ollamaAbsenceData.TimestampStart)
-	if err != nil {
-		return nil, err
-	}
-	timeToString, err := helpers.AbsenceDateToString(ollamaAbsenceData.TimestampEnd)
+	typeOfAbsenceNumber, err := strconv.Atoi(ollamaAbsenceData.TypeOfAbsence)
 	if err != nil {
 		return nil, err
 	}
 	return &model.AbsenceUI{
-		ID:            int32(bitrixResponse.ID),
-		CreatedBy:     fmt.Sprintf("%s %s", user.FirstName, *user.SecondName),
-		TimeFrom:      timeFromString,
-		TimeTo:        timeToString,
-		TypeOfAbsence: models.AbsenceType(typeOfAbsence).GetName(),
+		ID:            nil,
+		TimeFrom:      ollamaAbsenceData.TimeFrom.Format(time.RFC3339),
+		TimeTo:        ollamaAbsenceData.TimeTo.Format(time.RFC3339),
+		TypeOfAbsence: int32(typeOfAbsenceNumber),
+	}, nil
+}
+
+// CreateAbsenceBitrix is the resolver for the createAbsenceBitrix field.
+func (r *mutationResolver) CreateAbsenceBitrix(ctx context.Context, absence model.AbsenceInput) (*model.AbsenceUI, error) {
+	user, ok := ctx.Value(jwt.MainUserContextKey).(*models.MainUser)
+	if !ok {
+		return nil, errors.New("Cannot load user from context")
+	}
+	bitrixResponse, err := r.BitrixClient.CreateAbsence(
+		ctx,
+		user.ID,
+		absence.TimeFrom,
+		absence.TimeTo,
+		int(absence.TypeOfAbsence),
+	)
+	if err != nil {
+		return nil, err
+	}
+	return &model.AbsenceUI{
+		ID:            &bitrixResponse.Result.Item.ID,
+		TimeFrom:      absence.TimeFrom,
+		TimeTo:        absence.TimeTo,
+		TypeOfAbsence: int32(absence.TypeOfAbsence),
 	}, nil
 }
 

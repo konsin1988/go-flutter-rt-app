@@ -101,9 +101,9 @@ type ChatStreamChunk struct {
 }
 
 type OllamaAbsenceData struct {
-  TimestampStart      string    `json:"timestamp_start"`
-  TimestampEnd        string    `json:"timestamp_end"`
-  TypeOfAbsence       string    `json:"type_of_absence"`
+  TimeFrom	      time.Time	  `json:"timestamp_start"`
+  TimeTo	      time.Time   `json:"timestamp_end"`
+  TypeOfAbsence       string	  `json:"type_of_absence"`
 }
 
 type AbsenceType int

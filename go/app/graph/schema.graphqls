@@ -98,15 +98,24 @@ extend type Mutation {
 
 # Absence
 type AbsenceUI {
-  ID: Int!
-  CreatedBy: String! 
+  ID: Int
   TimeFrom: String!
   TimeTo: String!
-  TypeOfAbsence: String!
+  TypeOfAbsence: Int!
 }
 
 extend type Mutation {
-  createAbsence(absencePrompt: String!): AbsenceUI!
+  createAbsenceData(absencePrompt: String!): AbsenceUI!
+}
+
+input AbsenceInput {
+  ID: Int
+  TimeFrom: String!
+  TimeTo: String!
+  TypeOfAbsence: Int!
+}
+extend type Mutation {
+  createAbsenceBitrix(absence: AbsenceInput!): AbsenceUI
 }
 
 # Depts

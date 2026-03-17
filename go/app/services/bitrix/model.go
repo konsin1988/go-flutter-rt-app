@@ -44,10 +44,9 @@ type AbsenceBitrixFields struct {
 
 type BitrixResponse struct {
     Result struct {
-        ID int `json:"id"`
+      Item struct {
+        ID int32   `json:"id"`
+      } `json:"item"`
     } `json:"result"`
 }
 
-type AbsenceResponse struct {
-    ID	  int `json:"id"`
-}

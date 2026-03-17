@@ -30,7 +30,7 @@ func (c *Client) CreateAbsence(ctx context.Context,
     dateStart string, 
     dateEnd string, 
     typeOfAbsence int, 
-  ) (*AbsenceResponse, error) {
+  ) (*BitrixResponse, error) {
   now := time.Now().UTC()
   nowString := now.Format(time.RFC3339)
   bitrixFields := AbsenceBitrixFields{
@@ -68,10 +68,11 @@ func (c *Client) CreateAbsence(ctx context.Context,
   if err != nil{
     return nil, err
   }
+  data := resp.Body
   defer resp.Body.Close()
 
-  var absenceResponse AbsenceResponse
-  if err := json.NewDecoder(resp.Body).Decode(&absenceResponse); err != nil {
+  var absenceResponse BitrixResponse 
+  if err := json.NewDecoder(data).Decode(&absenceResponse); err != nil {
     return nil, err
   }
 
