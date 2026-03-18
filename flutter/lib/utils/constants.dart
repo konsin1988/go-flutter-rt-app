@@ -15,6 +15,7 @@ class AppIcons {
 class AppImageIcons {
   AppImageIcons._();
   static const String assistant = 'assets/images/app/assistant.jpg';
+  static const String absenceAvatar = 'assets/images/app/absence-avatar-3.jpeg';
   static const List<String> appImageTitles = [
     assistant,
   ];
@@ -29,6 +30,7 @@ class AppRoutes {
   static const String services = '/services';
   static const String profile = '/profile';
   static const String assistant = '/assistant';
+  static const String absence = '/absence';
   static const String department = '/department';
   static const String image = '/image';
   static const List<String> appRoutes = [
@@ -39,6 +41,7 @@ class AppRoutes {
     services,
     profile,
     assistant,
+    absence,
     department,
     image,
   ];
@@ -60,6 +63,7 @@ class AppBarTitles {
   static const routeTitles = {
     '/assistant': 'Ваш ассистент',
     '/department': 'Департамент',
+    '/absence': 'Отпускатор',
   };
 }
 

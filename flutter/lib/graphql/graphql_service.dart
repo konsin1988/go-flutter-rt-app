@@ -60,6 +60,22 @@ class GraphQLService {
       wsLink,
       authLink.concat(httpLink),
     );
+    //final Link link = Link.split(
+    //  (request) {
+    //    final doc = request.document;
+    //    if (doc == null) return false;
+    //    
+    //    // Parse operation type from document definitions
+    //    for (final def in doc.definitions) {
+    //      if (def is OperationDefinitionNode) {
+    //        return def.type == OperationType.subscription;
+    //      }
+    //    }
+    //    return false;
+    //  },
+    //  wsLink,
+    //  authLink.concat(httpLink),
+    //);
 
     client = GraphQLClient(
       cache: GraphQLCache(store: HiveStoreFactory.create()),

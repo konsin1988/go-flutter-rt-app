@@ -10,17 +10,17 @@ import (
 )
 
 type AbsenceInput struct {
-	ID            *int32 `json:"ID,omitempty"`
-	TimeFrom      string `json:"TimeFrom"`
-	TimeTo        string `json:"TimeTo"`
-	TypeOfAbsence int32  `json:"TypeOfAbsence"`
+	ID            *int32 `json:"id,omitempty"`
+	TimeFrom      string `json:"time_from"`
+	TimeTo        string `json:"time_to"`
+	TypeOfAbsence int32  `json:"type_of_absence"`
 }
 
 type AbsenceUI struct {
-	ID            *int32 `json:"ID,omitempty"`
-	TimeFrom      string `json:"TimeFrom"`
-	TimeTo        string `json:"TimeTo"`
-	TypeOfAbsence int32  `json:"TypeOfAbsence"`
+	ID            *int32 `json:"id,omitempty"`
+	TimeFrom      string `json:"time_from"`
+	TimeTo        string `json:"time_to"`
+	TypeOfAbsence int32  `json:"type_of_absence"`
 }
 
 type ChatStreamChunk struct {

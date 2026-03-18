@@ -17,7 +17,7 @@ import (
 	"konsin1988/rt-app/helpers"
 	"log"
 	"os"
-	"strconv"
+	_ "strconv"
 	"strings"
 	"time"
 )
@@ -93,24 +93,37 @@ func (r *mutationResolver) DeleteConversation(ctx context.Context, conversationI
 }
 
 // CreateAbsenceData is the resolver for the createAbsenceData field.
-func (r *mutationResolver) CreateAbsenceData(ctx context.Context, absencePrompt string) (*model.AbsenceUI, error) {
-	user, ok := ctx.Value(jwt.MainUserContextKey).(*models.MainUser)
-	if !ok {
-		return nil, errors.New("Cannot load user from context")
-	}
-	ollamaAbsenceData, err := r.AiService.CreateAbsence(ctx, user.ID, absencePrompt)
-	if err != nil {
-		return nil, err
-	}
-	typeOfAbsenceNumber, err := strconv.Atoi(ollamaAbsenceData.TypeOfAbsence)
-	if err != nil {
-		return nil, err
-	}
+func (r *mutationResolver) CreateAbsenceData(ctx context.Context, prompt string) (*model.AbsenceUI, error) {
+	//user, ok := ctx.Value(jwt.MainUserContextKey).(*models.MainUser)
+	//if !ok {
+	//	return nil, errors.New("Cannot load user from context")
+	//}
+	//log.Printf("Start getting absence from prompt: %s\n", prompt)
+	//ollamaAbsenceData, err := r.AiService.CreateAbsence(ctx, user.ID, prompt)
+	//if err != nil {
+	//	log.Println(err)
+	//	return nil, err
+	//}
+	//typeOfAbsenceNumber, err := strconv.Atoi(ollamaAbsenceData.TypeOfAbsence)
+	//if err != nil {
+	//	return nil, err
+	//}
+	//
+	//log.Printf("Absence from %s to %s type %d\n", 
+	//  ollamaAbsenceData.TimeFrom.Format(time.RFC3339),
+	//  ollamaAbsenceData.TimeTo.Format(time.RFC3339),
+	//  int32(typeOfAbsenceNumber),
+	//)
+	//return &model.AbsenceUI{
+	//	TimeFrom:      ollamaAbsenceData.TimeFrom.Format(time.RFC3339),
+	//	TimeTo:        ollamaAbsenceData.TimeTo.Format(time.RFC3339),
+	//	TypeOfAbsence: int32(typeOfAbsenceNumber),
+	//}, nil
 	return &model.AbsenceUI{
-		ID:            nil,
-		TimeFrom:      ollamaAbsenceData.TimeFrom.Format(time.RFC3339),
-		TimeTo:        ollamaAbsenceData.TimeTo.Format(time.RFC3339),
-		TypeOfAbsence: int32(typeOfAbsenceNumber),
+	  ID: nil,
+	  TimeFrom: "2026-03-20T09:00:00+03:00",
+	  TimeTo: "2026-03-20T18:00:00+03:00",
+	  TypeOfAbsence: 1511,
 	}, nil
 }
 

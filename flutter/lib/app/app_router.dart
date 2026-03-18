@@ -16,6 +16,7 @@ import 'package:rt_app/screens/profile/profile_page.dart';
 import 'package:rt_app/screens/profile/UserPage.dart';
 import 'package:rt_app/screens/init/init_page.dart';
 import 'package:rt_app/screens/assistant/assistant_page.dart';
+import 'package:rt_app/screens/absence/absence_page.dart';
 import 'package:rt_app/screens/department/department_page.dart';
 import 'package:rt_app/screens/profile/widgets/FullScreenImagePage.dart';
 
@@ -106,6 +107,14 @@ GoRouter createAppRouter(BuildContext context) {
                 pageBuilder: (context, state) {
 		  return NoTransitionPage(
       	            child: AssistantPage(),
+		  );
+		},
+	      ),
+	      GoRoute(
+  	        path: AppRoutes.absence,
+                pageBuilder: (context, state) {
+		  return NoTransitionPage(
+      	            child: AbsencePage(),
 		  );
 		},
 	      ),
