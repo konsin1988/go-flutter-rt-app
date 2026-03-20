@@ -7,10 +7,11 @@ import 'package:provider/provider.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 import 'package:flutter/services.dart';
 
-import '../../graphql/graphql_service.dart';
-import '../../auth/auth_provider.dart';
-import '../../style/colors.dart';
-import '../../style/fonts.dart';
+import 'package:rt_app/graphql/graphql_service.dart';
+import 'package:rt_app/auth/auth_provider.dart';
+import 'package:rt_app/auth/token_storage.dart';
+import 'package:rt_app/style/colors.dart';
+import 'package:rt_app/style/fonts.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -22,14 +23,19 @@ void main() async {
   ]);
   
   final authProvider = AuthProvider();
+  TokenStorage.onAuthStateChanged = authProvider.checkAuthStatus;
   await authProvider.init();
   await GraphQLService().init();
 
   runApp(
     MultiProvider(
       providers: [
-        ChangeNotifierProvider<AuthProvider>.value(value: authProvider),
-        Provider<GraphQLClient>.value(value: GraphQLService().client),
+	ChangeNotifierProvider.value(
+	  value: authProvider,
+	),
+	Provider.value(value: GraphQLService().client),
+        //ChangeNotifierProvider<AuthProvider>.value(value: authProvider),
+        //Provider<GraphQLClient>.value(value: GraphQLService().client),
       ],
       child: MyApp(),
     ),

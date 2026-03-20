@@ -12,12 +12,23 @@ class AuthProvider extends ChangeNotifier {
   AuthStatus status = AuthStatus.unknown;
 
   Future<void> init() async {
+    TokenStorage.onAuthStateChanged = checkAuthStatus;
     await _tokenStorage.init();
 
     status = _tokenStorage.accessToken == null
       ? AuthStatus.unauthenticated
       : AuthStatus.authenticated;
 
+    notifyListeners(); 
+  }
+
+  void checkAuthStatus() {
+    final tokenStorage = TokenStorage();
+    if (tokenStorage.accessToken != null) {
+      status = AuthStatus.authenticated;
+    } else {
+      status = AuthStatus.unauthenticated;
+    }
     notifyListeners(); 
   }
   

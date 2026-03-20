@@ -73,37 +73,59 @@ class _AbsencePageState extends State<AbsencePage> {
     }
     final absence = absenceProvider.getAbsence;
 
-    return Stack(
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque, 
+      onTap: () {
+        FocusScope.of(context).unfocus();
+      }, 
+      child: Stack(
         children: [
           Center(
             child: Padding(
               padding: EdgeInsets.symmetric(horizontal: SW * 0.1),
 	      child: TextField(
+		maxLines: null,
+		minLines: 1,
 	        controller: _controller,
 	        textAlign: TextAlign.center,
+		cursorColor: RTColorStyle.beige700.value,
 	        decoration: InputDecoration(
-	          hintText: 'Введите дату и время отсутствия...',
+	          hintText: 'Введите данные...',
+		  hintStyle: TextStyle(                    
+		    color: RTColorStyle.light500.value,   
+  		    fontSize: 16,                        
+  		    fontWeight: FontWeight.w400,          
+		    fontFamily: "MuseoSans",
+  		  ),
 	          border: OutlineInputBorder(
-	            borderRadius: BorderRadius.circular(25),
+	            borderRadius: BorderRadius.circular(20),
 	          ),
-	          //contentPadding: EdgeInsets.symmetric(
-	          //  horizontal: 20,
-	          //  //vertical: 15,
-	          //),
-	          suffix: Row(
-	            //mainAxisSize: MainAxisSize.min,
-	            mainAxisSize: SW * 1,
+		  enabledBorder: OutlineInputBorder(
+		    borderRadius: BorderRadius.circular(20),
+    		    borderSide: BorderSide(
+    		      color: RTColorStyle.light500.value,
+    		      width: 1.0,
+    		    ),
+    		  ),
+		  focusedBorder: OutlineInputBorder(
+		    borderRadius: BorderRadius.circular(20),
+    		    borderSide: BorderSide(
+    		      color: RTColorStyle.beige800.value, 
+    		      width: SW * 0.003,
+    		    ),
+    		  ),
+	          suffixIcon: Row(
+	            mainAxisSize: MainAxisSize.min,
 	            children: [
-	              // Send button
 	              ElevatedButton(
 	                onPressed: _isLoading ? null : _processMessage,
 	                style: ElevatedButton.styleFrom(
 	                  shape: CircleBorder(),
-	                  //padding: EdgeInsets.all(12),  // Slightly smaller for suffix fit
+			  minimumSize: Size(SW * 0.09, SW * 0.09),  
+			  padding: EdgeInsets.all(0),
 	                ),
-	                child: Icon(Icons.send, size: 20),
+	                child: Icon(Icons.send, size: SW * 0.046, color: RTColorStyle.dark800.value),
 	              ),
-	              // Audio record button
 	              ElevatedButton(
 	                onPressed: _isLoading ? null : () {
 	                  ScaffoldMessenger.of(context).showSnackBar(
@@ -111,12 +133,14 @@ class _AbsencePageState extends State<AbsencePage> {
 	                  );
 	                },
 	                style: ElevatedButton.styleFrom(
-	                  backgroundColor: Colors.blue,
+	                  backgroundColor: RTColorStyle.beige700.value,
 	                  shape: CircleBorder(),
-	                  //padding: EdgeInsets.all(12),
+			  minimumSize: Size(SW * 0.09, SW * 0.09), 
+			  padding: EdgeInsets.all(0),
 	                ),
-	                child: Icon(Icons.mic, size: 20, color: Colors.white),
+	                child: Icon(Icons.mic, size: SW * 0.046, color: Colors.white),
 	              ),
+		      SizedBox(width: SW * 0.02),
 	            ],
 	          ),
 	        ),
@@ -269,6 +293,7 @@ class _AbsencePageState extends State<AbsencePage> {
               ),
             ),
         ],
+	),
       );
   }
 }

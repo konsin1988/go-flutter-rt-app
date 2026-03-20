@@ -7,11 +7,14 @@ import './auth_service.dart';
 final authService = AuthService();
 
 class TokenStorage {
+  
   static final TokenStorage _instance = TokenStorage._internal();
   factory TokenStorage() => _instance;
 
   TokenStorage._internal();
   static final FlutterSecureStorage _storage = FlutterSecureStorage();
+
+  static VoidCallback? onAuthStateChanged;
 
   String? _accessToken;
   String? _refreshToken;
@@ -44,10 +47,12 @@ class TokenStorage {
 	_accessToken = null;
 	_refreshToken = null;
 	await clear();
+	onAuthStateChanged?.call();
       }
 
     }
     await clear();
+    onAuthStateChanged?.call();
   }
 
   bool _isAccessTokenExpired(String token) {
