@@ -87,7 +87,7 @@ type ChatJob struct {
         Messages []ChatMessage `json:"messages"`
 }
 
-type AbsenceJob struct {
+type PromptJob struct {
 	Type	  string  `json:"type"`
 	JobID	  string  `json:"job_id"`
 	Prompt	  string  `json:"prompt"`
@@ -128,4 +128,9 @@ func (at AbsenceType) GetName() string {
         return name
     }
     return "Unknown"
+}
+
+
+type ConversationTitle struct {
+  Title	    string  `json:"title"`
 }

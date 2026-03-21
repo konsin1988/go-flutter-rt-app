@@ -160,3 +160,54 @@ func (c *Client) SetAbsence(ctx context.Context, job AbsenceJob) {
 
   fmt.Println("Job completed:", job.JobID)
 }
+
+func (c *Client) CreateTitle(ctx context.Context, job ConversationTitleJob){
+  prompt := fmt.Sprintf("Придумай название (на русском) в 3-5 словах для следующего текста, в ответе пришли только название(один вариант), без рассуждений, без кавычек: %s", job.Prompt)
+
+  log.Println(prompt)
+  reqBody := GenerateRequest{
+    Model:      c.AiModel,
+    Prompt:	prompt,
+    Stream:     false,  
+  }
+  jsonData, err := json.Marshal(reqBody)
+  if err != nil {
+    log.Println(err)
+    return
+  }
+  req, err := http.NewRequest("POST", c.BaseURL+"/api/generate", bytes.NewBuffer(jsonData))
+  req.Header.Set("Content-Type", "application/json")
+  resp, err := c.Client.Do(req)
+  if err != nil {
+    log.Println(err)
+    return
+  }
+  body, err := io.ReadAll(resp.Body)
+  if err != nil {
+      return
+  }
+  defer resp.Body.Close()
+
+  if resp.StatusCode != http.StatusOK {
+    err = fmt.Errorf("ollama returned status %d", resp.StatusCode)
+    log.Println(err)
+    return
+  }
+  var ollamaResp  OllamaGenerateResponse
+  if err := json.Unmarshal([]byte(body), &ollamaResp); err != nil {
+    log.Println(err)
+    return
+  }
+
+  convTitle := ConversationTitle{
+    Title: ollamaResp.Response,
+  }
+
+  jobChannel := fmt.Sprintf("title:%s", job.JobID)
+  message, err := json.Marshal(convTitle)
+  if err := c.RedisClient.Publish(ctx, jobChannel, string(message)).Err(); err != nil {
+  	fmt.Println("Redis publish error:", err)
+  }
+
+  fmt.Println("Job completed:", job.JobID)
+} 

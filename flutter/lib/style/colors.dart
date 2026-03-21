@@ -34,6 +34,7 @@ enum RTColorStyle {
   dark500,
   dark400,
   dark300,
+  red800,
 }
 
 extension RTColorStyleExtension on RTColorStyle {
@@ -42,6 +43,8 @@ extension RTColorStyleExtension on RTColorStyle {
       case RTColorStyle.bgLoginTextField:
         return const Color(0xFF313336);
 
+      case RTColorStyle.red800:
+	return const Color(0xAF950606);
       case RTColorStyle.beige1000:
         return const Color(0xFFDDB79A);
       case RTColorStyle.beige900:

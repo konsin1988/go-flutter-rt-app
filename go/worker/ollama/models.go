@@ -54,3 +54,13 @@ type AbsenceJob struct {
   JobID	    string  `json:"job_id"`
   Prompt    string  `json:"prompt"`
 }
+
+type ConversationTitleJob struct {
+  BaseJob
+  JobID	    string  `json:"job_id"`
+  Prompt    string  `json:"prompt"`
+}
+
+type ConversationTitle struct {
+  Title	  string    `json:"title"`
+}

@@ -29,6 +29,7 @@ class GraphQLService {
       AppLinks.graphqlWS,
       config: SocketClientConfig(
         autoReconnect: true,
+        //inactivityTimeout: Duration(seconds: 30), 
         inactivityTimeout: null, 
 	delayBetweenReconnectionAttempts: const Duration(seconds: 1),  
 	queryAndMutationTimeout: const Duration(seconds: 45),

@@ -16,7 +16,6 @@ import (
 	"konsin1988/rt-app/graph/model"
 	"konsin1988/rt-app/helpers"
 	"log"
-	"os"
 	_ "strconv"
 	"strings"
 	"time"
@@ -58,12 +57,13 @@ func (r *mutationResolver) CreateMessage(ctx context.Context, conversationID *in
 		return nil, errors.New("Unauthorized from resolver")
 	}
 	if conversationID == nil {
-		aiPrompt := os.Getenv("AI_CHAT_CONVERSATION_TITLE_PROMPT") + content
-		title, err := r.OllamaClient.Prompt(aiPrompt)
+		log.Println("Creating title")
+		titleStruct, err := r.AiService.CreateTitle(ctx, user.ID, content)
+		log.Printf("Title is %s", titleStruct.Title)
 		if err != nil {
 			return nil, err
 		}
-		conv, err := r.AiService.CreateConversation(ctx, user.ID, title)
+		conv, err := r.AiService.CreateConversation(ctx, user.ID, titleStruct.Title)
 		if err != nil {
 			return nil, err
 		}
@@ -71,6 +71,7 @@ func (r *mutationResolver) CreateMessage(ctx context.Context, conversationID *in
 		conversationID = &t
 	}
 	m, err := r.AiService.CreateMessage(ctx, user.ID, int(*conversationID), models.RoleUser, content)
+	log.Printf("ConversationID: %d", int(*conversationID))
 	if err != nil {
 		return nil, err
 	}

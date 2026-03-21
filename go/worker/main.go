@@ -26,6 +26,10 @@ func dispatchJob(ctx context.Context, aiClient ollama.Client, job interface{}) {
     if absenceJob, ok := job.(ollama.AbsenceJob); ok {
       go aiClient.SetAbsence(ctx, absenceJob)
     }
+  case ollama.ConversationTitleJob:
+    if titleJob, ok := job.(ollama.ConversationTitleJob); ok {
+      go aiClient.CreateTitle(ctx, titleJob)
+    }
   default:
     fmt.Printf("unknown job type: %T\n", j)
   }
@@ -79,11 +83,20 @@ func main() {
 	  continue
 	}
 	job = absenceJob
+      
+      case "title":
+	var titleJob ollama.ConversationTitleJob
+	if err := json.Unmarshal([]byte(jobData), &titleJob); err != nil {
+	  fmt.Println("Absence job unmarshal error: ", err)
+	  continue
+	}
+	job = titleJob
+
       default:
         fmt.Println("Unknown job type:", baseJob.Type)
         continue
+
     }
-    
     dispatchJob(ctx, *aiClient, job)
   }
 }

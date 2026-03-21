@@ -146,58 +146,6 @@ class _AbsencePageState extends State<AbsencePage> {
 	        ),
 	        enabled: !_isLoading,
 	      ),
-
-              //child: Row(
-              //  mainAxisAlignment: MainAxisAlignment.center,
-              //  children: [
-              //    Expanded(
-              //      child: SizedBox(
-              //        width: double.infinity,
-              //        child: TextField(
-              //          controller: _controller,
-              //          textAlign: TextAlign.center,
-              //          decoration: InputDecoration(
-              //            hintText: 'Введите дату и время отсутствия...',
-              //            border: OutlineInputBorder(
-              //              borderRadius: BorderRadius.circular(25),
-              //            ),
-              //            contentPadding: EdgeInsets.symmetric(
-              //              horizontal: 20,
-              //              vertical: 15,
-              //            ),
-              //          ),
-              //          enabled: !_isLoading,
-              //        ),
-              //      ),
-              //    ),
-              //    SizedBox(width: 12),
-              //    // Send button
-              //    ElevatedButton(
-              //      onPressed: _isLoading ? null : _processMessage,
-              //      style: ElevatedButton.styleFrom(
-              //        shape: CircleBorder(),
-              //        padding: EdgeInsets.all(16),
-              //      ),
-              //      child: Icon(Icons.send, size: 24),
-              //    ),
-              //    SizedBox(width: 8),
-              //    // Audio record button
-              //    ElevatedButton(
-              //      onPressed: _isLoading ? null : () {
-              //        // TODO: Implement audio recording + STT
-              //        ScaffoldMessenger.of(context).showSnackBar(
-              //          SnackBar(content: Text('Audio recording not implemented')),
-              //        );
-              //      },
-              //      style: ElevatedButton.styleFrom(
-              //        backgroundColor: Colors.blue,
-              //        shape: CircleBorder(),
-              //        padding: EdgeInsets.all(16),
-              //      ),
-              //      child: Icon(Icons.mic, size: 24, color: Colors.white),
-              //    ),
-              //  ],
-              //),
             ),
           ),
 
@@ -213,7 +161,7 @@ class _AbsencePageState extends State<AbsencePage> {
           // First modal (processed text + yes/no)
           if (_showAbsenceDataModal)
             GestureDetector(
-              onTap: () {}, // Prevent closing on outside tap
+              onTap: () {},
               child: Container(
                 color: Colors.black54,
                 child: Center(
@@ -231,7 +179,7 @@ class _AbsencePageState extends State<AbsencePage> {
                           "Установить отсутствие \nс: ${absence!.timeFromFormatted} \nпо: ${absence!.timeToFormatted}\n по причине: ${absence!.typeOfAbsenceName}?" ?? "ABSENCE: ",
                           style: TextStyle(
 			    fontSize: 16,
-			    color: Colors.black,
+			    color: RTColorStyle.dark900.value,
 			    ),
                           textAlign: TextAlign.center,
                         ),
@@ -245,13 +193,23 @@ class _AbsencePageState extends State<AbsencePage> {
                                 // Text stays in field (no clear)
                               },
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.red.shade400,
+                                backgroundColor: RTColorStyle.red800.value,
                               ),
-                              child: Text('No'),
+                              child: Text(
+				'Поменять',
+				style: TextStyle(
+				  color: Colors.white,
+				),
+			      ),
                             ),
                             ElevatedButton(
                               onPressed: _sendMutation,
-                              child: Text('Yes'),
+                              child: Text(
+				'Установить',
+				style: TextStyle(
+				  color: RTColorStyle.dark900.value,
+				),
+			      ),
                             ),
                           ],
                         ),
@@ -282,8 +240,12 @@ class _AbsencePageState extends State<AbsencePage> {
                         Icon(Icons.check_circle, color: Colors.green, size: 64),
                         SizedBox(height: 16),
                         Text(
-                          'Message sent successfully!',
-                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                          'Отсутствие успешно заведено!',
+                          style: TextStyle(
+			    fontSize: 18, 
+			    fontWeight: FontWeight.bold,
+			    color: RTColorStyle.dark700.value,
+			  ),
                           textAlign: TextAlign.center,
                         ),
                       ],

@@ -263,7 +263,7 @@ func (s *Service) DeleteConversation(ctx context.Context, conversationId int) er
 func (s *Service) CreateAbsence(ctx context.Context, userID int, prompt string)(*models.OllamaAbsenceData, error){
   epoch := time.Now().Unix()
   jobID := fmt.Sprintf("%d:%d", userID, epoch)
-  job := models.AbsenceJob{
+  job := models.PromptJob{
     Type: "absence",
     JobID: jobID,
     Prompt: prompt,
@@ -285,3 +285,29 @@ func (s *Service) CreateAbsence(ctx context.Context, userID int, prompt string)(
   }
   return &ollamaAbsenceData, nil
 } 
+
+func (s *Service) CreateTitle(ctx context.Context, userID int, prompt string) (*models.ConversationTitle, error){
+  epoch := time.Now().Unix()
+  jobID := fmt.Sprintf("%d:%d", userID, epoch)
+  job := models.PromptJob{
+    Type: "title",
+    JobID: jobID,
+    Prompt: prompt,
+  }
+  err := s.queue.Enqueue(ctx, job)
+  if err != nil {
+    return nil, err
+  }
+
+  channel := fmt.Sprintf("title:%s", jobID)
+  msg, err := s.queue.ReceiveOnce(ctx, channel, 120*time.Second)
+  if err != nil{
+    return nil, err
+  }
+
+  var convTitle models.ConversationTitle
+  if err := json.Unmarshal([]byte(msg.Payload), &convTitle); err != nil {
+    return nil, err 
+  }
+  return &convTitle, nil
+}
