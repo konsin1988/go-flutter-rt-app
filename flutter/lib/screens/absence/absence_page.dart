@@ -240,7 +240,7 @@ class _AbsencePageState extends State<AbsencePage> {
                         Icon(Icons.check_circle, color: Colors.green, size: 64),
                         SizedBox(height: 16),
                         Text(
-                          'Отсутствие успешно заведено!',
+                          'Отсутствие успешно зарегестрировано!',
                           style: TextStyle(
 			    fontSize: 18, 
 			    fontWeight: FontWeight.bold,

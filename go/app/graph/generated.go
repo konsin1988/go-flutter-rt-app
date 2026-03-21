@@ -72,6 +72,7 @@ type ComplexityRoot struct {
 	ConversationListItem struct {
 		CreatedAt func(childComplexity int) int
 		ID        func(childComplexity int) int
+		IsPinned  func(childComplexity int) int
 		Title     func(childComplexity int) int
 		UpdatedAt func(childComplexity int) int
 	}
@@ -114,10 +115,11 @@ type ComplexityRoot struct {
 	}
 
 	Mutation struct {
-		CreateAbsenceBitrix func(childComplexity int, absence model.AbsenceInput) int
-		CreateAbsenceData   func(childComplexity int, prompt string) int
-		CreateMessage       func(childComplexity int, conversationID *int32, content string) int
-		DeleteConversation  func(childComplexity int, conversationID int32) int
+		CreateAbsenceBitrix      func(childComplexity int, absence model.AbsenceInput) int
+		CreateAbsenceData        func(childComplexity int, prompt string) int
+		CreateMessage            func(childComplexity int, conversationID *int32, content string) int
+		DeleteConversation       func(childComplexity int, conversationID int32) int
+		TogglePinnedConversation func(childComplexity int, conversationID int32, isPinned int32) int
 	}
 
 	Query struct {
@@ -164,6 +166,7 @@ type ConversationResolver interface {
 type MutationResolver interface {
 	CreateMessage(ctx context.Context, conversationID *int32, content string) (*model.Message, error)
 	DeleteConversation(ctx context.Context, conversationID int32) (bool, error)
+	TogglePinnedConversation(ctx context.Context, conversationID int32, isPinned int32) (bool, error)
 	CreateAbsenceData(ctx context.Context, prompt string) (*model.AbsenceUI, error)
 	CreateAbsenceBitrix(ctx context.Context, absence model.AbsenceInput) (*model.AbsenceUI, error)
 }
@@ -284,6 +287,12 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.ConversationListItem.ID(childComplexity), true
+	case "ConversationListItem.isPinned":
+		if e.complexity.ConversationListItem.IsPinned == nil {
+			break
+		}
+
+		return e.complexity.ConversationListItem.IsPinned(childComplexity), true
 	case "ConversationListItem.title":
 		if e.complexity.ConversationListItem.Title == nil {
 			break
@@ -478,6 +487,17 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.Mutation.DeleteConversation(childComplexity, args["conversationId"].(int32)), true
+	case "Mutation.togglePinnedConversation":
+		if e.complexity.Mutation.TogglePinnedConversation == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_togglePinnedConversation_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.TogglePinnedConversation(childComplexity, args["conversationId"].(int32), args["isPinned"].(int32)), true
 
 	case "Query.ConversationById":
 		if e.complexity.Query.ConversationByID == nil {
@@ -857,6 +877,22 @@ func (ec *executionContext) field_Mutation_deleteConversation_args(ctx context.C
 		return nil, err
 	}
 	args["conversationId"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_togglePinnedConversation_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "conversationId", ec.unmarshalNInt2int32)
+	if err != nil {
+		return nil, err
+	}
+	args["conversationId"] = arg0
+	arg1, err := graphql.ProcessArgField(ctx, rawArgs, "isPinned", ec.unmarshalNInt2int32)
+	if err != nil {
+		return nil, err
+	}
+	args["isPinned"] = arg1
 	return args, nil
 }
 
@@ -1426,6 +1462,35 @@ func (ec *executionContext) fieldContext_ConversationListItem_updatedAt(_ contex
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ConversationListItem_isPinned(ctx context.Context, field graphql.CollectedField, obj *model.ConversationListItem) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_ConversationListItem_isPinned,
+		func(ctx context.Context) (any, error) {
+			return obj.IsPinned, nil
+		},
+		nil,
+		ec.marshalNInt2int32,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_ConversationListItem_isPinned(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ConversationListItem",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
 		},
 	}
 	return fc, nil
@@ -2173,6 +2238,47 @@ func (ec *executionContext) fieldContext_Mutation_deleteConversation(ctx context
 	return fc, nil
 }
 
+func (ec *executionContext) _Mutation_togglePinnedConversation(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Mutation_togglePinnedConversation,
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.resolvers.Mutation().TogglePinnedConversation(ctx, fc.Args["conversationId"].(int32), fc.Args["isPinned"].(int32))
+		},
+		nil,
+		ec.marshalNBoolean2bool,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Mutation_togglePinnedConversation(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_togglePinnedConversation_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Mutation_createAbsenceData(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
 		ctx,
@@ -2472,6 +2578,8 @@ func (ec *executionContext) fieldContext_Query_ConversationList(_ context.Contex
 				return ec.fieldContext_ConversationListItem_createdAt(ctx, field)
 			case "updatedAt":
 				return ec.fieldContext_ConversationListItem_updatedAt(ctx, field)
+			case "isPinned":
+				return ec.fieldContext_ConversationListItem_isPinned(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type ConversationListItem", field.Name)
 		},
@@ -5000,6 +5108,11 @@ func (ec *executionContext) _ConversationListItem(ctx context.Context, sel ast.S
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
+		case "isPinned":
+			out.Values[i] = ec._ConversationListItem_isPinned(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -5314,6 +5427,13 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 		case "deleteConversation":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_deleteConversation(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "togglePinnedConversation":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_togglePinnedConversation(ctx, field)
 			})
 			if out.Values[i] == graphql.Null {
 				out.Invalids++

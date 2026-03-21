@@ -8,6 +8,7 @@ class AiQueries {
 	title	
 	createdAt	
 	updatedAt	
+	isPinned
       }
     }
   ''';
@@ -48,6 +49,13 @@ class AiQueries {
   static const String deleteConversation = r'''
     mutation deleteConversation($conversationId: Int!){
       deleteConversation(conversationId: $conversationId) 
+    }
+  ''';
+
+  // Toggle Pinned Conversation 
+  static const String togglePinnedConversation = r'''
+    mutation togglePinnedConversation($conversationId: Int!, $isPinned: Int!){
+      togglePinnedConversation(conversationId: $conversationId, isPinned: $isPinned) 
     }
   ''';
 

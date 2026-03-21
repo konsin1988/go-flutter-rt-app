@@ -41,6 +41,7 @@ type ConversationListItem struct {
 	Title     string `json:"title"`
 	CreatedAt string `json:"createdAt"`
 	UpdatedAt string `json:"updatedAt"`
+	IsPinned  int32  `json:"isPinned"`
 }
 
 type Department struct {

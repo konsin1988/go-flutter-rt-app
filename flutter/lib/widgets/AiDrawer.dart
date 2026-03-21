@@ -44,7 +44,7 @@ class AiDrawer extends StatelessWidget {
 	    ),
 	  ),
 	  ListTile(
-	    //leading: Icon(Icons.add, color: RTColorStyle.beige900.value),
+	    //leading: Icon(Icons.push_pin, color: RTColorStyle.beige900.value),
 	    title: Padding(
 	      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 3),
 	      child: TextButton(
@@ -92,11 +92,18 @@ class AiDrawer extends StatelessWidget {
                       Navigator.of(context).pop();
                     },
     		    child: Container(
-    		      padding: EdgeInsets.symmetric(vertical: SH * 0.001, horizontal: SW * 0.09),
+    		      padding: EdgeInsets.only(left: SW * 0.02, right: SW * 0.03, top: SH * 0.001),
     		      child: Row(
     		        children: [
+			  c.IsPinned == 1 
+			  ? Icon(Icons.bookmark, 
+			    color: RTColorStyle.beige900.value,
+			    size: SW * 0.06,
+			    )
+    		          : SizedBox(width: SW * 0.06),
     		          //CircleAvatar(radius: 5), 
     		          //SizedBox(width: 12),
+			  SizedBox(width: SW * 0.02),
     		          Expanded(
     		            child: Column(
     		              crossAxisAlignment: CrossAxisAlignment.start,
@@ -131,7 +138,9 @@ class AiDrawer extends StatelessWidget {
   		      	      onSelected: (String value) {
   		      	        if (value == 'delete') {
 				  aiProvider.deleteConversation(c.ID); 
-  		      	        }
+  		      	        } else if (value == 'pin') {
+				  aiProvider.togglePinnedConversation(c.ID);
+				}
   		      	      },
 			      itemBuilder: (BuildContext context) => [
 			        for (var item in menuItems)

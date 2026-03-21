@@ -96,11 +96,28 @@ class AiRepository {
     );
   }
   
+  // deleteConversation
   Future<void> DeleteConversation(int conversationId) async {
     final result = await _client.query(
       QueryOptions(
         document: gql(AiQueries.deleteConversation),
 	variables: {'conversationId': conversationId},
+        fetchPolicy: FetchPolicy.networkOnly,
+      ),
+    );
+
+    if (result.hasException) {
+      debugPrint('GraphQL error: ${result.exception}');
+      throw result.exception!;
+    }
+  }
+
+  // toggle pinned conversation
+  Future<void> TogglePinnedConversation(int conversationId, int isPinned) async {
+    final result = await _client.query(
+      QueryOptions(
+        document: gql(AiQueries.togglePinnedConversation),
+	variables: {'conversationId': conversationId, 'isPinned': isPinned},
         fetchPolicy: FetchPolicy.networkOnly,
       ),
     );

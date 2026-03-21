@@ -29,8 +29,8 @@ class GraphQLService {
       AppLinks.graphqlWS,
       config: SocketClientConfig(
         autoReconnect: true,
-        //inactivityTimeout: Duration(seconds: 30), 
-        inactivityTimeout: null, 
+        inactivityTimeout: Duration(seconds: 30), 
+        //inactivityTimeout: null, 
 	delayBetweenReconnectionAttempts: const Duration(seconds: 1),  
 	queryAndMutationTimeout: const Duration(seconds: 45),
         initialPayload: () async {
@@ -41,8 +41,8 @@ class GraphQLService {
   	    attempts++;
   	  }
   	  
-  	  print('WS Token: ${token?.substring(0, 20)}...'); 
-  	  print('Token length: ${token?.length ?? 0}');
+  	  debugPrint('WS Token: ${token?.substring(0, 20)}...'); 
+  	  debugPrint('Token length: ${token?.length ?? 0}');
     
   	  if (token == null) {
   	    print('NO TOKEN IN STORAGE!');
@@ -61,26 +61,12 @@ class GraphQLService {
       wsLink,
       authLink.concat(httpLink),
     );
-    //final Link link = Link.split(
-    //  (request) {
-    //    final doc = request.document;
-    //    if (doc == null) return false;
-    //    
-    //    // Parse operation type from document definitions
-    //    for (final def in doc.definitions) {
-    //      if (def is OperationDefinitionNode) {
-    //        return def.type == OperationType.subscription;
-    //      }
-    //    }
-    //    return false;
-    //  },
-    //  wsLink,
-    //  authLink.concat(httpLink),
-    //);
+
 
     client = GraphQLClient(
       cache: GraphQLCache(store: HiveStoreFactory.create()),
       link: link,
+      queryRequestTimeout: Duration(seconds: 60),
     );
   }
 

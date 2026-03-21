@@ -20,6 +20,7 @@ type Repository interface {
   CreateConversation(ctx context.Context, userID int, title string)(*models.ConversationListItem, error)
   CreateMessage(ctx context.Context, conversationId int, messageRole models.MessageRole, content string) (*models.Message, error)
   DeleteConversation(ctx context.Context, conversationId int)(error)
+  TogglePinnedConversation(ctx context.Context, conversationId int, isPinned int)(error)
 }
 
 type Service struct {
@@ -252,14 +253,43 @@ func (s *Service) SubscribeToStream (
   return out, nil
 }
 
-func (s *Service) DeleteConversation(ctx context.Context, conversationId int) error {
+// Delete conversation
+func (s *Service) DeleteConversation(ctx context.Context, userID int, conversationId int) error {
   err := s.repo.DeleteConversation(ctx, conversationId)
   if err != nil {
     return err
   }
+  keys := []string{
+    fmt.Sprintf("user:%d:conversations", userID),
+    fmt.Sprintf("conversation:%d:meta", conversationId),
+    fmt.Sprintf("conversation:%d:messages:latest:%d", conversationId, 20),
+  }
+  err = s.cache.DeleteMany(ctx, keys...)
+  if err != nil {
+    return fmt.Errorf("Error due caching: %v", err)
+  }
   return nil
 }
 
+// TogglePinnedConversation
+func (s *Service) TogglePinnedConversation(ctx context.Context, userID int, conversationId int, isPinned int) error {
+  err := s.repo.TogglePinnedConversation(ctx, conversationId, isPinned)
+  if err != nil {
+    return err
+  }
+  keys := []string{
+    fmt.Sprintf("user:%d:conversations", userID),
+    fmt.Sprintf("conversation:%d:meta", conversationId),
+    fmt.Sprintf("conversation:%d:messages:latest:%d", conversationId, 20),
+  }
+  err = s.cache.DeleteMany(ctx, keys...)
+  if err != nil {
+    return fmt.Errorf("Error due caching: %v", err)
+  }
+  return nil
+}
+
+// Create Absence
 func (s *Service) CreateAbsence(ctx context.Context, userID int, prompt string)(*models.OllamaAbsenceData, error){
   epoch := time.Now().Unix()
   jobID := fmt.Sprintf("%d:%d", userID, epoch)
@@ -286,6 +316,7 @@ func (s *Service) CreateAbsence(ctx context.Context, userID int, prompt string)(
   return &ollamaAbsenceData, nil
 } 
 
+// Create Title
 func (s *Service) CreateTitle(ctx context.Context, userID int, prompt string) (*models.ConversationTitle, error){
   epoch := time.Now().Unix()
   jobID := fmt.Sprintf("%d:%d", userID, epoch)

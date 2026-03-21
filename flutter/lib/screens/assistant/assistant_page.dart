@@ -65,27 +65,51 @@ class _AssistantPageState extends State<AssistantPage> {
 		return Align(
       	          alignment:
       	              message?.Role == "USER" ? Alignment.centerRight : Alignment.centerLeft,
-      	          child: Container(
-		    margin: message?.Role == "USER"
-			  ? EdgeInsets.only(left: SW * 0.13, right: SW * 0.01, top: SH * 0.005, bottom: SH * 0.005)
-			  : EdgeInsets.only(right: SW * 0.13, left: SW * 0.01, top: SH * 0.005, bottom: SH * 0.005),
-      	            padding: EdgeInsets.symmetric(vertical: SH * 0.01, horizontal: SW * 0.04),
-      	            decoration: BoxDecoration(
-      	              color: message?.Role == "USER"
-      	                  ? RTColorStyle.beige500.value 
-      	                  : RTColorStyle.light800.value,
-      	              borderRadius: BorderRadius.circular(12),
-      	            ),
-      	            child: Text(
-      	              message?.Content ?? "",
-      	              style: TextStyle(
-      	                color: message?.Role == "USER" ? RTColorStyle.light1000.value : RTColorStyle.dark1000.value,
-			fontFamily: "MuseoSans",
-            		fontSize: SW * 0.04,
-            		fontWeight: FontWeight.w500,
-      	              ),
-      	            ),
-      	          ),
+      	          child: Padding(
+		    padding: EdgeInsets.symmetric(vertical: SH * 0.005),  
+      		    child: Column(
+      		      crossAxisAlignment: message?.Role == "USER" 
+      		        ? CrossAxisAlignment.end 
+      		        : CrossAxisAlignment.start,
+      		      mainAxisSize: MainAxisSize.min,
+      		      children: [
+      		        if (message?.Role == "USER")
+			Padding(
+      		          padding: EdgeInsets.only(),
+      		          child: Text(
+      		            message?.CreatedAtFormatted ?? "",
+      		            style: TextStyle(
+      		              fontSize: SW * 0.027,
+      		              color: RTColorStyle.light600.value.withOpacity(0.5), 
+      		              fontFamily: "MuseoSans",
+      		              fontWeight: FontWeight.w400,
+      		            ),
+      		          ),
+      		        ),  
+			Container(
+		  	  margin: message?.Role == "USER"
+		  	        ? EdgeInsets.only(left: SW * 0.13, right: SW * 0.01, top: SH * 0.005, bottom: SH * 0.005)
+		  	        : EdgeInsets.only(right: SW * 0.13, left: SW * 0.01, top: SH * 0.005, bottom: SH * 0.005),
+      	          	  padding: EdgeInsets.symmetric(vertical: SH * 0.01, horizontal: SW * 0.04),
+      	          	  decoration: BoxDecoration(
+      	          	    color: message?.Role == "USER"
+      	          	        ? RTColorStyle.beige500.value 
+      	          	        : RTColorStyle.light800.value.withOpacity(0.0),
+      	          	    borderRadius: BorderRadius.circular(12),
+      	          	  ),
+      	          	  child: Text(
+      	          	    message?.Content ?? "",
+      	          	    style: TextStyle(
+      	          	      color: message?.Role == "USER" ? RTColorStyle.light1000.value : RTColorStyle.light700.value,
+		  	      fontFamily: "MuseoSans",
+            	  	      fontSize: SW * 0.04,
+            	  	      fontWeight: FontWeight.w500,
+      	          	    ),
+      	          	  ),
+      	          	),
+		      ],
+		    ),
+		  ),
       	        );
       	      },
       	    ),

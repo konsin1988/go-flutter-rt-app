@@ -26,15 +26,6 @@ class AiProvider extends ChangeNotifier{
 
   }
 
-  //ConversationListItem? get selectedConversation {
-  //  if (_conversationList.isEmpty) return null;
-  //  if (_selectedId == null) return _conversationList.first;
-  //  return _conversationList.firstWhere(
-  //    (c) => c.ID == _selectedId,
-  //    orElse: () => _conversationList.first,
-  //  );
-  //}
-
   // Conversation List
   Future<void> loadConversationList() async {
     loading = true;
@@ -91,6 +82,19 @@ class AiProvider extends ChangeNotifier{
       }
     }
     setConversationList(updatedList);
+    notifyListeners();
+  }
+
+  // Toggle Pinned Conversation
+  Future<void> togglePinnedConversation(int id) async {
+    int index = _conversationList.indexWhere((item) => item.ID == id);
+    if (index != -1) {
+      await _repo.TogglePinnedConversation(id, _conversationList[index].IsPinned);
+      _conversationList = await _repo.ConversationList();
+    }
+    
+    setConversationList(_conversationList);  
+    notifyListeners();
   }
 
   // CreateMessage
@@ -154,7 +158,6 @@ class AiProvider extends ChangeNotifier{
   void _createOptimisticConversation() {
     final now = DateTime.now();
     final fakeConvId = -2;
-    //final fakeConvId = -DateTime.now().millisecondsSinceEpoch;
     final conv = Conversation(
       ID: fakeConvId,
       Title: "",

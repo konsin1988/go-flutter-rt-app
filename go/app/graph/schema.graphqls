@@ -64,6 +64,7 @@ type ConversationListItem {
   title: String!
   createdAt: String!
   updatedAt: String!
+  isPinned: Int!
 }
 
 type Message {
@@ -94,6 +95,10 @@ extend type Mutation {
 
 extend type Mutation {
   deleteConversation(conversationId: Int!): Boolean! 
+}
+
+extend type Mutation {
+  togglePinnedConversation(conversationId: Int!, isPinned: Int!): Boolean!
 }
 
 # Absence

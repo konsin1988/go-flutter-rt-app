@@ -16,7 +16,7 @@ import (
 	"konsin1988/rt-app/graph/model"
 	"konsin1988/rt-app/helpers"
 	"log"
-	_ "strconv"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -57,9 +57,7 @@ func (r *mutationResolver) CreateMessage(ctx context.Context, conversationID *in
 		return nil, errors.New("Unauthorized from resolver")
 	}
 	if conversationID == nil {
-		log.Println("Creating title")
 		titleStruct, err := r.AiService.CreateTitle(ctx, user.ID, content)
-		log.Printf("Title is %s", titleStruct.Title)
 		if err != nil {
 			return nil, err
 		}
@@ -86,7 +84,24 @@ func (r *mutationResolver) CreateMessage(ctx context.Context, conversationID *in
 
 // DeleteConversation is the resolver for the deleteConversation field.
 func (r *mutationResolver) DeleteConversation(ctx context.Context, conversationID int32) (bool, error) {
-	err := r.AiService.DeleteConversation(ctx, int(conversationID))
+	user := ctx.Value(jwt.MainUserContextKey).(*models.MainUser)
+	if user == nil {
+		return false, errors.New("Unauthorized from resolver")
+	}
+	err := r.AiService.DeleteConversation(ctx, user.ID, int(conversationID))
+	if err != nil {
+		return false, err
+	}
+	return true, nil
+}
+
+// TogglePinnedConversation is the resolver for the togglePinnedConversation field.
+func (r *mutationResolver) TogglePinnedConversation(ctx context.Context, conversationID int32, isPinned int32) (bool, error) {
+	user := ctx.Value(jwt.MainUserContextKey).(*models.MainUser)
+	if user == nil {
+		return false, errors.New("Unauthorized from resolver")
+	}
+	err := r.AiService.TogglePinnedConversation(ctx, user.ID, int(conversationID), int(isPinned))
 	if err != nil {
 		return false, err
 	}
@@ -95,36 +110,30 @@ func (r *mutationResolver) DeleteConversation(ctx context.Context, conversationI
 
 // CreateAbsenceData is the resolver for the createAbsenceData field.
 func (r *mutationResolver) CreateAbsenceData(ctx context.Context, prompt string) (*model.AbsenceUI, error) {
-	//user, ok := ctx.Value(jwt.MainUserContextKey).(*models.MainUser)
-	//if !ok {
-	//	return nil, errors.New("Cannot load user from context")
-	//}
-	//log.Printf("Start getting absence from prompt: %s\n", prompt)
-	//ollamaAbsenceData, err := r.AiService.CreateAbsence(ctx, user.ID, prompt)
-	//if err != nil {
-	//	log.Println(err)
-	//	return nil, err
-	//}
-	//typeOfAbsenceNumber, err := strconv.Atoi(ollamaAbsenceData.TypeOfAbsence)
-	//if err != nil {
-	//	return nil, err
-	//}
-	//
-	//log.Printf("Absence from %s to %s type %d\n", 
-	//  ollamaAbsenceData.TimeFrom.Format(time.RFC3339),
-	//  ollamaAbsenceData.TimeTo.Format(time.RFC3339),
-	//  int32(typeOfAbsenceNumber),
-	//)
-	//return &model.AbsenceUI{
-	//	TimeFrom:      ollamaAbsenceData.TimeFrom.Format(time.RFC3339),
-	//	TimeTo:        ollamaAbsenceData.TimeTo.Format(time.RFC3339),
-	//	TypeOfAbsence: int32(typeOfAbsenceNumber),
-	//}, nil
+	user, ok := ctx.Value(jwt.MainUserContextKey).(*models.MainUser)
+	if !ok {
+		return nil, errors.New("Cannot load user from context")
+	}
+	log.Printf("Start getting absence from prompt: %s\n", prompt)
+	ollamaAbsenceData, err := r.AiService.CreateAbsence(ctx, user.ID, prompt)
+	if err != nil {
+		log.Println(err)
+		return nil, err
+	}
+	typeOfAbsenceNumber, err := strconv.Atoi(ollamaAbsenceData.TypeOfAbsence)
+	if err != nil {
+		return nil, err
+	}
+
+	log.Printf("Absence from %s to %s type %d\n",
+		ollamaAbsenceData.TimeFrom.Format(time.RFC3339),
+		ollamaAbsenceData.TimeTo.Format(time.RFC3339),
+		int32(typeOfAbsenceNumber),
+	)
 	return &model.AbsenceUI{
-	  ID: nil,
-	  TimeFrom: "2026-03-20T09:00:00+03:00",
-	  TimeTo: "2026-03-20T18:00:00+03:00",
-	  TypeOfAbsence: 1511,
+		TimeFrom:      ollamaAbsenceData.TimeFrom.Format(time.RFC3339),
+		TimeTo:        ollamaAbsenceData.TimeTo.Format(time.RFC3339),
+		TypeOfAbsence: int32(typeOfAbsenceNumber),
 	}, nil
 }
 
@@ -237,6 +246,7 @@ func (r *queryResolver) ConversationList(ctx context.Context) ([]*model.Conversa
 			Title:     val.Title,
 			CreatedAt: val.CreatedAt.Format(time.RFC3339),
 			UpdatedAt: val.UpdatedAt.Format(time.RFC3339),
+			IsPinned:  int32(val.IsPinned),
 		}
 		conversationList = append(conversationList, item)
 	}

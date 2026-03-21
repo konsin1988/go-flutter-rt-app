@@ -10,6 +10,7 @@ type ConversationListItem struct {
   Title		string	      `json:"title"` 
   CreatedAt	time.Time     `json:"created_at"` 
   UpdatedAt	time.Time     `json:"updated_at"`
+  IsPinned	int	      `json:"is_pinned"`
 }
 
 type ConversationMeta struct {

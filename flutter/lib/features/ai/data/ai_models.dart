@@ -1,3 +1,5 @@
+import 'package:intl/intl.dart';
+
 class Message {
   final int ID;
   final int ConversationID;
@@ -37,6 +39,27 @@ class Message {
       Content: json['content'] as String,
       CreatedAt: DateTime.parse(json['createdAt'] as String),
     );
+  }
+  
+  String _formatTime(DateTime date) {
+    //final msk = dateDt.timeZoneName; 
+    final dateDt = date.toLocal();
+    final day = DateFormat('dd').format(dateDt);
+    final month = _getMonth(dateDt.month);
+    final year = DateFormat('yyyy').format(dateDt);
+    final hour = DateFormat('HH').format(dateDt);
+    final minute = DateFormat('mm').format(dateDt);
+    return '$day $month $year $hour:$minute ';
+  }
+
+  String get CreatedAtFormatted => _formatTime(CreatedAt);
+
+  static String _getMonth(int month) {
+    const months = [
+      '', 'января', 'февраля', 'марта', 'апреля', 'мая', 'июня',
+      'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'
+    ];
+    return months[month];
   }
 
   @override
@@ -91,13 +114,31 @@ class ConversationListItem {
   final String Title;
   final DateTime CreatedAt;
   final DateTime UpdatedAt;
+  final int  IsPinned;
   
   ConversationListItem({
     required this.ID,
     required this.Title,
     required this.CreatedAt,
     required this.UpdatedAt,
+    required this.IsPinned,
   });
+
+  ConversationListItem copyWith({
+    int? ID,
+    String? Title,
+    DateTime? CreatedAt,
+    DateTime? UpdatedAt,
+    int? IsPinned,
+  }) {
+    return ConversationListItem(
+      ID: ID ?? this.ID,
+      Title: Title ?? this.Title,
+      CreatedAt: CreatedAt ?? this.CreatedAt,
+      UpdatedAt: UpdatedAt ?? this.UpdatedAt,
+      IsPinned: IsPinned ?? this.IsPinned,
+    );
+  }
   
   factory ConversationListItem.fromJson(Map<String, dynamic> json) {
     return ConversationListItem(
@@ -105,6 +146,7 @@ class ConversationListItem {
       Title: json['title'] as String,
       CreatedAt: DateTime.parse(json['createdAt']),
       UpdatedAt: DateTime.parse(json['updatedAt']), 
+      IsPinned: json['isPinned'] as int,
     );
   }
 }

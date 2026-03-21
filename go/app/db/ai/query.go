@@ -13,10 +13,19 @@ import (
 
 func (r *AiRepo) GetConversationList (ctx context.Context, user_id int) ([]models.ConversationListItem, error) {
   const query = `
-    select * 
+    select 
+      id,
+      user_id,
+      title,
+      created_at,
+      updated_at,
+      case 
+        when pinned_at <> 'epoch' then 1 
+        else 0 
+      end as is_pinned
     from ai_conversation
     where user_id = $1
-    order by updated_at desc
+    order by pinned_at desc, updated_at desc
   ` 
 
   rows, err := r.db.QueryContext(ctx, query, user_id)
@@ -36,6 +45,7 @@ func (r *AiRepo) GetConversationList (ctx context.Context, user_id int) ([]model
       &c.Title,
       &c.CreatedAt,
       &c.UpdatedAt,
+      &c.IsPinned,
     ); err != nil {
       return nil, err
     }
@@ -155,6 +165,21 @@ func (r *AiRepo) CreateMessage(
   if err != nil {
     return nil, err
   }
+
+  query = `
+    UPDATE ai_conversation
+    SET updated_at = now()
+    WHERE id = $1;
+  `
+  result, err := r.db.ExecContext(ctx, query, conversationId)
+  if err != nil {
+      return nil, err
+  }
+  
+  _, err = result.RowsAffected()
+  if err != nil {
+    return nil, err
+  }
   m.ConversationID = conversationId
   m.Role = messageRole
   m.Content = content
@@ -182,6 +207,29 @@ func (r *AiRepo) DeleteConversation(ctx context.Context, conversationId int) err
     return err
   }
   rowAffected, _ = result.RowsAffected()
+  if rowAffected == 0 { return err }
+
+  return nil
+}
+
+func (r *AiRepo) TogglePinnedConversation(ctx context.Context, conversationId int, isPinned int) error {
+  query := `
+    UPDATE ai_conversation
+    SET pinned_at = 'epoch'
+    WHERE id = $1
+  `
+  if isPinned == 0 {
+    query = `
+      UPDATE ai_conversation
+      SET pinned_at = now()
+      WHERE id = $1
+    `
+  }
+  result, err := r.db.ExecContext(ctx, query, conversationId)
+  if err != nil {
+    return err
+  }
+  rowAffected, _ := result.RowsAffected()
   if rowAffected == 0 { return err }
 
   return nil
