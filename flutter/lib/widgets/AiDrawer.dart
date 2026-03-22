@@ -9,9 +9,6 @@ import 'package:rt_app/features/ai/state/ai_provider.dart';
 class AiDrawer extends StatelessWidget {
   const AiDrawer({super.key});
 
-  Future<void> _deleteConversation(int id) async {
-    
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -28,6 +25,14 @@ class AiDrawer extends StatelessWidget {
       return const Center(child: CircularProgressIndicator());
     }
     final conversationList = aiProvider.conversationList;
+
+    Future<void> _saveAndExit(AiProvider provider, int id)  async {
+      if (provider.pendingTitle != null && provider.pendingTitle!.trim().isNotEmpty) {
+        await provider.updateConversationTitle(id, provider.pendingTitle!);
+      } else {
+        provider.cancelRename();
+      }
+    }
 
     return Drawer(
       backgroundColor: RTColorStyle.dark900.value, 
@@ -95,40 +100,80 @@ class AiDrawer extends StatelessWidget {
     		      padding: EdgeInsets.only(left: SW * 0.02, right: SW * 0.03, top: SH * 0.001),
     		      child: Row(
     		        children: [
-			  c.IsPinned == 1 
-			  ? Icon(Icons.bookmark, 
-			    color: RTColorStyle.beige900.value,
-			    size: SW * 0.06,
-			    )
+		          c.IsPinned == 1 
+		          ? Icon(Icons.bookmark, 
+		            color: RTColorStyle.beige700.value,
+		            size: SW * 0.06,
+		            )
     		          : SizedBox(width: SW * 0.06),
     		          //CircleAvatar(radius: 5), 
     		          //SizedBox(width: 12),
-			  SizedBox(width: SW * 0.02),
+		          SizedBox(width: SW * 0.02),
     		          Expanded(
     		            child: Column(
     		              crossAxisAlignment: CrossAxisAlignment.start,
     		              mainAxisSize: MainAxisSize.min,
     		              children: [
-    		                Text(
-				  c.Title, 
-				  style: TextStyle(
-		  		    color: RTColorStyle.dark900.value, 
-		  		    fontSize: SW * 0.035,
-		  		    fontWeight: FontWeight.w700,
-		  		  ),
-				),
+				aiProvider.editingConversationId == c.ID
+		      	  	? Theme(
+				    data: Theme.of(context).copyWith(
+  				      textSelectionTheme: TextSelectionThemeData(
+  				        selectionHandleColor: RTColorStyle.beige700.value,  // Pointer handles
+					selectionColor: RTColorStyle.beige700.value,
+  				      ),
+  				    ),
+  				    child: TextField(
+                      	  	    //controller: TextEditingController(text: aiProvider.pendingTitle ?? c.Title),
+                      	  	    controller: TextEditingController(text: aiProvider.pendingTitle),
+                      	  	    style: TextStyle(
+                      	  	      color: RTColorStyle.dark900.value,
+                      	  	      fontSize: SW * 0.035,
+                      	  	      fontWeight: FontWeight.w700,
+                      	  	    ),
+				    cursorColor: RTColorStyle.beige700.value,
+                      	  	    maxLines: 1,
+                      	  	    textAlignVertical: TextAlignVertical.top,
+                      	  	    decoration: InputDecoration(
+                      	  	      border: InputBorder.none,  // Seamless look
+                      	  	      //contentPadding: EdgeInsets.zero,
+			  	      isDense: true,
+				      focusedBorder: OutlineInputBorder(
+		  		        borderRadius: BorderRadius.circular(2),
+    		  		        borderSide: BorderSide(
+    		  		          color: RTColorStyle.beige800.value, 
+    		  		          width: SW * 0.001,
+    		  		        ),
+    		  		      ),
+                      	  	    ),
+                      	  	    autofocus: true,
+                      	  	    onChanged: (newTitle) {
+                      	  	      aiProvider.pendingTitle = newTitle;  // Track live changes
+                      	  	    },
+			  	    onSubmitted: (_) async { await _saveAndExit(aiProvider, c.ID); },
+			  	    //onTapOutside: (_) => _saveAndExit(aiProvider, c.ID),
+			  	    onTapOutside: (_) async { await _saveAndExit(aiProvider, c.ID); },
+                      	  	  ),
+				)
+    		                : Text(
+		        	  c.Title, 
+		        	  style: TextStyle(
+		      	    color: RTColorStyle.dark900.value, 
+		      	    fontSize: SW * 0.035,
+		      	    fontWeight: FontWeight.w700,
+		      	  ),
+		        	),
     		                //Text(conversation.preview, style: subtitleStyle),
     		              ],
     		            ),
     		          ),
-			  Padding(
+		          Padding(
 		      	    padding: EdgeInsets.symmetric(horizontal: 8.0, vertical: SH * 0.0001), 
 		      	    child: PopupMenuButton<String>(
-			      color: RTColorStyle.beige400.value, 
-  			      shape: RoundedRectangleBorder(
-  			        borderRadius: BorderRadius.circular(12), 
-  			        side: BorderSide(color: RTColorStyle.beige300.value, width: 1),
-  			      ),
+		              color: RTColorStyle.beige400.value, 
+  		              shape: RoundedRectangleBorder(
+  		                borderRadius: BorderRadius.circular(12), 
+  		                side: BorderSide(color: RTColorStyle.beige300.value, width: 1),
+  		              ),
 		      	      offset: Offset(SW * 0.3, -(SW * 0.23)),
   		      	      icon: Icon(
   		      	        Icons.more_horiz,
@@ -137,26 +182,28 @@ class AiDrawer extends StatelessWidget {
   		      	      ),
   		      	      onSelected: (String value) {
   		      	        if (value == 'delete') {
-				  aiProvider.deleteConversation(c.ID); 
+		        	  aiProvider.deleteConversation(c.ID); 
   		      	        } else if (value == 'pin') {
-				  aiProvider.togglePinnedConversation(c.ID);
-				}
+		        	  aiProvider.togglePinnedConversation(c.ID);
+		        	} else if (value == 'rename') {
+		        	  aiProvider.startRename(c.ID, c.Title);
+		        	}
   		      	      },
-			      itemBuilder: (BuildContext context) => [
-			        for (var item in menuItems)
-			          PopupMenuItem(
-			            value: item['value'] as String,
-				    height: SH * 0.026,
-			            child: Text(
-			              item['label'] as String,
-			              style: TextStyle(
-			                color: item['color'] as Color,
-			                fontWeight: FontWeight.w700,
-			                fontSize: SH * 0.015,
-			              ),
-			            ),
-			          ),
-			      ],
+		              itemBuilder: (BuildContext context) => [
+		                for (var item in menuItems)
+		                  PopupMenuItem(
+		                    value: item['value'] as String,
+		        	    height: SH * 0.026,
+		                    child: Text(
+		                      item['label'] as String,
+		                      style: TextStyle(
+		                        color: item['color'] as Color,
+		                        fontWeight: FontWeight.w700,
+		                        fontSize: SH * 0.015,
+		                      ),
+		                    ),
+		                  ),
+		              ],
   		      	    ),
 		      	  )
     		        ],

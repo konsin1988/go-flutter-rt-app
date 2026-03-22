@@ -20,6 +20,9 @@ class AiProvider extends ChangeNotifier{
   Conversation? get currentConversation => _currentConversation;
   StreamSubscription? get streamSub => _streamSub;
 
+  int? editingConversationId;
+  String? pendingTitle;
+
   AiProvider(this._repo){
     debugPrint("AiProvider created;");
     loadConversationList();
@@ -94,6 +97,34 @@ class AiProvider extends ChangeNotifier{
     }
     
     setConversationList(_conversationList);  
+    notifyListeners();
+  }
+
+  // StartRename
+  Future<void> startRename(int id, String currentTitle) async {
+    editingConversationId = id;
+    pendingTitle = currentTitle;
+    notifyListeners();
+  }
+  
+
+  // Update Conversation Title
+  Future<void> updateConversationTitle(int id, String newTitle) async {
+    int index = _conversationList.indexWhere((item) => item.ID == id);
+    try {
+      editingConversationId = null;
+      await _repo.RenameConversation(id, newTitle);
+      conversationList[index] = conversationList[index].copyWith(Title: newTitle);
+    } finally {
+      cancelRename();
+    }
+    notifyListeners();
+  }
+ 
+ // Cancel Rename
+  void cancelRename() {
+    editingConversationId = null;
+    pendingTitle = null;
     notifyListeners();
   }
 

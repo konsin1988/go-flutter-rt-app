@@ -108,6 +108,25 @@ func (r *mutationResolver) TogglePinnedConversation(ctx context.Context, convers
 	return true, nil
 }
 
+// RenameConversation is the resolver for the renameConversation field.
+func (r *mutationResolver) RenameConversation(ctx context.Context, conversationID int32, newTitle string) (*model.ConversationListItem, error) {
+	user := ctx.Value(jwt.MainUserContextKey).(*models.MainUser)
+	if user == nil {
+		return nil, errors.New("Unauthorized from resolver")
+	}
+	c, err := r.AiService.RenameConversation(ctx, user.ID, int(conversationID), newTitle) 
+	if err != nil {
+		return nil, err
+	}
+	return &model.ConversationListItem{
+	  ID: int32(c.ID),
+	  Title: c.Title,
+	  CreatedAt: c.CreatedAt.Format(time.RFC3339),
+	  UpdatedAt: c.UpdatedAt.Format(time.RFC3339),
+	  IsPinned: int32(c.IsPinned),
+	}, nil
+}
+
 // CreateAbsenceData is the resolver for the createAbsenceData field.
 func (r *mutationResolver) CreateAbsenceData(ctx context.Context, prompt string) (*model.AbsenceUI, error) {
 	user, ok := ctx.Value(jwt.MainUserContextKey).(*models.MainUser)

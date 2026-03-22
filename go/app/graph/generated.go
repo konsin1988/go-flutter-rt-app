@@ -119,6 +119,7 @@ type ComplexityRoot struct {
 		CreateAbsenceData        func(childComplexity int, prompt string) int
 		CreateMessage            func(childComplexity int, conversationID *int32, content string) int
 		DeleteConversation       func(childComplexity int, conversationID int32) int
+		RenameConversation       func(childComplexity int, conversationID int32, newTitle string) int
 		TogglePinnedConversation func(childComplexity int, conversationID int32, isPinned int32) int
 	}
 
@@ -167,6 +168,7 @@ type MutationResolver interface {
 	CreateMessage(ctx context.Context, conversationID *int32, content string) (*model.Message, error)
 	DeleteConversation(ctx context.Context, conversationID int32) (bool, error)
 	TogglePinnedConversation(ctx context.Context, conversationID int32, isPinned int32) (bool, error)
+	RenameConversation(ctx context.Context, conversationID int32, newTitle string) (*model.ConversationListItem, error)
 	CreateAbsenceData(ctx context.Context, prompt string) (*model.AbsenceUI, error)
 	CreateAbsenceBitrix(ctx context.Context, absence model.AbsenceInput) (*model.AbsenceUI, error)
 }
@@ -487,6 +489,17 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.Mutation.DeleteConversation(childComplexity, args["conversationId"].(int32)), true
+	case "Mutation.renameConversation":
+		if e.complexity.Mutation.RenameConversation == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_renameConversation_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.RenameConversation(childComplexity, args["conversationId"].(int32), args["newTitle"].(string)), true
 	case "Mutation.togglePinnedConversation":
 		if e.complexity.Mutation.TogglePinnedConversation == nil {
 			break
@@ -877,6 +890,22 @@ func (ec *executionContext) field_Mutation_deleteConversation_args(ctx context.C
 		return nil, err
 	}
 	args["conversationId"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_renameConversation_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "conversationId", ec.unmarshalNInt2int32)
+	if err != nil {
+		return nil, err
+	}
+	args["conversationId"] = arg0
+	arg1, err := graphql.ProcessArgField(ctx, rawArgs, "newTitle", ec.unmarshalNString2string)
+	if err != nil {
+		return nil, err
+	}
+	args["newTitle"] = arg1
 	return args, nil
 }
 
@@ -2273,6 +2302,59 @@ func (ec *executionContext) fieldContext_Mutation_togglePinnedConversation(ctx c
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_togglePinnedConversation_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_renameConversation(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Mutation_renameConversation,
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.resolvers.Mutation().RenameConversation(ctx, fc.Args["conversationId"].(int32), fc.Args["newTitle"].(string))
+		},
+		nil,
+		ec.marshalOConversationListItem2ᚖkonsin1988ᚋrtᚑappᚋgraphᚋmodelᚐConversationListItem,
+		true,
+		false,
+	)
+}
+
+func (ec *executionContext) fieldContext_Mutation_renameConversation(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_ConversationListItem_id(ctx, field)
+			case "title":
+				return ec.fieldContext_ConversationListItem_title(ctx, field)
+			case "createdAt":
+				return ec.fieldContext_ConversationListItem_createdAt(ctx, field)
+			case "updatedAt":
+				return ec.fieldContext_ConversationListItem_updatedAt(ctx, field)
+			case "isPinned":
+				return ec.fieldContext_ConversationListItem_isPinned(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type ConversationListItem", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_renameConversation_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -5438,6 +5520,10 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
+		case "renameConversation":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_renameConversation(ctx, field)
+			})
 		case "createAbsenceData":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_createAbsenceData(ctx, field)
@@ -6927,6 +7013,13 @@ func (ec *executionContext) marshalOBoolean2ᚖbool(ctx context.Context, sel ast
 	_ = ctx
 	res := graphql.MarshalBoolean(*v)
 	return res
+}
+
+func (ec *executionContext) marshalOConversationListItem2ᚖkonsin1988ᚋrtᚑappᚋgraphᚋmodelᚐConversationListItem(ctx context.Context, sel ast.SelectionSet, v *model.ConversationListItem) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._ConversationListItem(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalODate2ᚖstring(ctx context.Context, v any) (*string, error) {

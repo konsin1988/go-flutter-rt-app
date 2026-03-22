@@ -21,6 +21,7 @@ type Repository interface {
   CreateMessage(ctx context.Context, conversationId int, messageRole models.MessageRole, content string) (*models.Message, error)
   DeleteConversation(ctx context.Context, conversationId int)(error)
   TogglePinnedConversation(ctx context.Context, conversationId int, isPinned int)(error)
+  RenameConversation(ctx context.Context, conversationId int, newTitle string)(*models.ConversationListItem, error)
 }
 
 type Service struct {
@@ -287,6 +288,22 @@ func (s *Service) TogglePinnedConversation(ctx context.Context, userID int, conv
     return fmt.Errorf("Error due caching: %v", err)
   }
   return nil
+}
+
+// Rename conversation
+func (s *Service) RenameConversation(ctx context.Context, userID int, conversationId int, newTitle string) (*models.ConversationListItem, error){
+  renamedConversation, err := s.repo.RenameConversation(ctx, conversationId, newTitle)
+  if err != nil{
+    return nil, err
+  }
+  keys := []string{
+    fmt.Sprintf("user:%d:conversations", userID),
+  }
+  err = s.cache.DeleteMany(ctx, keys...)
+  if err != nil {
+    return renamedConversation, fmt.Errorf("Error due caching: %v", err)
+  }
+  return renamedConversation, nil
 }
 
 // Create Absence

@@ -101,6 +101,10 @@ extend type Mutation {
   togglePinnedConversation(conversationId: Int!, isPinned: Int!): Boolean!
 }
 
+extend type Mutation {
+  renameConversation(conversationId: Int!, newTitle: String!): ConversationListItem 
+}
+
 # Absence
 type AbsenceUI {
   id: Int

@@ -234,3 +234,23 @@ func (r *AiRepo) TogglePinnedConversation(ctx context.Context, conversationId in
 
   return nil
 }
+
+func (r *AiRepo) RenameConversation(ctx context.Context, conversationId int, newTitle string) (*models.ConversationListItem, error){
+  query := `
+    update ai_conversation ac 
+    set title = $1 
+    where id = $2
+    returning id, user_id, title, created_at, updated_at,
+    case
+    	when pinned_at = 'epoch' then 0
+    	else 1
+    end as is_pinned;
+  `
+  var c models.ConversationListItem
+  err := r.db.QueryRowContext(ctx, query,  newTitle, conversationId).
+    Scan(&c.ID, &c.UserID, &c.Title, &c.CreatedAt, &c.UpdatedAt, &c.IsPinned)
+  if err != nil {
+    return nil, err
+  }
+  return &c, nil
+} 

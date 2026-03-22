@@ -127,6 +127,21 @@ class AiRepository {
       throw result.exception!;
     }
   }
+
+  // Rename conversation
+  Future<void> RenameConversation(int conversationId, String newTitle) async {
+    final result = await _client.query(
+      QueryOptions(
+        document: gql(AiQueries.renameConversation),
+	variables: {'conversationId': conversationId, 'newTitle': newTitle},
+        fetchPolicy: FetchPolicy.networkOnly,
+      ),
+    );
+    if (result.hasException) {
+      debugPrint('GraphQL error: ${result.exception}');
+      throw result.exception!;
+    }
+  }
 }
 
   

@@ -58,6 +58,19 @@ class AiQueries {
       togglePinnedConversation(conversationId: $conversationId, isPinned: $isPinned) 
     }
   ''';
+  
+  // Rename Conversation
+  static const String renameConversation = r'''
+    mutation renameConversation($conversationId: Int!, $newTitle: String!){
+      renameConversation(conversationId: $conversationId, newTitle: $newTitle) {
+	id
+	title
+	createdAt
+	updatedAt
+	isPinned
+      } 
+    }
+  ''';
 
   // messageStream
   static const String messageStream = r'''
