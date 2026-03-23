@@ -28,7 +28,7 @@ class AbsenceProvider extends ChangeNotifier{
   }
 
   // Conversation Setter
-  void setAbsence(Absence absence) {
+  void setAbsence(Absence? absence) {
     _absence = absence;
     notifyListeners();
   }
@@ -42,11 +42,30 @@ class AbsenceProvider extends ChangeNotifier{
       _isLoading = true;
       notifyListeners();
 
-      final absence = await _repo.createAbsenceData(
+      final absence = await _repo.CreateAbsenceData(
         prompt: prompt,
       );
       debugPrint("ABSENCE: ${absence}");
       setAbsence(absence);
+      _error = null;
+    } catch (e) {
+      debugPrint("ERROR: ${e}");
+      _error = e.toString();
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+    notifyListeners();
+  }
+
+  Future<void> CreateAbsenceBitrix() async {
+    try {
+      _isLoading = true;
+      notifyListeners();
+      final absenceResult = await _repo.CreateAbsenceBitrix(
+	absence: _absence!,
+      );
+      setAbsence(absenceResult);
       _error = null;
     } catch (e) {
       debugPrint("ERROR: ${e}");

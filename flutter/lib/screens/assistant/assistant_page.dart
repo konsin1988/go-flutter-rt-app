@@ -122,31 +122,39 @@ class _AssistantPageState extends State<AssistantPage> {
       	      child: Row(
       	        children: [
       	          Expanded(
-      	            child: TextField(
-		      maxLines: null,
-		      minLines: 1,
-		      keyboardType: TextInputType.multiline,
-      	              controller: _controller,
-		      cursorColor: RTColorStyle.dark800.value,
-      	              decoration: InputDecoration(
-      	                hintText: 'Введите Ваш вопрос...',
-      	                border: OutlineInputBorder(
-      	                  borderRadius: BorderRadius.circular(8),
-    			  borderSide: BorderSide(
-    			    color: RTColorStyle.beige300.value,
-    			    width: 2,
-    			  ),
+		    child: Theme(
+		      data: Theme.of(context).copyWith(
+  		        textSelectionTheme: TextSelectionThemeData(
+  		          selectionHandleColor: RTColorStyle.beige700.value, 
+		      selectionColor: RTColorStyle.beige700.value,
+  		        ),
+  		      ),
+		      child: TextField(
+		        maxLines: null,
+		        minLines: 1,
+		        keyboardType: TextInputType.multiline,
+      	                controller: _controller,
+		        cursorColor: RTColorStyle.dark800.value,
+      	                decoration: InputDecoration(
+      	                  hintText: 'Введите Ваш вопрос...',
+      	                  border: OutlineInputBorder(
+      	                    borderRadius: BorderRadius.circular(8),
+    		            borderSide: BorderSide(
+    		              color: RTColorStyle.beige300.value,
+    		              width: 2,
+    		            ),
+      	                  ),
+    		          focusedBorder: OutlineInputBorder(
+    		            borderRadius: BorderRadius.circular(8),
+    		            borderSide: BorderSide(
+    		              color: RTColorStyle.dark800.value,
+    		              width: 2,
+    		            ),
+    		          ),
       	                ),
-    			focusedBorder: OutlineInputBorder(
-    			  borderRadius: BorderRadius.circular(8),
-    			  borderSide: BorderSide(
-    			    color: RTColorStyle.dark800.value,
-    			    width: 2,
-    			  ),
-    			),
+      	                onSubmitted: (_) => _sendMessage(),
       	              ),
-      	              onSubmitted: (_) => _sendMessage(),
-      	            ),
+		    ),
       	          ),
       	          SizedBox(width: 8),
       	          IconButton(

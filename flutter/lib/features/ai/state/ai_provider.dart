@@ -15,6 +15,9 @@ class AiProvider extends ChangeNotifier{
   bool loading = false;
   StreamSubscription? _streamSub;
 
+  // rename conversation 
+  final renameController = TextEditingController();
+
   List<ConversationListItem> get conversationList => _conversationList;
   int? get selectedId => _selectedId;
   Conversation? get currentConversation => _currentConversation;
@@ -103,7 +106,7 @@ class AiProvider extends ChangeNotifier{
   // StartRename
   Future<void> startRename(int id, String currentTitle) async {
     editingConversationId = id;
-    pendingTitle = currentTitle;
+    renameController.text = currentTitle;
     notifyListeners();
   }
   
@@ -112,9 +115,9 @@ class AiProvider extends ChangeNotifier{
   Future<void> updateConversationTitle(int id, String newTitle) async {
     int index = _conversationList.indexWhere((item) => item.ID == id);
     try {
-      editingConversationId = null;
-      await _repo.RenameConversation(id, newTitle);
       conversationList[index] = conversationList[index].copyWith(Title: newTitle);
+      await _repo.RenameConversation(id, newTitle);
+      editingConversationId = null;
     } finally {
       cancelRename();
     }

@@ -11,5 +11,16 @@ class AbsenceQueries {
       }
     }
   ''';
+
+  static const String createAbsenceBitrix = r'''
+    mutation createAbsenceBitrix($absence: AbsenceInput!) {
+      createAbsenceBitrix(absence: $absence) {
+      	id
+      	time_from
+      	time_to
+      	type_of_absence
+    }
+  }
+  ''';
 }
 

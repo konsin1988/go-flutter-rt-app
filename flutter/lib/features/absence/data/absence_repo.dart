@@ -10,7 +10,7 @@ class AbsenceRepository {
 
   AbsenceRepository(this._client);
 
-  Future<Absence> createAbsenceData({
+  Future<Absence> CreateAbsenceData({
     required String prompt,
     }) async {
     final result = await _client.mutate(
@@ -31,4 +31,26 @@ class AbsenceRepository {
     final data = result.data!['createAbsenceData'];
     return Absence.fromJson(data);
   }
+
+  Future<Absence> CreateAbsenceBitrix({
+    required Absence absence,
+  }) async {
+    final result = await _client.mutate(
+      MutationOptions(
+	document: gql(AbsenceQueries.createAbsenceBitrix),
+	variables: {
+	  'absence': absence!.toJson(),
+	},
+        fetchPolicy: FetchPolicy.networkOnly,
+    ));
+    debugPrint("RESULT FROM GO: ${result}");
+
+    if (result.hasException) {
+      debugPrint("${result.exception}");
+      throw result.exception!;
+    }
+
+    final data = result.data!['createAbsenceBitrix'];
+    return Absence.fromJson(data);
+  } 
 }

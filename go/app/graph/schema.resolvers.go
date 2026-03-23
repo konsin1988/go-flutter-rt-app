@@ -162,6 +162,7 @@ func (r *mutationResolver) CreateAbsenceBitrix(ctx context.Context, absence mode
 	if !ok {
 		return nil, errors.New("Cannot load user from context")
 	}
+	log.Println(absence)
 	bitrixResponse, err := r.BitrixClient.CreateAbsence(
 		ctx,
 		user.ID,

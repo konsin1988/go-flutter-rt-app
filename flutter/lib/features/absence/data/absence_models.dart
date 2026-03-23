@@ -22,6 +22,13 @@ class Absence {
     );
   }
 
+  Map<String, dynamic> toJson() => {
+    'id': ID ?? null,
+    'time_from': TimeFrom.toIso8601String(),
+    'time_to': TimeTo.toIso8601String(),
+    'type_of_absence': TypeOfAbsence,
+  };
+
   String _formatTime(DateTime date) {
     //final msk = dateDt.timeZoneName; 
     final dateDt = date.toLocal();

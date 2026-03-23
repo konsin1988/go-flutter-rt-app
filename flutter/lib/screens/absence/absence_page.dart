@@ -35,22 +35,23 @@ class _AbsencePageState extends State<AbsencePage> {
 
     // Simulate API processing delay
     final absenceProvider = context.read<AbsenceProvider>();
-    final absence = await absenceProvider.createAbsenceData(_controller.text);
+    await absenceProvider.createAbsenceData(_controller.text);
 
     setState(() {
       _isLoading = false;
-      _processedText = 'Processed: ${_controller.text} (AI response here)';
+      _processedText = 'Processed: ${_controller.text}';
       _showAbsenceDataModal = true;
     });
   }
 
-  Future<void> _sendMutation() async {
+  Future<void> _createBitrixAbsence() async {
     setState(() {
       _showAbsenceDataModal = false;
       _showBitrixSuccessModal = true;
     });
 
-    // Simulate server mutation
+    final absenceProvider = context.read<AbsenceProvider>();
+    final absence = await absenceProvider.CreateAbsenceBitrix();
     await Future.delayed(Duration(seconds: 1));
 
     // Auto-dismiss success modal and clear text
@@ -58,6 +59,7 @@ class _AbsencePageState extends State<AbsencePage> {
       setState(() {
         _showBitrixSuccessModal = false;
         _controller.clear();
+	absenceProvider.setAbsence(null);
       });
     });
   }
@@ -83,68 +85,76 @@ class _AbsencePageState extends State<AbsencePage> {
           Center(
             child: Padding(
               padding: EdgeInsets.symmetric(horizontal: SW * 0.1),
-	      child: TextField(
-		maxLines: null,
-		minLines: 1,
-	        controller: _controller,
-	        textAlign: TextAlign.center,
-		cursorColor: RTColorStyle.beige700.value,
-	        decoration: InputDecoration(
-	          hintText: 'Введите данные...',
-		  hintStyle: TextStyle(                    
-		    color: RTColorStyle.light500.value,   
-  		    fontSize: 16,                        
-  		    fontWeight: FontWeight.w400,          
-		    fontFamily: "MuseoSans",
-  		  ),
-	          border: OutlineInputBorder(
-	            borderRadius: BorderRadius.circular(20),
-	          ),
-		  enabledBorder: OutlineInputBorder(
-		    borderRadius: BorderRadius.circular(20),
-    		    borderSide: BorderSide(
-    		      color: RTColorStyle.light500.value,
-    		      width: 1.0,
-    		    ),
-    		  ),
-		  focusedBorder: OutlineInputBorder(
-		    borderRadius: BorderRadius.circular(20),
-    		    borderSide: BorderSide(
-    		      color: RTColorStyle.beige800.value, 
-    		      width: SW * 0.003,
-    		    ),
-    		  ),
-	          suffixIcon: Row(
-	            mainAxisSize: MainAxisSize.min,
-	            children: [
-	              ElevatedButton(
-	                onPressed: _isLoading ? null : _processMessage,
-	                style: ElevatedButton.styleFrom(
-	                  shape: CircleBorder(),
-			  minimumSize: Size(SW * 0.09, SW * 0.09),  
-			  padding: EdgeInsets.all(0),
-	                ),
-	                child: Icon(Icons.send, size: SW * 0.046, color: RTColorStyle.dark800.value),
-	              ),
-	              ElevatedButton(
-	                onPressed: _isLoading ? null : () {
-	                  ScaffoldMessenger.of(context).showSnackBar(
-	                    SnackBar(content: Text('Audio recording not implemented')),
-	                  );
-	                },
-	                style: ElevatedButton.styleFrom(
-	                  backgroundColor: RTColorStyle.beige700.value,
-	                  shape: CircleBorder(),
-			  minimumSize: Size(SW * 0.09, SW * 0.09), 
-			  padding: EdgeInsets.all(0),
-	                ),
-	                child: Icon(Icons.mic, size: SW * 0.046, color: Colors.white),
-	              ),
-		      SizedBox(width: SW * 0.02),
-	            ],
-	          ),
-	        ),
-	        enabled: !_isLoading,
+	      child: Theme(
+	        data: Theme.of(context).copyWith(
+  	          textSelectionTheme: TextSelectionThemeData(
+  	            selectionHandleColor: RTColorStyle.beige700.value, 
+	        selectionColor: RTColorStyle.beige700.value,
+  	          ),
+  	        ),
+		child: TextField(
+	      	  maxLines: null,
+	      	  minLines: 1,
+	      	  controller: _controller,
+	      	  textAlign: TextAlign.center,
+	      	  cursorColor: RTColorStyle.beige700.value,
+	      	  decoration: InputDecoration(
+	      	    hintText: 'Введите данные...',
+	      	    hintStyle: TextStyle(                    
+	      	      color: RTColorStyle.light500.value,   
+  	      	      fontSize: 16,                        
+  	      	      fontWeight: FontWeight.w400,          
+	      	      fontFamily: "MuseoSans",
+  	      	    ),
+	      	    border: OutlineInputBorder(
+	      	      borderRadius: BorderRadius.circular(20),
+	      	    ),
+	      	    enabledBorder: OutlineInputBorder(
+	      	      borderRadius: BorderRadius.circular(20),
+    	      	      borderSide: BorderSide(
+    	      	        color: RTColorStyle.light500.value,
+    	      	        width: 1.0,
+    	      	      ),
+    	      	    ),
+	      	    focusedBorder: OutlineInputBorder(
+	      	      borderRadius: BorderRadius.circular(20),
+    	      	      borderSide: BorderSide(
+    	      	        color: RTColorStyle.beige800.value, 
+    	      	        width: SW * 0.003,
+    	      	      ),
+    	      	    ),
+	      	    suffixIcon: Row(
+	      	      mainAxisSize: MainAxisSize.min,
+	      	      children: [
+	      	        ElevatedButton(
+	      	          onPressed: _isLoading ? null : _processMessage,
+	      	          style: ElevatedButton.styleFrom(
+	      	            shape: CircleBorder(),
+	      	  	  minimumSize: Size(SW * 0.09, SW * 0.09),  
+	      	  	  padding: EdgeInsets.all(0),
+	      	          ),
+	      	          child: Icon(Icons.send, size: SW * 0.046, color: RTColorStyle.dark800.value),
+	      	        ),
+	      	        //ElevatedButton(
+	      	        //  onPressed: _isLoading ? null : () {
+	      	        //    ScaffoldMessenger.of(context).showSnackBar(
+	      	        //      SnackBar(content: Text('Audio recording not implemented')),
+	      	        //    );
+	      	        //  },
+	      	        //  style: ElevatedButton.styleFrom(
+	      	        //    backgroundColor: RTColorStyle.beige700.value,
+	      	        //    shape: CircleBorder(),
+	      	        //    minimumSize: Size(SW * 0.09, SW * 0.09), 
+	      	        //    padding: EdgeInsets.all(0),
+	      	        //  ),
+	      	        //  child: Icon(Icons.mic, size: SW * 0.046, color: Colors.white),
+	      	        //),
+	      	        SizedBox(width: SW * 0.02),
+	      	      ],
+	      	    ),
+	      	  ),
+	      	  enabled: !_isLoading,
+	      	),
 	      ),
             ),
           ),
@@ -176,7 +186,9 @@ class _AbsencePageState extends State<AbsencePage> {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Text(
-                          "Установить отсутствие \nс: ${absence!.timeFromFormatted} \nпо: ${absence!.timeToFormatted}\n по причине: ${absence!.typeOfAbsenceName}?" ?? "ABSENCE: ",
+			  absence != null
+                          ? "Установить отсутствие \nс: ${absence!.timeFromFormatted} \nпо: ${absence!.timeToFormatted}\n по причине: ${absence!.typeOfAbsenceName}?"
+			  : "Произошла ошибка! Попробуйте ещё раз!",
                           style: TextStyle(
 			    fontSize: 16,
 			    color: RTColorStyle.dark900.value,
@@ -190,7 +202,6 @@ class _AbsencePageState extends State<AbsencePage> {
                             ElevatedButton(
                               onPressed: () {
                                 setState(() => _showAbsenceDataModal = false);
-                                // Text stays in field (no clear)
                               },
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: RTColorStyle.red800.value,
@@ -202,8 +213,9 @@ class _AbsencePageState extends State<AbsencePage> {
 				),
 			      ),
                             ),
+			    if(absence != null)
                             ElevatedButton(
-                              onPressed: _sendMutation,
+                              onPressed: _createBitrixAbsence, 
                               child: Text(
 				'Установить',
 				style: TextStyle(
