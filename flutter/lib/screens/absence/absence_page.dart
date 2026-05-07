@@ -97,6 +97,11 @@ class _AbsencePageState extends State<AbsencePage> {
 	      	  minLines: 1,
 	      	  controller: _controller,
 	      	  textAlign: TextAlign.center,
+		  style: TextStyle(
+		    color: RTColorStyle.light800.value, 
+  		    //fontSize: 18.0,      
+  		    //fontWeight: FontWeight.bold,
+  		  ),
 	      	  cursorColor: RTColorStyle.beige700.value,
 	      	  decoration: InputDecoration(
 	      	    hintText: 'Введите данные...',
