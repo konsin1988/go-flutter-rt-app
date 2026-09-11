@@ -5,6 +5,7 @@ import (
     "log"
 
     "konsin1988/rt-app/config"
+		migrate "konsin1988/rt-app/db/migrate"
     health "konsin1988/rt-app/db/health"
     transport "konsin1988/rt-app/transport/http"
     keycloak "konsin1988/rt-app/auth/keycloak"
@@ -23,6 +24,8 @@ import (
 )
 
 func main() {
+	migrate.RunMigrations()
+
   db, err := config.ConnectDB()
   if err != nil{
     log.Fatal(err)

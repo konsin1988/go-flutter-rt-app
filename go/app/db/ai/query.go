@@ -23,7 +23,7 @@ func (r *AiRepo) GetConversationList (ctx context.Context, user_id int) ([]model
         when pinned_at <> 'epoch' then 1 
         else 0 
       end as is_pinned
-    from ai_conversation
+    from ai.conversation
     where user_id = $1
     order by pinned_at desc, updated_at desc
   ` 
@@ -66,7 +66,7 @@ func (r *AiRepo) GetConversationMeta(ctx context.Context, conversation_id int) (
 	c.title, 
 	c.created_at, 
 	c.updated_at
-    FROM ai_conversation c
+    FROM ai.conversation c
     WHERE c.id = $1
   `
 
@@ -88,8 +88,8 @@ func (r *AiRepo) GetConversationMessages(ctx context.Context, conversation_id in
 	mr."role", 
 	m."content",
 	m.created_at 
-    FROM ai_message m 
-    join ai_message_role mr on m.message_role_id = mr.id 
+    FROM ai.message m 
+    join ai.message_role mr on m.message_role_id = mr.id 
     and m.conversation_id = $1
   `
   var rows *sql.Rows
@@ -132,7 +132,7 @@ func (r *AiRepo) CreateConversation(
     title string,
 ) (*models.ConversationListItem, error) {
   query := `
-    INSERT INTO ai_conversation (user_id, title)
+    INSERT INTO ai.conversation (user_id, title)
     VALUES ($1, $2)
     RETURNING id, user_id, title, created_at, updated_at
   ` 
@@ -155,7 +155,7 @@ func (r *AiRepo) CreateMessage(
   modelName := os.Getenv("AI_CHAT_MODEL")
 
   query := `
-    INSERT INTO ai_message(conversation_id, message_role_id, content, model)
+    INSERT INTO ai.message(conversation_id, message_role_id, content, model)
     VALUES ($1, $2, $3, $4)
     RETURNING id, created_at
   `
@@ -167,7 +167,7 @@ func (r *AiRepo) CreateMessage(
   }
 
   query = `
-    UPDATE ai_conversation
+    UPDATE ai.conversation
     SET updated_at = now()
     WHERE id = $1;
   `
@@ -188,7 +188,7 @@ func (r *AiRepo) CreateMessage(
 
 func (r *AiRepo) DeleteConversation(ctx context.Context, conversationId int) error {
   query := `
-    DELETE FROM ai_conversation
+    DELETE FROM ai.conversation
     WHERE id = $1
   `
   result, err := r.db.ExecContext(ctx, query, conversationId)
@@ -199,7 +199,7 @@ func (r *AiRepo) DeleteConversation(ctx context.Context, conversationId int) err
   if rowAffected == 0 { return err }
 
   query = `
-    DELETE FROM ai_message
+    DELETE FROM ai.message
     WHERE conversation_id = $1
   `
   result, err = r.db.ExecContext(ctx, query, conversationId)
@@ -214,13 +214,13 @@ func (r *AiRepo) DeleteConversation(ctx context.Context, conversationId int) err
 
 func (r *AiRepo) TogglePinnedConversation(ctx context.Context, conversationId int, isPinned int) error {
   query := `
-    UPDATE ai_conversation
+    UPDATE ai.conversation
     SET pinned_at = 'epoch'
     WHERE id = $1
   `
   if isPinned == 0 {
     query = `
-      UPDATE ai_conversation
+      UPDATE ai.conversation
       SET pinned_at = now()
       WHERE id = $1
     `
@@ -237,7 +237,7 @@ func (r *AiRepo) TogglePinnedConversation(ctx context.Context, conversationId in
 
 func (r *AiRepo) RenameConversation(ctx context.Context, conversationId int, newTitle string) (*models.ConversationListItem, error){
   query := `
-    update ai_conversation ac 
+    update ai.conversation ac 
     set title = $1 
     where id = $2
     returning id, user_id, title, created_at, updated_at,

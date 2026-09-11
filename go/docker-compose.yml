@@ -6,8 +6,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.dev
-    image: konsin1988/rt-go-dev:1.0.0
-    container_name: rt-go-dev 
+    container_name: ${PROJECT_NAME}-api-dev
+    image: konsin1988/${PROJECT_NAME}-api-dev:${PROJECT_VERSION}
     env_file: .env
     ports:
       - "8000:8000"
@@ -45,7 +45,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.worker.dev
-    container_name: rt-app-worker-dev 
+    container_name: ${PROJECT_NAME}-worker-dev
+    image: konsin1988/${PROJECT_NAME}-worker-dev:${PROJECT_VERSION}
     env_file: .env
     volumes:
       - ./worker:/worker

@@ -31,8 +31,8 @@ func (r *UserRepo) AuthUser(ctx context.Context, email string) (*models.MainUser
         u.mobile,
         u.position,
         u.phone_inner,
-	u.dept as dept_id
-    FROM b_user u
+				u.dept as dept_id
+    FROM user_data.b_user u
     where u.email = $1 
     `
 
@@ -92,8 +92,8 @@ func (r *UserRepo) UserById (ctx context.Context, user_id int) (*models.MainUser
         u.mobile,
         u.position,
         u.phone_inner,
-	u.dept as dept_id
-    FROM b_user u
+				u.dept as dept_id
+    FROM user_data.b_user u
     where u.id = $1 
     `
 
@@ -148,7 +148,7 @@ func (r *UserRepo) getDept(ctx context.Context, id int) (*models.Department, err
       d.name,
       coalesce(d.parent, 0) as parent,
       coalesce(d.head, 0) as head
-    from b_department d
+    from user_data.b_department d
     where d.id = $1
   `
   d := models.Department{}
@@ -165,15 +165,15 @@ func (r *UserRepo) getHeadData(ctx context.Context, user_id int, d *models.Depar
     SELECT 
       u.id as id,
       concat_ws(' ', u.last_name, u.first_name, u.second_name) as fio
-    FROM b_user u
+    FROM user_data.b_user u
     WHERE u.id = $1
   `
   const next_head_query = `
     SELECT 
       u.id,
       concat_ws(' ', u.last_name, u.first_name, u.second_name) as fio
-    FROM b_user u
-    join b_department d on d.head = u.id
+    FROM user_data.b_user u
+    join user_data.b_department d on d.head = u.id
     where d.id = $1
   `
   h := models.Head{}

@@ -18,9 +18,9 @@ func (r *DeptRepo) GetDeptById (ctx context.Context, dept_id, user_id int32) (*m
 	bd_head."name" as parent_name,
 	bd.head as head,
 	concat_ws(' ', bu.last_name, bu.first_name, bu.second_name) as head_fio
-      from b_department bd
-      left join b_user bu on bd.head = bu.id
-      left join b_department bd_head on bd.parent = bd_head.id
+      from user_data.b_department bd
+      left join user_data.b_user bu on bd.head = bu.id
+      left join user_data.b_department bd_head on bd.parent = bd_head.id
       where bd.id = $1 
   `
   err := r.db.QueryRowContext(ctx, query, dept_id).Scan(&d.ID, &d.Name, &d.Parent, 
@@ -37,9 +37,9 @@ func (r *DeptRepo) GetDeptById (ctx context.Context, dept_id, user_id int32) (*m
 	concat_ws(' ', bu.last_name, bu.first_name, bu.second_name) as fio,
 	coalesce(bu."position", ''),
 	bu.photo
-    from b_user bu
+    from user_data.b_user bu
     JOIN LATERAL jsonb_array_elements_text(bu.dept::jsonb) AS dept_id(id) ON true
-    JOIN b_department d ON d.id = dept_id.id::int and d.id = $1 and bu.id <> $2
+    JOIN user_data.b_department d ON d.id = dept_id.id::int and d.id = $1 and bu.id <> $2
   `
 
   rows, err := r.db.QueryContext(ctx, query, dept_id, user_id)
