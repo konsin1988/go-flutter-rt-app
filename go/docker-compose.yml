@@ -18,6 +18,18 @@ services:
       - GO_ENABLED=0
       - GO111MODULE=on
     restart: unless-stopped
+    mem_limit: 1G
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+        reservations:
+          memory: 512M
+    logging:
+      driver: json-file
+      options:
+        max-size: "10M"
+        max-file: "3" 
     command: air /app
     networks:
       - rt-app
@@ -35,6 +47,18 @@ services:
     ports:
       - "8000:8000"
     restart: unless-stopped
+    mem_limit: 1G
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+        reservations:
+          memory: 512M
+    logging:
+      driver: json-file
+      options:
+        max-size: "10M"
+        max-file: "3" 
     networks:
       - rt-app
   
@@ -55,6 +79,18 @@ services:
       - GO111MODULE=on
     restart: unless-stopped
     command: air /worker
+    mem_limit: 1G
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+        reservations:
+          memory: 512M
+    logging:
+      driver: json-file
+      options:
+        max-size: "10M"
+        max-file: "3" 
     networks:
       - rt-app
 

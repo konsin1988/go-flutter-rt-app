@@ -114,16 +114,16 @@ func (r *mutationResolver) RenameConversation(ctx context.Context, conversationI
 	if user == nil {
 		return nil, errors.New("Unauthorized from resolver")
 	}
-	c, err := r.AiService.RenameConversation(ctx, user.ID, int(conversationID), newTitle) 
+	c, err := r.AiService.RenameConversation(ctx, user.ID, int(conversationID), newTitle)
 	if err != nil {
 		return nil, err
 	}
 	return &model.ConversationListItem{
-	  ID: int32(c.ID),
-	  Title: c.Title,
-	  CreatedAt: c.CreatedAt.Format(time.RFC3339),
-	  UpdatedAt: c.UpdatedAt.Format(time.RFC3339),
-	  IsPinned: int32(c.IsPinned),
+		ID:        int32(c.ID),
+		Title:     c.Title,
+		CreatedAt: c.CreatedAt.Format(time.RFC3339),
+		UpdatedAt: c.UpdatedAt.Format(time.RFC3339),
+		IsPinned:  int32(c.IsPinned),
 	}, nil
 }
 

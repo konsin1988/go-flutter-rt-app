@@ -3,6 +3,7 @@ services:
   postgres:
     image: pgvector/pgvector:pg16
     container_name: postgres
+    restart: unless-stopped
     ports:
       - "5432:5432"
     healthcheck:
@@ -13,6 +14,18 @@ services:
       timeout: 10s
       retries: 3
       start_period: 60s
+    mem_limit: 1G
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+        reservations:
+          memory: 512M
+    logging:
+      driver: json-file
+      options:
+        max-size: "10M"
+        max-file: "3" 
     environment:
       POSTGRES_DB: ${POSTGRES_DATABASE}
       POSTGRES_USER: ${POSTGRES_USERNAME}
@@ -21,6 +34,30 @@ services:
       - ./volumes/postgres_data:/var/lib/postgresql/data
     networks:
       - rt-app
+
+  backup:
+    image: postgres:15-alpine
+    container_name: backup
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./volumes/backups:/backups
+    entrypoint: >
+      sh -c "while true; do
+        PGPASSWORD=$$POSTGRES_PASSWORD pg_dump -h postgres -U $$POSTGRES_USER $$POSTGRES_DB |
+        gzip > /backups/backup_$$(date +%Y%m%d_%H%M%S).sql.gz;
+        find /backups -mtime +7 -print;
+        find /backups -mtime +7 -delete;
+        sleep 86400;
+      done"
+    environment:
+      POSTGRES_DB: ${POSTGRES_DATABASE}
+      POSTGRES_USER: ${POSTGRES_USERNAME}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    restart: unless-stopped
+    networks: 
+      - rt-app 
 
   redis:
     image: redis:latest
@@ -44,6 +81,18 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    mem_limit: 1G
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+        reservations:
+          memory: 512M
+    logging:
+      driver: json-file
+      options:
+        max-size: "10M"
+        max-file: "3" 
     networks:
       - rt-app
 
@@ -57,6 +106,18 @@ services:
     restart: unless-stopped
     environment:
       - OLLAMA_HOST=0.0.0.0
+    mem_limit: 1G
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+        reservations:
+          memory: 512M
+    logging:
+      driver: json-file
+      options:
+        max-size: "10M"
+        max-file: "3" 
     networks:
       - rt-app
 
