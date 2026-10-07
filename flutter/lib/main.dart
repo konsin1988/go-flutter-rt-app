@@ -50,7 +50,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp.router(
       debugShowCheckedModeBanner: false,
       routerConfig: createAppRouter(context),
-      title: 'РТ-ТЕХПРИЕМКА',
+      title: 'РТ-ТexX',
     );
   }
 }

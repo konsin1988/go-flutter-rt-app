@@ -6,6 +6,7 @@ import '../../style/colors.dart';
 import '../../style/fonts.dart';
 import './widgets/PasswordField.dart';
 import './widgets/LoginField.dart';
+import './change_password_page.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -76,14 +77,14 @@ class _LoginPageState extends State<LoginPage> {
 		  crossAxisAlignment: CrossAxisAlignment.start,
 		  children: [
 		    Container(
-		      child: Text('Логин', style: RTFontStyle.loginLabels.value),
 		      padding: EdgeInsets.only(left: 10, bottom: 5),
+		      child: Text('Логин', style: RTFontStyle.loginLabels.value),
 		      ),
 		    LoginField(controller: loginController),
 		    const SizedBox(height: 12),
 		    Container(
-		      child: Text('Пароль',style: RTFontStyle.loginLabels.value),
 		      padding: EdgeInsets.only(left: 10, bottom: 5),
+		      child: Text('Пароль',style: RTFontStyle.loginLabels.value),
 		    ),
 		    PasswordField(controller: passwordController),
 		    const SizedBox(height: 16),
@@ -102,6 +103,32 @@ class _LoginPageState extends State<LoginPage> {
 		        child: Text('Войти', style: TextStyle(fontSize: 18)),
 		      ),
 		    ),
+        const SizedBox(height: 12),
+       
+        SizedBox(
+          width: double.infinity,
+          child: TextButton(
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (_) => const ChangePasswordPage(),
+                ),
+              );
+            },
+            style: TextButton.styleFrom(
+              alignment: Alignment.topRight,
+              padding: EdgeInsets.zero,
+              minimumSize: Size.zero,
+              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            ),
+            child: Text(
+              'Изменить пароль',
+              style: RTFontStyle.loginLabels.value.copyWith(
+                fontSize: 15,
+              ),
+            ),
+          ),
+        ),
 		  ],
 		),
 	      ),

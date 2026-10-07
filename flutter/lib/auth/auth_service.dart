@@ -12,9 +12,12 @@ class AuthService {
   }) async {
     final response = await http.post(
       Uri.parse('$baseURL/auth/login'),
-      headers: {'Content-Type': 'application/json'},
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      },
       body: jsonEncode({
-	'email': email + '@rt-techpriemka.ru',
+	'email': email,
 	'password': password,
       }),
     );
@@ -23,6 +26,30 @@ class AuthService {
       return jsonDecode(response.body);
     } else {
       throw Exception('Login failed');
+    }
+  }
+
+  Future<void> changePassword({
+    required String email,
+    required String currentPassword,
+    required String newPassword
+  }) async {
+    final response = await http.post(
+      Uri.parse('$baseURL/auth/change_pass'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      },
+      body: jsonEncode({
+	'email': email,
+	'current_password': currentPassword,
+  'new_password': newPassword,
+      }),
+    );
+    if (response.statusCode < 200 || response.statusCode >= 300) {
+      throw Exception(
+      'Failed to change password: ${response.statusCode}',
+      );
     }
   }
   

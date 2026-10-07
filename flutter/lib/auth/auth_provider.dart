@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
 import 'auth_service.dart';
 import 'auth_state.dart';
@@ -45,6 +44,23 @@ class AuthProvider extends ChangeNotifier {
 
     status = AuthStatus.authenticated;
     notifyListeners();
+  }
+
+
+  Future<void> changePassword(String email, String currentPassword, String newPassword) async {
+    await _authService.changePassword(
+      email: email,
+      currentPassword: currentPassword,
+      newPassword: newPassword,
+    );
+
+    //await _tokenStorage.saveTokens(
+    //  accessToken: result['access_token'],
+    //  refreshToken: result['refresh_token'],
+    //);
+
+    //status = AuthStatus.authenticated;
+    //notifyListeners();
   }
 
   Future<void> logout() async {
