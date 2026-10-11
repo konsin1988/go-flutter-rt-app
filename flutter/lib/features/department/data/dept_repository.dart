@@ -1,5 +1,4 @@
 import 'package:graphql_flutter/graphql_flutter.dart';
-import 'package:flutter/material.dart';
 
 import 'dept_queries.dart';
 import 'dept_models.dart';

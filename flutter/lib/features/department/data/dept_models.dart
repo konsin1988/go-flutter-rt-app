@@ -1,5 +1,3 @@
-import 'package:rt_app/features/user/data/user_models.dart';
-
 class Department {
   final int id;
   final String name;
@@ -51,34 +49,42 @@ class DeptById {
   final int id;
   final String name;
   final int? parent;
-  final String? parent_name;
+  final String? parentName;
   final int? head;
-  final String? head_fio;
+  final String? headFio;
 
   final List<DeptUser> deptUsers;
+  final List<Department> childDeptList;
   
   DeptById({
     required this.id,
     required this.name,
     this.parent,
-    this.parent_name,
+    this.parentName,
     this.head,
-    this.head_fio,
+    this.headFio,
     required this.deptUsers,
+    required this.childDeptList,
   });
 
   factory DeptById.fromJson(Map<String, dynamic> json) {
     return DeptById(
       id: json['id'] as int,
       name: json['name'] as String,
-      parent: json['parent'] as int?,
-      parent_name: json['parentName'] as String?,
+      //parent: json['parent'] as int?,
+      parent: (json['parent'] as num?)?.toInt(),
+      //parentName: json['parentName'] as String?,
+      parentName: (json['parentName'] ?? json['parent_name']) as String?,
       head: json['head'] as int?,
-      head_fio: json['headFIO'] as String?,
+      headFio: json['headFIO'] as String?,
       
       deptUsers: (json['deptUserList'] as List?)
 	  ?.map((e) => DeptUser.fromJson(e as Map<String, dynamic>))
 	  .toList() ?? <DeptUser>[],
+
+      childDeptList: (json['childDeptList'] as List?)
+	  ?.map((e) => Department.fromJson(e as Map<String, dynamic>))
+	  .toList() ?? <Department>[],
     );
   }
 }

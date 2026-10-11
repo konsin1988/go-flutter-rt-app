@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
 
-import 'package:rt_app/style/colors.dart';
-import 'package:rt_app/style/fonts.dart';
-
 
 class FullScreenImagePage extends StatelessWidget {
   final String imageUrl;

@@ -6,26 +6,22 @@ import '../screens/login/login_page.dart';
 import '../providers/protected_providers.dart';
 import '../auth/auth_provider.dart';
 import '../auth/auth_state.dart';
-import '../../widgets/app_top_bar.dart';
-import 'package:rt_app/features/user/state/user_provider.dart';
+//import 'package:rt_app/features/user/state/user_provider.dart';
 
 import 'package:rt_app/screens/home/home_page.dart';
 import 'package:rt_app/screens/ai/ai_page.dart';
 import 'package:rt_app/screens/services/services_page.dart';
 import 'package:rt_app/screens/profile/profile_page.dart';
-import 'package:rt_app/screens/profile/UserPage.dart';
+import 'package:rt_app/screens/profile/user_page.dart';
 import 'package:rt_app/screens/init/init_page.dart';
 import 'package:rt_app/screens/assistant/assistant_page.dart';
 import 'package:rt_app/screens/absence/absence_page.dart';
 import 'package:rt_app/screens/department/department_page.dart';
-import 'package:rt_app/screens/profile/widgets/FullScreenImagePage.dart';
+import 'package:rt_app/screens/profile/widgets/full_screen_image_page.dart';
 
 
 import '../utils/constants.dart';
 import '../widgets/bottom_nav_scaffold.dart';
-
-import '../../style/colors.dart';
-import '../../style/fonts.dart';
 
 GoRouter createAppRouter(BuildContext context) {
   final authProvider = context.read<AuthProvider>();
@@ -133,8 +129,8 @@ GoRouter createAppRouter(BuildContext context) {
               GoRoute(
                 path: AppRoutes.profile,
                 pageBuilder: (context, state) {
-		  final userProvider = context.watch<UserProvider>();
-		  final user = userProvider.authUser; 
+		  // final userProvider = context.watch<UserProvider>();
+		  // final user = userProvider.authUser; 
 		  return CustomTransitionPage(
 		    key: state.pageKey,
     		    transitionDuration: const Duration(milliseconds: 200), 

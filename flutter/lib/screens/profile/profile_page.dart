@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import 'package:rt_app/features/user/data/user_models.dart';
 import 'package:rt_app/features/user/state/user_provider.dart';
-import 'widgets/UserInfo.dart';
+import 'widgets/user_info.dart';
 
 
 class ProfilePage extends StatelessWidget {

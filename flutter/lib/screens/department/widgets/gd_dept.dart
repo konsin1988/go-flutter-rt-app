@@ -1,23 +1,20 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:rt_app/graphql/graphql_service.dart';
 
-import 'package:rt_app/utils/constants.dart';
-import 'package:rt_app/features/department/data/dept_models.dart';
 import 'package:rt_app/features/user/data/user_repository.dart';
 import 'package:rt_app/features/user/data/user_models.dart';
 import 'package:rt_app/style/colors.dart';
 import 'package:rt_app/style/fonts.dart';
 
-class GDField extends StatelessWidget {
-  const GDField({
+class GDDept extends StatelessWidget {
+  const GDDept ({
     super.key,
   });
 
   @override
   Widget build(BuildContext context) {
-    final SW = MediaQuery.of(context).size.width;
-    final SH = MediaQuery.of(context).size.height;
+    final sw = MediaQuery.of(context).size.width;
+    final sh = MediaQuery.of(context).size.height;
     final repo = UserRepository(GraphQLService().client);
     
     return FutureBuilder<User>(
@@ -42,8 +39,8 @@ class GDField extends StatelessWidget {
     	  children: [
     	    const Spacer(flex:1),
     	    Container(
-    	      width: SW * 0.4,
-    	      height: SW * 0.4,
+    	      width: sw * 0.4,
+    	      height: sw * 0.4,
     	      padding: const EdgeInsets.all(4),
     	      decoration: BoxDecoration(
     	        shape: BoxShape.circle, 
@@ -66,18 +63,18 @@ class GDField extends StatelessWidget {
     	    Column(
     	      crossAxisAlignment: CrossAxisAlignment.start,
     	      children: [
-    	        SizedBox(height: SH * 0.02),
-    	        Text('${user.lastName}'),
+    	        SizedBox(height: sh * 0.02),
+    	        Text(user.lastName),
     	        Row(
     	          children: [
     	    	SizedBox(width:15),
-    	            Text('${user.firstName}'),
+    	            Text(user.firstName),
     	               ],
     	        ),
     	        Row(
     	          children: [
     	    	SizedBox(width:5),
-    	    	Text('${user.secondName}'),
+    	    	Text(user.secondName),
     	          ],
     	        ),
     	        SizedBox(height:20),
@@ -87,7 +84,7 @@ class GDField extends StatelessWidget {
     	            SizedBox(width:10),
     	        	Text(
     	    	  user.birthday != null ? '${user.birthday}' : '',
-    	    	  style: RTFontStyle.appTitle.value.copyWith(fontSize: SW * 0.05),
+    	    	  style: RTFontStyle.appTitle.value.copyWith(fontSize: sw * 0.05),
     	    	),
     	          ],
     	        ),

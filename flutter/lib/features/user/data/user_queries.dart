@@ -33,7 +33,7 @@ class UserQueries {
 	lastName
 	firstName
 	secondName
-        email
+  email
 	birthday	
 	photoURL
 	mobile	

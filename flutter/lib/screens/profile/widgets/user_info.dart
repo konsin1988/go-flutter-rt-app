@@ -4,10 +4,11 @@ import 'package:go_router/go_router.dart';
 import 'package:rt_app/features/user/data/user_models.dart';
 import 'package:rt_app/style/colors.dart';
 import 'package:rt_app/style/fonts.dart';
-import 'TextFields.dart';
-import 'PhoneField.dart';
-import 'DepartmentField.dart';
-import 'EmailField.dart';
+import 'phone_field.dart';
+import 'email_field.dart';
+
+import 'package:rt_app/screens/widgets/title_field.dart';
+import 'package:rt_app/screens/widgets/value_field.dart';
 
 class UserInfo extends StatelessWidget {
   final User user;
@@ -19,8 +20,8 @@ class UserInfo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final SW = MediaQuery.of(context).size.width;
-    final SH = MediaQuery.of(context).size.height;
+    final sw = MediaQuery.of(context).size.width;
+    final sh = MediaQuery.of(context).size.height;
     
     return Column(
       children: [
@@ -34,8 +35,8 @@ class UserInfo extends StatelessWidget {
 	    context.push('/image', extra: user.photoURL);
 	  },
 	  child: Container(
-    	    width: SW * 0.4,
-    	    height: SW * 0.4,
+    	    width: sw * 0.4,
+    	    height: sw * 0.4,
     	    padding: const EdgeInsets.all(4),
     	    decoration: BoxDecoration(
     	      shape: BoxShape.circle, 
@@ -59,18 +60,18 @@ class UserInfo extends StatelessWidget {
     	Column(
     	  crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-    	    SizedBox(height: SH * 0.02),
-    	    Text('${user.lastName}'),
+    	    SizedBox(height: sh * 0.02),
+    	    Text(user.lastName),
     	    Row(
     	      children: [
     		SizedBox(width:15),
-    	        Text('${user.firstName}'),
+    	        Text(user.firstName),
     	           ],
     	    ),
     	    Row(
     	      children: [
     		SizedBox(width:5),
-    		Text('${user.secondName}'),
+    		Text(user.secondName),
     	      ],
     	    ),
     	    SizedBox(height:20),
@@ -79,8 +80,8 @@ class UserInfo extends StatelessWidget {
     	        Icon(Icons.cake, size: 25, color: RTColorStyle.beige600.value),
     	        SizedBox(width:10),
                 	Text(
-    		  user.birthday != null ? '${user.birthday}' : '',
-    		  style: RTFontStyle.appTitle.value.copyWith(fontSize: SW * 0.05),
+    		  user.birthday ?? '',
+    		  style: RTFontStyle.appTitle.value.copyWith(fontSize: sw * 0.05),
     		),
     	      ],
     	    ),
@@ -95,7 +96,7 @@ class UserInfo extends StatelessWidget {
         const Spacer(flex: 1),
         
         Padding(
-          padding: EdgeInsets.only(left: 16, bottom: SH * 0.01),
+          padding: EdgeInsets.only(left: 16, bottom: sh * 0.01),
           child: Text(
     	"Основная информация",
     	style: RTFontStyle.appTitle.value 
@@ -103,17 +104,33 @@ class UserInfo extends StatelessWidget {
         ),
     
         /// -------- Section 2 --------
-        Container(
+        SizedBox(
           width: double.infinity,
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              DepartmentField(departmentList: user.deptList),
-	      TextFields(field: 'Должность:', value: '${user.position}'),
-              TextFields(field: 'Рабочий телефон:', value: user.inner != null ? '${user.inner}' : ''),
-              PhoneField(field: 'Мобильный телефон:', value: user.mobile != null ? '${user.mobile}' : ''),
-              EmailField(field: 'Электронная почта:', value: '${user.email}'),
-              //LinkableField(field: 'Руководитель:', value: '${user.headList[0].fio}'),
+              TitleField(title: 'Департамент'),
+	            ...List.generate(
+	                user.deptList.length,
+	                (index) {
+	                  final dept = user.deptList[index];
+	                  return ValueField(id: dept.id, title: dept.name, link: '/profile/department');
+              }),
+
+              TitleField(title: 'Должность'),
+              ValueField(title: user.position!),
+
+              user.inner != null 
+              ? Column(
+                  children: [
+                    TitleField(title: 'Рабочий телефон'),
+                    ValueField(title: user.inner!),
+              ])
+              : const SizedBox.shrink(),
+
+              user.mobile != null && user.mobile != ''
+                ? PhoneField(field: 'Мобильный телефон:', value: user.mobile != null ? '${user.mobile}' : '')
+                : const SizedBox.shrink(),
+              EmailField(field: 'Электронная почта:', value: user.email),
             ],
           ),
         ),

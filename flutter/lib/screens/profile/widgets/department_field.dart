@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-import 'package:rt_app/utils/constants.dart';
 import 'package:rt_app/features/department/data/dept_models.dart';
-import 'package:rt_app/style/colors.dart';
 import 'package:rt_app/style/fonts.dart';
 
 class DepartmentField extends StatelessWidget {
@@ -25,7 +23,7 @@ class DepartmentField extends StatelessWidget {
 	  padding: EdgeInsets.only(left: SW * 0.06),
 	  child: Text(
 	    'Департамент',
-	    style: RTFontStyle.ProfileField.value 
+	    style: RTFontStyle.ProfileField.value.copyWith(fontSize: 13)
 	  ),
 	),
 	...List.generate(

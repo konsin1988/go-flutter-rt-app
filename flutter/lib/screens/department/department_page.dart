@@ -1,16 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:graphql_flutter/graphql_flutter.dart';
 
-import 'package:rt_app/style/colors.dart';
 import 'package:rt_app/style/fonts.dart';
-import 'package:rt_app/features/department/data/dept_queries.dart';
 import 'package:rt_app/features/department/data/dept_models.dart';
 import 'package:rt_app/features/department/data/dept_repository.dart';
 import 'package:rt_app/graphql/graphql_service.dart';
-import 'widgets/DepartmentField.dart';
-import 'widgets/UserField.dart';
-import 'widgets/DeptUserTile.dart';
-import 'widgets/GDField.dart';
+import 'package:rt_app/screens/widgets/title_field.dart';
+import 'package:rt_app/screens/widgets/value_field.dart';
+
+import 'widgets/deptUserTile.dart';
 
 class DepartmentPage extends StatelessWidget {
   final int departmentId;
@@ -23,8 +20,8 @@ class DepartmentPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
-    final SW = MediaQuery.of(context).size.width;
-    final SH = MediaQuery.of(context).size.height;
+    final sw = MediaQuery.of(context).size.width;
+    final sh = MediaQuery.of(context).size.height;
     final repo = DeptRepository(GraphQLService().client);
 
     return FutureBuilder<DeptById>(
@@ -43,38 +40,48 @@ class DepartmentPage extends StatelessWidget {
 
 	final dept = snapshot.data!;
 
-	final department = Department(
-	  id: dept.id,
-	  name: dept.name.toString(),
-	  parent: dept.parent,
-	  head: dept.head,
-	);
-
-
-	return Container(
+	return SizedBox(
 	  width: double.infinity,
 	  height: double.infinity,
 	  child: Column( 
 	    children: [
 	      Padding(
-	        padding: EdgeInsets.symmetric(horizontal: SW * 0.08, vertical: SH * 0.015),
+	        padding: EdgeInsets.symmetric(horizontal: sw * 0.08, vertical: sh * 0.018),
 	        child: Center(
-		  child: Text(
-		    dept.name,
-		    style: RTFontStyle.h2.value.copyWith(fontSize: 20), 
-		  ),
-		),
+		        child: Text(
+		          dept.name,
+		          style: RTFontStyle.h2.value.copyWith(fontSize: 20), 
+		        ),
+		      ),
 	      ),
-	      dept.id == 108  
-		?  Padding(
-		    padding: EdgeInsets.only(top: SH * 0.01), 
-		    child: GDField(),
-		    )
-		: UserField(user_id: dept.head ?? 0, name: dept.head_fio ?? ''),
-	      dept.parent != null 
-		    ? DepartmentField(id: dept.parent!, deptName: dept.parent_name!) 
-		    : Text(''), 
+	      // dept.id == 108  
+		    //?  GDDept()
+		    //: UserField(user_id: dept.head ?? 0, name: dept.headFio ?? ''),
+        TitleField(title: 'Руководитель'),
+        ValueField(id: dept.head!, title: dept.headFio!, link: '/profile/user'),
+        SizedBox(height: sh * 0.013),
+
+	      dept.parent != null && dept.parent != 0 
+		      ? Column(
+              children: [ 
+                TitleField(title: 'Вышестоящий департамент'),
+                ValueField(id: dept.parent!, title: dept.parentName!, link: '/profile/department')
+              ])
+          : const SizedBox.shrink(),
+        SizedBox(height: sh * 0.013),
+
+        dept.childDeptList.isNotEmpty 
+		      ? Column(
+            children: [ 
+              TitleField(title: 'Дочерние департаменты'),
+              for (var dept in dept.childDeptList)
+                ValueField(id: dept.id, title: dept.name, link: '/profile/department'),
+              SizedBox(height: sh * 0.013),
+          ])
+          : const SizedBox.shrink(),
+
 	      const Divider(),
+
 
 	      Expanded(
 	        child: ListView.builder(
@@ -84,12 +91,11 @@ class DepartmentPage extends StatelessWidget {
       	          },
       	        ),
       	      ),
-	    ],
-	  ),
-	);
+	          ],
+	        ),
+	      );
       }
     );
-    
   }
 }
 
