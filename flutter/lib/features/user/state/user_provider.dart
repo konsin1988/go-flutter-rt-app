@@ -11,9 +11,16 @@ class UserProvider extends ChangeNotifier{
   User? _authUser;
   User? _currentUser;
   bool loading = false;
+  String _searchPath = '';
 
   User? get authUser => _authUser;
   User? get currentUser => _currentUser;
+  String get searchPath => _searchPath;
+
+  void setSearchPath(String value) {
+    _searchPath = value;
+    notifyListeners();
+  }
 
   UserProvider(this._repo){
     loadMe();

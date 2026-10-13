@@ -17,22 +17,22 @@ class UserPage extends StatelessWidget {
     return FutureBuilder<User>(
       future: repo.userById(userId),
       builder: (context, snapshot) {
-	if (snapshot.connectionState == ConnectionState.waiting) {
-	  return const Center(child: CircularProgressIndicator());
-	}
+	      if (snapshot.connectionState == ConnectionState.waiting) {
+	        return const Center(child: CircularProgressIndicator());
+	      }
 
-	if (snapshot.hasError) {
-	  return Center(child: Text(snapshot.error.toString()));
-	}
-	if (!snapshot.hasData) {
-	  return const Center(child: Text('User not found'));
-	}
+	      if (snapshot.hasError) {
+	        return Center(child: Text(snapshot.error.toString()));
+	      }
+	      if (!snapshot.hasData) {
+	        return const Center(child: Text('User not found'));
+	      }
 
-	final user = snapshot.data!;
+	      final user = snapshot.data!;
 
-	return Center(
-	  child: UserInfo(user: user),
-	);
+	      return Center(
+	        child: UserInfo(user: user),
+	      );
       }
     );
   }

@@ -1,69 +1,99 @@
 import 'package:go_router/go_router.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:rt_app/features/user/state/user_provider.dart';
 
 import 'package:rt_app/auth/auth_provider.dart';
-import '../../style/colors.dart';
-import '../../style/fonts.dart';
-import '../utils/constants.dart';
+import 'package:rt_app/style/colors.dart';
+import 'package:rt_app/style/fonts.dart';
+
+import './search_text_field.dart';
 
 class AppTopBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
 
   const AppTopBar({
     super.key,
+    this.onSearchChanged,
+    this.isProfile = false,
+    this.searchMode = false,
     required this.title,
   });
 
+  final bool searchMode;
+  final bool isProfile;
+  final ValueChanged<String>? onSearchChanged;
+
   @override
   Widget build(BuildContext context) {
-    final SW = MediaQuery.of(context).size.width;
-    final SH = MediaQuery.of(context).size.height;
 
-    Future<void> _onLogoutPressed() async {
+    Future<void> onLogoutPressed() async {
       try {
         final auth = Provider.of<AuthProvider>(context, listen: false);
         await auth.logout();
+
       } catch (e) {
+        if (!context.mounted) return;
+
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Logout failed')),
         );
       } 
     }
 
-    List<String> assistantTitles = ['Ваш ассистент', 'Главная', 'Профиль'];
+    Future<void>searchPressed()async{
+      context.read<UserProvider>().setSearchPath('');
+      context.push('/profile/search-users');
+    }
+
+    //List<String> assistantTitles = ['Ваш ассистент', 'Главная', 'Профиль'];
     return AppBar(
       centerTitle: true,
-      backgroundColor: RTColorStyle.dark1000.value,
+      backgroundColor: searchMode
+      ? RTColorStyle.dark1000.value.withValues(alpha: 0.3)
+      : RTColorStyle.dark1000.value,
       iconTheme: IconThemeData(
         color: RTColorStyle.beige1000.value,
       ),
       leading: title == 'Ваш ассистент' 
-	? null
-	: IconButton(
-	  icon: const Icon(Icons.arrow_back),
-      	  color: RTColorStyle.beige1000.value,
-      	  onPressed: () {
-      	    if (context.canPop()) {
-      	      context.pop();
-      	    }
-      	  },
-      	),
-      title: Text(
-	title,
-	style: RTFontStyle.appTitle.value 
-      ),
+	      ? null
+	      : IconButton(
+	          icon: const Icon(Icons.arrow_back),
+      	    color: RTColorStyle.beige1000.value,
+      	    onPressed: () {
+      	      if (context.canPop()) {
+      	        context.pop();
+      	      }
+      	    },
+      	  ),
+
+      title: searchMode
+      ? SearchTextField()
+      : Text(
+	        title,
+	        style: RTFontStyle.appTitle.value 
+        ),
+
       actions: [
-	Padding(
-	  padding: EdgeInsets.only(right: 12),
-	  child: IconButton(
-    	    icon: Icon(
-	      Icons.logout,
-	      color: RTColorStyle.beige1000.value,
+        if (isProfile)
+          IconButton(
+            icon: Icon(
+              Icons.search,
+              color: RTColorStyle.beige1000.value,
+            ),
+            tooltip: 'Search users',
+            onPressed: searchPressed
+          ),
+	      Padding(
+	        padding: EdgeInsets.only(right: 12),
+	        child: IconButton(
+    	      icon: Icon(
+	          Icons.logout,
+	          color: RTColorStyle.beige1000.value,
+	        ),
+    	    onPressed: onLogoutPressed 
+    	    ),
 	      ),
-    	    onPressed: _onLogoutPressed 
-    	  ),
-	),
       ],
     );
   }

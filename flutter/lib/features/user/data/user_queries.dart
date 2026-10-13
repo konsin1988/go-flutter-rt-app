@@ -52,5 +52,14 @@ class UserQueries {
       }
     }
   ''';
-}
 
+  static const String getSearchUsers = r'''
+    query GetSearchUsers($search_path: String!, $offset: Int!){
+      GetSearchUsers(search_path: $search_path, offset: $offset) {
+	      id
+        fio
+        photoURL
+      }
+    }
+  ''';
+}

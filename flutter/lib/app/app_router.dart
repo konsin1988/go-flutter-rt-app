@@ -18,6 +18,7 @@ import 'package:rt_app/screens/assistant/assistant_page.dart';
 import 'package:rt_app/screens/absence/absence_page.dart';
 import 'package:rt_app/screens/department/department_page.dart';
 import 'package:rt_app/screens/profile/widgets/full_screen_image_page.dart';
+import 'package:rt_app/screens/search_user/search_user_page.dart';
 
 
 import '../utils/constants.dart';
@@ -93,27 +94,27 @@ GoRouter createAppRouter(BuildContext context) {
               GoRoute(
                 path: AppRoutes.ai,
                 pageBuilder: (context, state) {
-		  return NoTransitionPage(
-		    child: AIPage(),
-		  );
-		},
+		              return NoTransitionPage(
+		                child: AIPage(),
+		              );
+		            },
               ),
-	      GoRoute(
-  	        path: AppRoutes.assistant,
+	            GoRoute(
+  	            path: AppRoutes.assistant,
                 pageBuilder: (context, state) {
-		  return NoTransitionPage(
-      	            child: AssistantPage(),
-		  );
-		},
-	      ),
-	      GoRoute(
-  	        path: AppRoutes.absence,
-                pageBuilder: (context, state) {
-		  return NoTransitionPage(
-      	            child: AbsencePage(),
-		  );
-		},
-	      ),
+		              return NoTransitionPage(
+                  	child: AssistantPage(),
+		              );
+		            },
+	            ),
+	            GoRoute(
+  	            path: AppRoutes.absence,
+                  pageBuilder: (context, state) {
+		                return NoTransitionPage(
+                    	child: AbsencePage(),
+		                );
+		              },
+	              ),
             ],
           ),
           StatefulShellBranch(
@@ -129,45 +130,52 @@ GoRouter createAppRouter(BuildContext context) {
               GoRoute(
                 path: AppRoutes.profile,
                 pageBuilder: (context, state) {
-		  // final userProvider = context.watch<UserProvider>();
-		  // final user = userProvider.authUser; 
-		  return CustomTransitionPage(
-		    key: state.pageKey,
-    		    transitionDuration: const Duration(milliseconds: 200), 
-    		    child: ProfilePage(),
-    		    transitionsBuilder: (context, animation, secondaryAnimation, child) {
-    		      return SlideTransition(
-    		        position: Tween<Offset>(
-    		          begin: const Offset(1.0, 0.0),
-    		          end: Offset.zero,
-    		        ).animate(animation),
-    		        child: child,
-    		      );
-    		    },
-    		  );
-		},
-		routes: [
-		  GoRoute(
-      		    path: 'department/:id',
-		    pageBuilder: (context, state) {
-      		      final idString = state.pathParameters['id']!;
-      		      final departmentId = int.tryParse(idString)!;
-		      return NoTransitionPage(
+		              return CustomTransitionPage(
+		                key: state.pageKey,
+    		            transitionDuration: const Duration(milliseconds: 200), 
+    		            child: ProfilePage(),
+    		            transitionsBuilder: (context, animation, secondaryAnimation, child) {
+    		              return SlideTransition(
+    		                position: Tween<Offset>(
+    		                  begin: const Offset(1.0, 0.0),
+    		                  end: Offset.zero,
+    		                ).animate(animation),
+    		                child: child,
+    		              );
+    		            },
+    		          );
+		            },
+		            routes: [
+		              GoRoute(
+      		          path: 'department/:id',
+		                pageBuilder: (context, state) {
+      		            final idString = state.pathParameters['id']!;
+      		            final departmentId = int.tryParse(idString)!;
+		                  return NoTransitionPage(
       	                child: DepartmentPage(departmentId: departmentId),
-		      );
-		    },
-      		  ),
-		  GoRoute(
-      		    path: 'user/:id',
-		    pageBuilder: (context, state) {
-      		      final idString = state.pathParameters['id']!;
-      		      final userId = int.tryParse(idString)!;
-		      return NoTransitionPage(
-      	                child: UserPage(userId: userId),
-		      );
-		    },
-      		  ),
-		],
+		                  );
+		                },
+      		        ),
+		              GoRoute(
+                  	path: 'user/:id',
+		                pageBuilder: (context, state) {
+                  		final idString = state.pathParameters['id']!;
+                  		final userId = int.tryParse(idString)!;
+		                  return NoTransitionPage(
+                  	    child: UserPage(userId: userId),
+		                  );
+		                },
+                  ),
+		              GoRoute(
+                  	path: 'search-users',
+                    //builder: (context, state) => const SearchUserPage(),
+		                pageBuilder: (context, state) {
+		                  return NoTransitionPage(
+                  	    child: SearchUserPage(),
+		                  );
+		                },
+                  ),
+		            ],
               ),
             ],
           ),

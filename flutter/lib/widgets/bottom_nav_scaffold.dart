@@ -4,7 +4,6 @@ import 'package:provider/provider.dart';
 import '../../features/user/state/user_provider.dart';
 
 import '../utils/constants.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import '../../widgets/app_top_bar.dart';
 import '../../style/colors.dart';
 import '../../style/fonts.dart';
@@ -15,8 +14,8 @@ class BottomNavScaffold extends StatelessWidget {
   final StatefulNavigationShell navigationShell;
 
   const BottomNavScaffold ({
-    super.key,
     required this.navigationShell,
+    super.key,
   });
 
   void _onTap(int index) {
@@ -35,7 +34,6 @@ class BottomNavScaffold extends StatelessWidget {
       return "Департамент";
     }
     return AppBarTitles.tabTitles[navigationShell.currentIndex];
-    return 'aa';
   }
 
   
@@ -50,28 +48,38 @@ class BottomNavScaffold extends StatelessWidget {
     final imageSize = SW * 0.07;
     final imageActiveSize = SW * 0.068;
 
+    final isUserSearch = location.endsWith('search-users');
+    final isProfile = location.contains('profile') && !location.contains('department');
+
     return Scaffold(
       body: DefaultTextStyle(
         style: RTFontStyle.h2.value, 
         child: navigationShell,
       ),
       appBar: AppTopBar(
-	title: appBarTitle(location),
-      ),
+	          title: appBarTitle(location),
+            searchMode: isUserSearch,
+            isProfile: isProfile,
+            //onSearchChanged: isUserSearch
+            //  ? (query) => context.read<UserProvider>().searchUsers(query)
+            //  : null,
+            ),
       drawer: AiDrawer(),
-      drawerScrimColor: Colors.black.withOpacity(0.5),
+      drawerScrimColor: Colors.black.withValues(alpha: 0.5),
       backgroundColor: RTColorStyle.dark900.value,
-      bottomNavigationBar: BottomNavigationBar(
-	currentIndex: navigationShell.currentIndex,
-      	type: BottomNavigationBarType.fixed,
-      	onTap: _onTap,
-      	backgroundColor: RTColorStyle.dark1000.value,
-      	selectedLabelStyle: tabbarStyle,
-      	selectedItemColor: RTColorStyle.beige1000.value,
-      	unselectedItemColor: RTColorStyle.light800.value,
-      	unselectedLabelStyle: tabbarStyle,
-      	iconSize: 22,
-      	items: [
+      bottomNavigationBar: isUserSearch
+        ? null
+        : BottomNavigationBar(
+	        currentIndex: navigationShell.currentIndex,
+      	  type: BottomNavigationBarType.fixed,
+      	  onTap: _onTap,
+      	  backgroundColor: RTColorStyle.dark1000.value,
+      	  selectedLabelStyle: tabbarStyle,
+      	  selectedItemColor: RTColorStyle.beige1000.value,
+      	  unselectedItemColor: RTColorStyle.light800.value,
+      	  unselectedLabelStyle: tabbarStyle,
+      	  iconSize: 22,
+      	  items: [
 	  buildNavItem(
 	      assetPath: AppIcons.home,
   	      label: 'Главная',
@@ -90,7 +98,7 @@ class BottomNavScaffold extends StatelessWidget {
   	      imageSize: imageSize,
   	      imageActiveSize: imageActiveSize,
 	  ),
-      	  BottomNavigationBarItem(
+    BottomNavigationBarItem(
 	    icon: Container(
 		  width: SW * 0.075,
 		  height: SW * 0.075,
@@ -106,19 +114,19 @@ class BottomNavScaffold extends StatelessWidget {
                     backgroundImage: NetworkImage(
 		      '${user?.photoURL}',
                     ),
+		    ),
 		  ),
-		),
 	    activeIcon: Container(
 		  width: SW * 0.075,
 		  height: SW * 0.075,
 		  padding: const EdgeInsets.all(1),
 		  decoration: BoxDecoration(
-  		    shape: BoxShape.circle, 
-  		    border: Border.all(
-  		      color: RTColorStyle.beige900.value,
-  		      width: 1
-  		    ),
+  		  shape: BoxShape.circle, 
+  		  border: Border.all(
+  		    color: RTColorStyle.beige900.value,
+  		    width: 1
   		  ),
+  		),
 		  child: CircleAvatar(
                     backgroundImage: NetworkImage(
 		      '${user?.photoURL}',
@@ -128,7 +136,7 @@ class BottomNavScaffold extends StatelessWidget {
       	    label: 'Профиль',
 	  ),
 	],
-      ), 
+      ),
     );
   }
 }

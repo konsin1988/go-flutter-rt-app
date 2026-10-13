@@ -3,7 +3,6 @@ import 'package:provider/single_child_widget.dart';
 import 'package:flutter/widgets.dart';
 import 'package:graphql_flutter/graphql_flutter.dart';
 
-import '../graphql/graphql_service.dart';
 import 'package:rt_app/features/user/state/user_provider.dart';
 import 'package:rt_app/features/user/data/user_repository.dart';
 import 'package:rt_app/features/posts/state/post_provider.dart';

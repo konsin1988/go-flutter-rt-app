@@ -70,3 +70,23 @@ class Head {
   }
 }
 
+
+class SearchUser {
+  final int id;
+  final String fio;
+  final String? photoURL;
+
+  SearchUser({
+    required this.id,
+    required this.fio,
+    this.photoURL,
+  });
+
+  factory SearchUser.fromJson(Map<String, dynamic> json) {
+    return SearchUser(
+      id: (json['id'] as num).toInt(),
+      fio: json['fio'] as String,
+      photoURL: json['photoURL'] as String? ?? '',
+    );
+  }
+}
