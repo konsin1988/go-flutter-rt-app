@@ -17,9 +17,10 @@ class GraphQLService {
 
     final AuthLink authLink = AuthLink(
       getToken: () async {
-	final token = TokenStorage().accessToken;
-	if (token == null) return null; 
-	return 'Bearer $token';
+	      //final token = TokenStorage().accessToken;
+	      final token = await TokenStorage().getValidAccessToken();
+	      if (token == null) return null; 
+	      return 'Bearer $token';
       },
     );
 
@@ -31,8 +32,8 @@ class GraphQLService {
         autoReconnect: true,
         inactivityTimeout: Duration(seconds: 30), 
         //inactivityTimeout: null, 
-	delayBetweenReconnectionAttempts: const Duration(seconds: 1),  
-	queryAndMutationTimeout: const Duration(seconds: 45),
+	      delayBetweenReconnectionAttempts: const Duration(seconds: 1),  
+	      queryAndMutationTimeout: const Duration(seconds: 45),
         initialPayload: () async {
 	  String? token;
 	  int attempts = 0;
@@ -50,7 +51,7 @@ class GraphQLService {
   	  }
   	  
   	  return {
-  	    "Authorization": "Bearer ${token}",
+  	    "Authorization": "Bearer $token",
   	  };
         },
       ),

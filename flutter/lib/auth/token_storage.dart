@@ -36,18 +36,23 @@ class TokenStorage {
 
     if (_refreshToken != null) {
       try {
-	final newAccessToken = await authService.getRefreshToken(_refreshToken!);
-	_accessToken = newAccessToken;
-	if (newAccessToken != null) {
-      	  _accessToken = newAccessToken;
-      	  await _storage.write(key: 'access_token', value: newAccessToken);
-      	  return;
-      	}
+	      final result = await authService.getRefreshToken(_refreshToken!);
+        final newAccessToken = result['access_token'] as String?;
+        final newRefreshToken = result['refresh_token'] as String?;
+
+        if (newAccessToken != null) {
+          await saveTokens(
+            accessToken: newAccessToken,
+            // Keep the existing refresh token if the server doesn't return a new one.
+            refreshToken: newRefreshToken ?? _refreshToken!,
+          );
+          return;
+        }
       } catch (e) {
-	_accessToken = null;
-	_refreshToken = null;
-	await clear();
-	onAuthStateChanged?.call();
+	      _accessToken = null;
+	      _refreshToken = null;
+	      await clear();
+	      onAuthStateChanged?.call();
       }
 
     }
@@ -55,18 +60,90 @@ class TokenStorage {
     onAuthStateChanged?.call();
   }
 
-  bool _isAccessTokenExpired(String token) {
-    final parts = token.split('.');
-    if (parts.length != 3) return true;
+  Future<String?> getValidAccessToken() async {
+    if (_accessToken == null) {
+      return null;
+    }
+  
+    if (!_isAccessTokenExpired(_accessToken!)) {
+      return _accessToken;
+    }
+  
+    final refreshed = await refreshAccessToken();
+  
+    if (!refreshed || _accessToken == null) {
+      throw Exception('Unable to refresh access token');
+    }
+  
+    return _accessToken;
+  }
 
-    final payload = json.decode(
-      utf8.decode(base64Url.decode(base64Url.normalize(parts[1]))),
-    );
+  Future<bool> refreshAccessToken() async {
+    if (_refreshToken == null) {
+      return false;
+    }
+  
+    try {
+      final result = await authService.getRefreshToken(_refreshToken!);
+  
+      final newAccessToken = result['access_token'] as String?;
+      final newRefreshToken = result['refresh_token'] as String?;
+  
+      if (newAccessToken == null) {
+        return false;
+      }
+  
+      await saveTokens(
+        accessToken: newAccessToken,
+        refreshToken: newRefreshToken ?? _refreshToken!,
+      );
+  
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
 
-    final exp = payload['exp'];
-    final now = DateTime.now().millisecondsSinceEpoch / 1000;
-
-    return exp == null || now >= exp;
+  bool _isAccessTokenExpired(
+    String token, {
+    Duration buffer = const Duration(seconds: 30),
+  }) {
+    try {
+      final parts = token.split('.');
+  
+      if (parts.length != 3) {
+        return true;
+      }
+  
+      final payload = json.decode(
+        utf8.decode(
+          base64Url.decode(
+            base64Url.normalize(parts[1]),
+          ),
+        ),
+      );
+  
+      if (payload is! Map<String, dynamic>) {
+        return true;
+      }
+  
+      final exp = payload['exp'];
+  
+      if (exp is! num) {
+        return true;
+      }
+  
+      final expiration = DateTime.fromMillisecondsSinceEpoch(
+        (exp * 1000).round(),
+      );
+  
+      return !expiration.isAfter(
+        DateTime.now().add(buffer),
+      );
+    } catch (_) {
+      // A malformed or undecodable token must not be treated as valid.
+      return true;
+    }
   }
 
   Future<void> saveTokens({

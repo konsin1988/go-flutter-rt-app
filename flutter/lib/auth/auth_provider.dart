@@ -22,14 +22,21 @@ class AuthProvider extends ChangeNotifier {
   }
 
   void checkAuthStatus() {
-    final tokenStorage = TokenStorage();
-    if (tokenStorage.accessToken != null) {
-      status = AuthStatus.authenticated;
-    } else {
-      status = AuthStatus.unauthenticated;
-    }
-    notifyListeners(); 
+    status = _tokenStorage.accessToken != null
+        ? AuthStatus.authenticated
+        : AuthStatus.unauthenticated;
+
+    notifyListeners();
   }
+  //void checkAuthStatus() {
+  //  final tokenStorage = TokenStorage();
+  //  if (tokenStorage.accessToken != null) {
+  //    status = AuthStatus.authenticated;
+  //  } else {
+  //    status = AuthStatus.unauthenticated;
+  //  }
+  //  notifyListeners(); 
+  //}
   
   Future<void> login(String email, String password) async {
     final result = await _authService.login(
