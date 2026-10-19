@@ -20,6 +20,7 @@ class _LoginFieldState extends State<LoginField> {
   Widget build(BuildContext context) {
     return TextField(
       controller: widget.controller,
+      autofillHints: const [AutofillHints.username, AutofillHints.email],
       cursorColor: RTColorStyle.light600.value,
       style: RTFontStyle.loginTextField.value,
       decoration: InputDecoration(

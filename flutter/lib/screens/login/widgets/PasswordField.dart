@@ -22,6 +22,7 @@ class _PasswordFieldState extends State<PasswordField> {
     return TextField(
       controller: widget.controller,
       obscureText: _obscureText,
+      autofillHints: const [AutofillHints.password],
       cursorColor: RTColorStyle.light600.value,
       style: RTFontStyle.loginTextField.value,
       decoration: InputDecoration(

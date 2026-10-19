@@ -1,0 +1,14 @@
+services:
+  data_update:
+    build: .
+    image: "konsin1988/rt-app-data_updater:1.0.1"
+    container_name: data_update 
+    env_file:
+      - .env
+    restart: "on-failure:3"
+    networks:
+      - rt-app
+
+networks:
+  rt-app:
+    external: true 
